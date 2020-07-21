@@ -18,7 +18,7 @@ import androidx.core.content.ContextCompat;
 
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static com.zj.views.DPUtils.dp2px;
+import static com.zj.views.ut.DPUtils.dp2px;
 
 /**
  * Created by ZJJ on 2018/5/4.

@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import static com.zj.views.DPUtils.dp2px;
+import static com.zj.views.ut.DPUtils.dp2px;
 
 /**
  * Created by ZJJ on 2018/7/13.
