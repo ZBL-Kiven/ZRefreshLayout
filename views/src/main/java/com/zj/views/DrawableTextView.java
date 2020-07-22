@@ -1,6 +1,7 @@
 package com.zj.views;
 
 import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -12,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.annotation.Nullable;
 
@@ -62,9 +64,31 @@ public class DrawableTextView extends View {
     private float badgeMarginEnd = 0.0f;
     private float badgeMarginTop = 0.0f;
     private float badgeMarginBottom = 0.0f;
+    private int animDuration = 0;
 
     private Paint textPaint;
     private Paint badgeTextPaint;
+
+
+    private DrawableValueAnimator animator;
+    private boolean isSelected = false;
+
+    @Override
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        if (isSelected() == selected) return;
+        isSelected = selected;
+        if (animator == null) {
+            curAnimFraction = isSelected ? 1f : 0f;
+        } else {
+            animator.start(isSelected());
+        }
+        postInvalidate();
+    }
 
     @Target(ElementType.PARAMETER)
     public @interface Orientation {
@@ -93,10 +117,11 @@ public class DrawableTextView extends View {
 
     public DrawableTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context, attrs);
+        initAttrs(context, attrs);
+        initData();
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void initAttrs(Context context, AttributeSet attrs) {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DrawableTextView);
             try {
@@ -118,6 +143,7 @@ public class DrawableTextView extends View {
                 textColorSelect = ta.getColor(R.styleable.DrawableTextView_textColorSelect, textColorSelect);
                 translationTime = ta.getInteger(R.styleable.DrawableTextView_translationTime, translationTime);
                 orientation = ta.getInt(R.styleable.DrawableTextView_orientation, Orientation.left);
+                animDuration = ta.getInt(R.styleable.DrawableTextView_animDuration, 0);
                 gravity = ta.getInt(R.styleable.DrawableTextView_gravity, Gravity.center);
                 badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_badgeEnable, badgeEnable);
                 if (badgeEnable) {
@@ -141,6 +167,9 @@ public class DrawableTextView extends View {
                 ta.recycle();
             }
         }
+    }
+
+    private void initData() {
         textPaint = new Paint();
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(textSize);
@@ -153,6 +182,17 @@ public class DrawableTextView extends View {
             badgeTextPaint.setTextAlign(Paint.Align.CENTER);
         }
         calculationAll();
+        if (animDuration > 0) {
+            animator = new DrawableValueAnimator();
+            animator.setDuration(animDuration);
+            animator.setOnAnimListener(new OnAnimListener() {
+                @Override
+                public void onAnimFraction(float fraction) {
+                    DrawableTextView.this.curAnimFraction = fraction;
+                    postInvalidate();
+                }
+            });
+        }
     }
 
     private PointF textStart, badgeTextStart;
@@ -338,12 +378,6 @@ public class DrawableTextView extends View {
 
     private float curAnimFraction;
 
-    //Use the initData method to generate a gradient animation based on the value of a property state. It is recommended to use it with OnSelectedAnimParent;
-    public void initData(float curAnimationFraction) {
-        this.curAnimFraction = curAnimationFraction;
-        postInvalidate();
-    }
-
     //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
     public void setBadgeText(String text) {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
@@ -360,6 +394,12 @@ public class DrawableTextView extends View {
         this.text = s;
         postInvalidate();
     }
+
+    public void setOrientation(@Orientation int orientation) {
+        this.orientation = orientation;
+        postInvalidate();
+    }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -424,8 +464,71 @@ public class DrawableTextView extends View {
         setMeasuredDimension((int) w, (int) h);
     }
 
-    public void setOrientation(@Orientation int orientation) {
-        this.orientation = orientation;
-        postInvalidate();
+    private interface OnAnimListener {
+        void onAnimFraction(float fraction);
+    }
+
+    private static class DrawableValueAnimator {
+
+        private OnAnimListener onAnimListener;
+        private ValueAnimator valueAnimator;
+
+        private long curDuration;
+        private float curFraction;
+
+        private long maxDuration;
+        private float maxFraction;
+        private long animDuration;
+        private boolean isSelected;
+
+        void setDuration(long duration) {
+            this.animDuration = duration;
+        }
+
+        void setOnAnimListener(OnAnimListener listener) {
+            this.onAnimListener = listener;
+        }
+
+        void start(boolean isSelected) {
+            this.isSelected = isSelected;
+            boolean isRunning = valueAnimator != null && valueAnimator.isRunning();
+            if (valueAnimator != null) valueAnimator.cancel();
+            if (valueAnimator == null || !valueAnimator.isRunning()) {
+                valueAnimator = getAnim(isRunning);
+                valueAnimator.start();
+                return;
+            }
+
+            valueAnimator = getAnim(true);
+            valueAnimator.start();
+        }
+
+        private ValueAnimator getAnim(boolean isRunning) {
+            maxFraction = isRunning ? curFraction : 1.0f;
+            maxDuration = isRunning ? curDuration : animDuration;
+            ValueAnimator animator = new ValueAnimator();
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            setValues(animator);
+            setListener(animator);
+            return animator;
+        }
+
+        private void setValues(ValueAnimator animator) {
+            curFraction = 0;
+            curDuration = 0;
+            animator.setDuration(maxDuration);
+            animator.setFloatValues(0.0f, maxFraction);
+        }
+
+        private void setListener(ValueAnimator animator) {
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    curDuration = Math.min(animDuration, animation.getCurrentPlayTime());
+                    curFraction = isSelected ? animation.getAnimatedFraction() : Math.max(0, maxFraction - animation.getAnimatedFraction());
+                    if (onAnimListener != null) onAnimListener.onAnimFraction(curFraction);
+                }
+            });
+        }
     }
 }

@@ -31,6 +31,7 @@
         <attr name="badgeMarginEnd" format="dimension" />
         <attr name="badgeMarginTop" format="dimension" />
         <attr name="badgeMarginBottom" format="dimension" />
+        <attr name="animDuration" format="integer" />
         <attr name="badgeInGravity" format="flags">
             <flag name="LEFT" value="2" />
             <flag name="TOP" value="4" />
@@ -51,38 +52,5 @@
             <flag name="BOTTOM" value="16" />
             <flag name="CENTER" value="1" />
         </attr>
-    </declare-styleable>
-
-    <declare-styleable name="SimpleCusLayoutView">
-        <attr name="vDrawable" format="reference|color" />
-        <attr name="vText" format="reference|string" />
-        <attr name="vWidth" format="dimension" />
-        <attr name="vHeight" format="dimension" />
-        <attr name="vPadding" format="dimension" />
-        <attr name="vTextSize" format="dimension" />
-        <attr name="vTextColor" format="integer|color" />
-        <attr name="vDrawableColor" format="integer|color" />
-    </declare-styleable>
-
-    <declare-styleable name="BaseTitleView">
-        <attr name="l_vDrawable" format="reference|color" />
-        <attr name="l_vText" format="reference|string" />
-        <attr name="l_vWidth" format="float" />
-        <attr name="l_vHeight" format="float" />
-        <attr name="l_vPadding" format="float" />
-        <attr name="l_vTextSize" format="float" />
-        <attr name="l_vTextColor" format="reference|color" />
-        <attr name="l_vDrawableColor" format="reference|color" />
-        <attr name="r_vDrawable" format="reference|color" />
-        <attr name="r_vText" format="reference|string" />
-        <attr name="r_vWidth" format="float" />
-        <attr name="r_vHeight" format="float" />
-        <attr name="r_vPadding" format="float" />
-        <attr name="r_vTextSize" format="float" />
-        <attr name="r_vTextColor" format="reference|color" />
-        <attr name="r_vDrawableColor" format="reference|color" />
-        <attr name="vTitle" format="reference|string" />
-        <attr name="vTitleTextSize" format="float" />
-        <attr name="vTitleTextColor" format="reference|color" />
     </declare-styleable>
 </resources>

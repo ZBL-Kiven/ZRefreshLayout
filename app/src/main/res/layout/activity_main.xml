@@ -9,6 +9,7 @@
     tools:context=".MainActivity">
 
     <com.zj.views.DrawableTextView
+        android:id="@+id/dtv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -27,10 +28,12 @@
         app:drawableWidth="20dp"
         app:orientation="top"
         app:padding="5dp"
-        app:replaceDrawable="@mipmap/ic_launcher"
+        app:animDuration="3000"
+        app:replaceDrawable="@android:drawable/btn_dialog"
+        app:selectedDrawable="@android:drawable/btn_minus"
         app:text="index"
-        app:textColor="#acc"
-        app:textColorSelect="#ddf"
+        app:textColor="#000"
+        app:textColorSelect="#fff"
         app:textSize="12sp"
         app:translationTime="500"
         app:viewHeight="100dp"
