@@ -1,68 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DrawableTextView">
-        <attr name="viewWidth" format="dimension"/>
-        <attr name="viewHeight" format="dimension"/>
-        <attr name="drawableWidth" format="dimension"/>
-        <attr name="drawableHeight" format="dimension"/>
-        <attr name="padding" format="dimension"/>
-        <attr name="paddingLeft" format="dimension"/>
-        <attr name="paddingRight" format="dimension"/>
-        <attr name="paddingTop" format="dimension"/>
-        <attr name="paddingBottom" format="dimension"/>
-        <attr name="drawablePadding" format="dimension"/>
-        <attr name="replaceDrawable" format="reference"/>
-        <attr name="selectedDrawable" format="reference"/>
-        <attr name="text" format="reference|string"/>
-        <attr name="textSize" format="dimension"/>
-        <attr name="textColor" format="color|reference"/>
-        <attr name="textColor_select" format="color|reference"/>
-        <attr name="translationTime" format="integer"/>
+        <attr name="viewWidth" format="dimension" />
+        <attr name="viewHeight" format="dimension" />
+        <attr name="drawableWidth" format="dimension" />
+        <attr name="drawableHeight" format="dimension" />
+        <attr name="padding" format="dimension" />
+        <attr name="paddingLeft" format="dimension" />
+        <attr name="paddingRight" format="dimension" />
+        <attr name="paddingTop" format="dimension" />
+        <attr name="paddingBottom" format="dimension" />
+        <attr name="drawablePadding" format="dimension" />
+        <attr name="replaceDrawable" format="reference" />
+        <attr name="selectedDrawable" format="reference" />
+        <attr name="text" format="reference|string" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="color|reference" />
+        <attr name="textColorSelect" format="color|reference" />
+        <attr name="translationTime" format="integer" />
+        <attr name="badgeEnable" format="boolean" />
+        <attr name="badgeBackground" format="reference" />
+        <attr name="badgeText" format="string" />
+        <attr name="badgeTextColor" format="color|reference" />
+        <attr name="badgeTextSize" format="dimension" />
+        <attr name="badgePadding" format="dimension" />
+        <attr name="badgeMinWidth" format="dimension" />
+        <attr name="badgeMinHeight" format="dimension" />
+        <attr name="badgeMargin" format="dimension" />
+        <attr name="badgeMarginStart" format="dimension" />
+        <attr name="badgeMarginEnd" format="dimension" />
+        <attr name="badgeMarginTop" format="dimension" />
+        <attr name="badgeMarginBottom" format="dimension" />
+        <attr name="badgeInGravity" format="flags">
+            <flag name="LEFT" value="2" />
+            <flag name="TOP" value="4" />
+            <flag name="RIGHT" value="8" />
+            <flag name="BOTTOM" value="16" />
+            <flag name="CENTER" value="1" />
+        </attr>
         <attr name="orientation" format="enum">
-            <enum name="left" value="0"/>
-            <enum name="top" value="1"/>
-            <enum name="right" value="2"/>
-            <enum name="bottom" value="3"/>
+            <enum name="left" value="0" />
+            <enum name="top" value="1" />
+            <enum name="right" value="2" />
+            <enum name="bottom" value="3" />
         </attr>
         <attr name="gravity" format="flags">
-            <flag name="LEFT" value="2"/>
-            <flag name="TOP" value="4"/>
-            <flag name="RIGHT" value="8"/>
-            <flag name="BOTTOM" value="16"/>
-            <flag name="CENTER" value="1"/>
+            <flag name="LEFT" value="2" />
+            <flag name="TOP" value="4" />
+            <flag name="RIGHT" value="8" />
+            <flag name="BOTTOM" value="16" />
+            <flag name="CENTER" value="1" />
         </attr>
     </declare-styleable>
 
     <declare-styleable name="SimpleCusLayoutView">
-        <attr name="vDrawable" format="reference|color"/>
-        <attr name="vText" format="reference|string"/>
-        <attr name="vWidth" format="dimension"/>
-        <attr name="vHeight" format="dimension"/>
-        <attr name="vPadding" format="dimension"/>
-        <attr name="vTextSize" format="dimension"/>
-        <attr name="vTextColor" format="integer|color"/>
-        <attr name="vDrawableColor" format="integer|color"/>
+        <attr name="vDrawable" format="reference|color" />
+        <attr name="vText" format="reference|string" />
+        <attr name="vWidth" format="dimension" />
+        <attr name="vHeight" format="dimension" />
+        <attr name="vPadding" format="dimension" />
+        <attr name="vTextSize" format="dimension" />
+        <attr name="vTextColor" format="integer|color" />
+        <attr name="vDrawableColor" format="integer|color" />
     </declare-styleable>
 
     <declare-styleable name="BaseTitleView">
-        <attr name="l_vDrawable" format="reference|color"/>
-        <attr name="l_vText" format="reference|string"/>
-        <attr name="l_vWidth" format="float"/>
-        <attr name="l_vHeight" format="float"/>
-        <attr name="l_vPadding" format="float"/>
-        <attr name="l_vTextSize" format="float"/>
-        <attr name="l_vTextColor" format="reference|color"/>
-        <attr name="l_vDrawableColor" format="reference|color"/>
-        <attr name="r_vDrawable" format="reference|color"/>
-        <attr name="r_vText" format="reference|string"/>
-        <attr name="r_vWidth" format="float"/>
-        <attr name="r_vHeight" format="float"/>
-        <attr name="r_vPadding" format="float"/>
-        <attr name="r_vTextSize" format="float"/>
-        <attr name="r_vTextColor" format="reference|color"/>
-        <attr name="r_vDrawableColor" format="reference|color"/>
-        <attr name="vTitle" format="reference|string"/>
-        <attr name="vTitleTextSize" format="float"/>
-        <attr name="vTitleTextColor" format="reference|color"/>
+        <attr name="l_vDrawable" format="reference|color" />
+        <attr name="l_vText" format="reference|string" />
+        <attr name="l_vWidth" format="float" />
+        <attr name="l_vHeight" format="float" />
+        <attr name="l_vPadding" format="float" />
+        <attr name="l_vTextSize" format="float" />
+        <attr name="l_vTextColor" format="reference|color" />
+        <attr name="l_vDrawableColor" format="reference|color" />
+        <attr name="r_vDrawable" format="reference|color" />
+        <attr name="r_vText" format="reference|string" />
+        <attr name="r_vWidth" format="float" />
+        <attr name="r_vHeight" format="float" />
+        <attr name="r_vPadding" format="float" />
+        <attr name="r_vTextSize" format="float" />
+        <attr name="r_vTextColor" format="reference|color" />
+        <attr name="r_vDrawableColor" format="reference|color" />
+        <attr name="vTitle" format="reference|string" />
+        <attr name="vTitleTextSize" format="float" />
+        <attr name="vTitleTextColor" format="reference|color" />
     </declare-styleable>
 </resources>

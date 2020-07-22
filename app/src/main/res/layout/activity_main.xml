@@ -4,15 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000"
+    android:gravity="center"
     tools:context=".MainActivity">
 
-    <TextView
+    <com.zj.views.DrawableTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_gravity="center"
+        android:background="#aaa"
+        app:badgeBackground="@drawable/ic_launcher_background"
+        app:badgeEnable="true"
+        app:badgeInGravity="TOP|RIGHT"
+        app:badgeMinHeight="15dp"
+        app:badgeMinWidth="15dp"
+        app:badgePadding="3dp"
+        app:badgeText="9"
+        app:badgeTextColor="#00A"
+        app:badgeTextSize="12dp"
+        app:drawableHeight="20dp"
+        app:drawablePadding="3dp"
+        app:drawableWidth="20dp"
+        app:orientation="top"
+        app:padding="5dp"
+        app:replaceDrawable="@mipmap/ic_launcher"
+        app:selectedDrawable="@mipmap/ic_launcher"
+        app:text="index"
+        app:textColor="#acc"
+        app:textColorSelect="#ddf"
+        app:textSize="12sp"
+        app:translationTime="500"
+        app:viewHeight="100dp"
+        app:viewWidth="100dp" />
 
 </LinearLayout>
