@@ -42,7 +42,6 @@ public class DrawableTextView extends View {
 
     private float drawableWidth = dp2px(20);
     private float drawableHeight = dp2px(20);
-    private int translationTime = 300;
     @Nullable
     private Drawable replaceDrawable, selectedDrawable, badgeBackground;
     private int orientation;
@@ -141,7 +140,6 @@ public class DrawableTextView extends View {
                 textSize = ta.getDimension(R.styleable.DrawableTextView_textSize, textSize);
                 textColor = ta.getColor(R.styleable.DrawableTextView_textColor, textColor);
                 textColorSelect = ta.getColor(R.styleable.DrawableTextView_textColorSelect, textColorSelect);
-                translationTime = ta.getInteger(R.styleable.DrawableTextView_translationTime, translationTime);
                 orientation = ta.getInt(R.styleable.DrawableTextView_orientation, Orientation.left);
                 animDuration = ta.getInt(R.styleable.DrawableTextView_animDuration, 0);
                 gravity = ta.getInt(R.styleable.DrawableTextView_gravity, Gravity.center);
