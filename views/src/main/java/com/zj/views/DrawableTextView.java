@@ -356,6 +356,11 @@ public class DrawableTextView extends View {
         postInvalidate();
     }
 
+    public void setText(String s) {
+        this.text = s;
+        postInvalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
