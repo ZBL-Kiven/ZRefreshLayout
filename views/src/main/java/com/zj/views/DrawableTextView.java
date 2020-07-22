@@ -375,13 +375,17 @@ public class DrawableTextView extends View {
     }
 
     private void drawDrawable(Canvas canvas) {
-        if (selectedDrawable == null && replaceDrawable == null) return;
-        if (replaceDrawable == null) {
-            selectedDrawable.setAlpha(255);
-            return;
-        }
-        if (selectedDrawable == null) {
-            replaceDrawable.setAlpha(255);
+        if (selectedDrawable == null || replaceDrawable == null) {
+            if (selectedDrawable != null) {
+                selectedDrawable.setBounds(drawableRect);
+                selectedDrawable.setAlpha(255);
+                selectedDrawable.draw(canvas);
+            }
+            if (replaceDrawable != null) {
+                replaceDrawable.setAlpha(255);
+                replaceDrawable.setBounds(drawableRect);
+                replaceDrawable.draw(canvas);
+            }
             return;
         }
         replaceDrawable.setBounds(drawableRect);

@@ -28,7 +28,6 @@
         app:orientation="top"
         app:padding="5dp"
         app:replaceDrawable="@mipmap/ic_launcher"
-        app:selectedDrawable="@mipmap/ic_launcher"
         app:text="index"
         app:textColor="#acc"
         app:textColorSelect="#ddf"
