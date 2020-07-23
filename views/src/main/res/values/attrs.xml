@@ -53,4 +53,57 @@
             <flag name="CENTER" value="1" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="RefreshLayout">
+        <attr name="android:clipChildren" />
+        <attr name="android:clipToPadding" />
+        <attr name="rlPrimaryColor" format="color|reference" />
+        <attr name="rlAccentColor" format="color|reference" />
+        <attr name="rlReboundDuration" format="integer" />
+        <attr name="rlHeaderHeight" format="dimension" />
+        <attr name="rlFooterHeight" format="dimension" />
+        <attr name="rlHeaderInsetStart" format="dimension" />
+        <attr name="rlFooterInsetStart" format="dimension" />
+        <attr name="rlDragRate" format="float" />
+        <attr name="rlHeaderMaxDragRate" format="float" />
+        <attr name="rlFooterMaxDragRate" format="float" />
+        <attr name="rlHeaderTriggerRate" format="float" />
+        <attr name="rlFooterTriggerRate" format="float" />
+        <attr name="rlEnableRefresh" format="boolean" />
+        <attr name="rlEnableLoadMore" format="boolean" />
+        <attr name="rlEnableHeaderTranslationContent" format="boolean" />
+        <attr name="rlEnableFooterTranslationContent" format="boolean" />
+        <attr name="rlHeaderTranslationViewId" format="reference" />
+        <attr name="rlFooterTranslationViewId" format="reference" />
+        <attr name="rlEnablePreviewInEditMode" format="boolean" />
+        <attr name="rlEnableAutoLoadMore" format="boolean" />
+        <attr name="rlEnableOverScrollBounce" format="boolean" />
+        <attr name="rlEnablePureScrollMode" format="boolean" />
+        <attr name="rlEnableNestedScrolling" format="boolean" />
+        <attr name="rlEnableScrollContentWhenLoaded" format="boolean" />
+        <attr name="rlEnableScrollContentWhenRefreshed" format="boolean" />
+        <attr name="rlEnableLoadMoreWhenContentNotFull" format="boolean" />
+        <attr name="rlEnableFooterFollowWhenLoadFinished" format="boolean" />
+        <attr name="rlEnableFooterFollowWhenNoMoreData" format="boolean" />
+        <attr name="rlEnableClipHeaderWhenFixedBehind" format="boolean" />
+        <attr name="rlEnableClipFooterWhenFixedBehind" format="boolean" />
+        <attr name="rlEnableOverScrollDrag" format="boolean" />
+        <attr name="rlDisableContentWhenRefresh" format="boolean" />
+        <attr name="rlDisableContentWhenLoading" format="boolean" />
+        <attr name="rlFixedHeaderViewId" format="reference" />
+        <attr name="rlFixedFooterViewId" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="RefreshLayout_Layout">
+        <attr name="layout_rlSpinnerStyle" format="enum">
+            <enum name="Translate" value="0" />
+            <enum name="Scale" value="1" />
+            <enum name="FixedBehind" value="2" />
+            <enum name="FixedFront" value="3" />
+            <enum name="MatchLayout" value="4" />
+            />
+        </attr>
+        <attr name="layout_rlBackgroundColor" format="color" />
+    </declare-styleable>
+
 </resources>
