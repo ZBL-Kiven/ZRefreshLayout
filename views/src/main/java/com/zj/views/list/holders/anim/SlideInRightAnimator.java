@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.zj.views.list.holders.BaseItemAnimator;
 
 @SuppressWarnings("unused")
-@SuppressWarnings("unused")
 public class SlideInRightAnimator extends BaseItemAnimator {
 
   public SlideInRightAnimator() {
