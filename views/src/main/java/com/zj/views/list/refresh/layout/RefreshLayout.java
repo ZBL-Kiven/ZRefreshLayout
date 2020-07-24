@@ -390,7 +390,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                 errorView.setGravity(Gravity.CENTER);
                 errorView.setTextSize(20);
                 errorView.setText(R.string.rl_content_empty);
-                super.addView(errorView, 0, new LayoutParams(MATCH_PARENT, MATCH_PARENT));
+                super.addView(errorView, 0, new RLLayoutParams(MATCH_PARENT, MATCH_PARENT));
                 mRefreshContent = new RefreshContentWrapper(errorView);
                 mRefreshContent.getView().setPadding(padding, padding, padding, padding);
             }
@@ -1522,7 +1522,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     @Override
     public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
         final View thisView = this;
-        return new LayoutParams(thisView.getContext(), attrs);
+        return new RLLayoutParams(thisView.getContext(), attrs);
     }
 
     @Override
@@ -2203,7 +2203,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         this.mHeaderHeightStatus = DimensionStatus.DefaultUnNotify;
         width = width == 0 ? MATCH_PARENT : width;
         height = height == 0 ? WRAP_CONTENT : height;
-        LayoutParams lp = new LayoutParams(width, height);
+        RLLayoutParams lp = new RLLayoutParams(width, height);
         Object olp = header.getView().getLayoutParams();
         if (olp instanceof RLLayoutParams) {
             lp = ((RLLayoutParams) olp);
@@ -2255,12 +2255,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         this.mFooterNeedTouchEventWhenLoading = false;
         this.mFooterHeightStatus = DimensionStatus.DefaultUnNotify;//2020-5-23 修复动态切换时，不能及时测量新的高度
         this.mEnableLoadMore = !mManualLoadMore || mEnableLoadMore;
-        /*
-         * 2020-3-16 修复 header 中自带 LayoutParams 丢失问题
-         */
         width = width == 0 ? MATCH_PARENT : width;
         height = height == 0 ? WRAP_CONTENT : height;
-        LayoutParams lp = new LayoutParams(width, height);
+        RLLayoutParams lp = new RLLayoutParams(width, height);
         Object olp = footer.getView().getLayoutParams();
         if (olp instanceof RLLayoutParams) {
             lp = ((RLLayoutParams) olp);
@@ -2307,25 +2304,18 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             super.removeView(mRefreshContent.getView());
         }
         final ViewGroup thisGroup = this;
-
-        /*
-         * 2020-3-16 修复 content 中自带 LayoutParams 丢失问题
-         */
         width = width == 0 ? MATCH_PARENT : width;
         height = height == 0 ? MATCH_PARENT : height;
-        LayoutParams lp = new LayoutParams(width, height);
+        RLLayoutParams lp = new RLLayoutParams(width, height);
         Object olp = content.getLayoutParams();
         if (olp instanceof RLLayoutParams) {
             lp = ((RLLayoutParams) olp);
         }
-
         super.addView(content, thisGroup.getChildCount(), lp);
-
         mRefreshContent = new RefreshContentWrapper(content);
         if (mAttachedToWindow) {
             View fixedHeaderView = thisView.findViewById(mFixedHeaderViewId);
             View fixedFooterView = thisView.findViewById(mFixedFooterViewId);
-
             mRefreshContent.setScrollBoundaryDecider(mScrollBoundaryDecider);
             mRefreshContent.setEnableLoadMoreWhenContentNotFull(mEnableLoadMoreWhenContentNotFull);
             mRefreshContent.setUpComponent(mKernel, fixedHeaderView, fixedFooterView);

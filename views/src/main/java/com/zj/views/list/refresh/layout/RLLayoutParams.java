@@ -10,7 +10,7 @@ import com.zj.views.list.refresh.layout.constant.SpinnerStyle;
 
 public class RLLayoutParams extends ViewGroup.MarginLayoutParams {
 
-    public RLLayoutParams(Context context, AttributeSet attrs) {
+    RLLayoutParams(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.RefreshLayout_Layout);
         backgroundColor = ta.getColor(R.styleable.RefreshLayout_Layout_layout_rlBackgroundColor, backgroundColor);
@@ -19,9 +19,11 @@ public class RLLayoutParams extends ViewGroup.MarginLayoutParams {
         }
         ta.recycle();
     }
-    public RLLayoutParams(int width, int height) {
+
+    RLLayoutParams(int width, int height) {
         super(width, height);
     }
+
     public int backgroundColor = 0;
     public SpinnerStyle spinnerStyle = null;
 }

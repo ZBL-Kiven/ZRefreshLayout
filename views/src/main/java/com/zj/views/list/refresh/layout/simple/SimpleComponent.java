@@ -1,6 +1,8 @@
 package com.zj.views.list.refresh.layout.simple;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -44,6 +46,11 @@ public abstract class SimpleComponent extends RelativeLayout implements RefreshC
         } else if (this instanceof RefreshHeader && mWrappedInternal instanceof RefreshFooter && mWrappedInternal.getSpinnerStyle() == SpinnerStyle.MatchLayout) {
             wrappedInternal.getView().setScaleY(-1);
         }
+    }
+
+    @SuppressWarnings("unused")
+    protected SimpleComponent(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
     @Override
