@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/logo_00"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_01"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_02"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_03"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_04"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_05"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_06"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_07"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_08"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_09"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_10"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_11"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_12"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_13"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_14"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_15"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_16"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_17"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_18"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_19"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_20"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_21"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_22"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_23"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_24"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_25"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_26"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_27"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_28"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_29"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_30"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_31"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_32"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_33"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_34"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_35"
+        android:duration="35" />
+    <item
+        android:drawable="@drawable/logo_36"
+        android:duration="35" />
+</animation-list>

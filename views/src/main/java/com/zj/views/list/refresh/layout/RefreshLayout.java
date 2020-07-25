@@ -1133,7 +1133,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                         mRefreshListener.onRefresh(RefreshLayout.this);
                     }
                 } else if (mOnMultiListener == null) {
-                    finishRefresh(3000);
+                    finishRefresh(10000);
                 }
                 if (mRefreshHeader != null) {
                     mRefreshHeader.onStartAnimator(RefreshLayout.this, mHeaderHeight, (int) (mHeaderMaxDragRate * mHeaderHeight));
