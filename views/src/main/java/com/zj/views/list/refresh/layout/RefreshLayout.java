@@ -747,7 +747,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         return super.drawChild(canvas, child, drawingTime);
     }
 
-    protected boolean mVerticalPermit = false;                  //竖直通信证（用于特殊事件的权限判定）
+    protected boolean mVerticalPermit = false; //竖直通信证（用于特殊事件的权限判定）
 
     //重写 computeScroll 来完成 越界回弹/边界碰撞
     @Override
@@ -1064,7 +1064,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     mLoadMoreListener.onLoadMore(this);
                 }
             } else if (mOnMultiListener == null) {
-                finishLoadMore(2000);//如果没有任何加载监听器，两秒之后自动关闭
+                finishLoadMore(2000);
             }
             if (mRefreshFooter != null) {
                 mRefreshFooter.onStartAnimator(this, mFooterHeight, (int) (mFooterMaxDragRate * mFooterHeight));
@@ -1133,7 +1133,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                         mRefreshListener.onRefresh(RefreshLayout.this);
                     }
                 } else if (mOnMultiListener == null) {
-                    finishRefresh(10000);
+                    finishRefresh(5000);
                 }
                 if (mRefreshHeader != null) {
                     mRefreshHeader.onStartAnimator(RefreshLayout.this, mHeaderHeight, (int) (mHeaderMaxDragRate * mHeaderHeight));
@@ -1205,7 +1205,6 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     protected Runnable animationRunnable;
     protected ValueAnimator reboundAnimator;
 
-    @SuppressWarnings("WeakerAccess")
     protected class FlingRunnable implements Runnable {
         int mOffset;
         int mFrame = 0;

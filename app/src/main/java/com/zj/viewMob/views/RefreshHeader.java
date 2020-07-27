@@ -6,15 +6,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AnticipateInterpolator;
 import android.view.animation.CycleInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -28,8 +25,6 @@ import com.zj.views.list.refresh.layout.simple.SimpleComponent;
 import com.zj.views.ut.DPUtils;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class RefreshHeader extends SimpleComponent implements com.zj.views.list.refresh.layout.api.RefreshHeader {
@@ -41,7 +36,6 @@ public class RefreshHeader extends SimpleComponent implements com.zj.views.list.
     private ValueAnimator standingLookupAnim;
     private LoadingPop loadingPop;
     private Paint paint;
-    private final int textColor = Color.BLACK;
 
     private Context getCtx() {
         return new WeakReference<>(super.getContext()).get();
@@ -59,9 +53,10 @@ public class RefreshHeader extends SimpleComponent implements com.zj.views.list.
         super(context, attrs, defStyleAttr);
         paint = new Paint();
         paint.setAntiAlias(true);
+        int textColor = Color.BLACK;
         paint.setColor(textColor);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
+        paint.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
     @Override

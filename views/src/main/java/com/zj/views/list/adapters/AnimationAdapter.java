@@ -36,9 +36,9 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     }
 
     @Override
-    protected void initData(BaseViewHolder holder, int position, T module, List<Object> payloads) {
+    protected final void initData(BaseViewHolder holder, int position, T module, List<Object> payloads) {
         int adapterPosition = holder.getAdapterPosition();
-        bindData(holder, position, module);
+        bindData(holder, position, module, payloads);
         if (!isFirstOnly || adapterPosition > mLastPosition) {
             for (Animator anim : getAnimators(holder.itemView)) {
                 anim.setInterpolator(mInterpolator);
@@ -64,7 +64,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
 
     protected abstract Animator[] getAnimators(View view);
 
-    public abstract void bindData(BaseViewHolder holder, int position, T module);
+    public abstract void bindData(BaseViewHolder holder, int position, T module, List<Object> payloads);
 
     public void setFirstOnly(boolean firstOnly) {
         isFirstOnly = firstOnly;

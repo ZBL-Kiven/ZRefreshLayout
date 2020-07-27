@@ -12,16 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="80dp" />
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="30dp"
+        android:scrollbars="none"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="3000dp"
-            android:background="#cca" />
-
-
-    </ScrollView>
+    <com.zj.viewMob.views.RefreshFooter
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#acc" />
 
 </com.zj.views.list.refresh.layout.RefreshLayout>

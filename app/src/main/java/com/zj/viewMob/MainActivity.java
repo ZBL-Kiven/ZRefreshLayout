@@ -1,34 +1,21 @@
 package com.zj.viewMob;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.widget.LinearLayout;
 
-import com.zj.views.DrawableTextView;
-import com.zj.views.list.refresh.layout.wrapper.RefreshContentWrapper;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends Activity {
+import com.zj.cf.managers.BaseFragmentManager;
+
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_2);
+        LinearLayout ll = findViewById(R.id.group);
+        new BaseFragmentManager(this, R.id.fg_content, 0, ll, new Frg1(), new Frg1()) {
 
-        final DrawableTextView v = findViewById(R.id.dtv);
-
-        v.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                v.setSelected(true);
-            }
-        }, 1000);
-
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(v.getContext(), SecondActivity.class));
-            }
-        });
+        };
     }
 }
