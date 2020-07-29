@@ -39,7 +39,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     protected final void initData(BaseViewHolder holder, int position, T module, List<Object> payloads) {
         int adapterPosition = holder.getAdapterPosition();
         bindData(holder, position, module, payloads);
-        if (!isFirstOnly || adapterPosition > mLastPosition) {
+        if ((!isFirstOnly || adapterPosition > mLastPosition) && (payloads == null || payloads.isEmpty())) {
             for (Animator anim : getAnimators(holder.itemView)) {
                 anim.setInterpolator(mInterpolator);
                 anim.setDuration(mDuration).start();
