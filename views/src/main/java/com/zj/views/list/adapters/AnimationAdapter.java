@@ -6,6 +6,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 
 import com.zj.views.list.ViewHelper;
 import com.zj.views.list.holders.BaseViewHolder;
@@ -36,7 +37,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     }
 
     @Override
-    protected final void initData(BaseViewHolder holder, int position, T module, List<Object> payloads) {
+    protected final void initData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads) {
         int adapterPosition = holder.getAdapterPosition();
         bindData(holder, position, module, payloads);
         if ((!isFirstOnly || adapterPosition > mLastPosition) && (payloads == null || payloads.isEmpty())) {
@@ -64,7 +65,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
 
     protected abstract Animator[] getAnimators(View view);
 
-    public abstract void bindData(BaseViewHolder holder, int position, T module, List<Object> payloads);
+    public abstract void bindData(BaseViewHolder holder, int position,@Nullable T module, List<Object> payloads);
 
     public void setFirstOnly(boolean firstOnly) {
         isFirstOnly = firstOnly;

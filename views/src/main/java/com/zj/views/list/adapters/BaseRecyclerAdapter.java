@@ -1,5 +1,6 @@
 package com.zj.views.list.adapters;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.zj.views.list.holders.BaseViewHolder;
@@ -39,7 +40,9 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
         return data;
     }
 
+    @Nullable
     public T getItem(int position) {
+        if (data == null || data.isEmpty() || position < 0 || position >= data.size()) return null;
         return data.get(position);
     }
 

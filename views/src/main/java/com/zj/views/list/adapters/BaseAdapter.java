@@ -16,7 +16,6 @@ import java.util.List;
  * Created by ZJJ on 2018/4/4.
  */
 
-@SuppressWarnings("WeakerAccess")
 public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder, T> {
 
     private final int resId;
@@ -52,7 +51,7 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder,
         initData(holder, position, getItem(position), payloads);
     }
 
-    protected abstract void initData(BaseViewHolder holder, int position, T module, List<Object> payloads);
+    protected abstract void initData(BaseViewHolder holder, int position, @Nullable T module, @Nullable List<Object> payloads);
 
 
 }
