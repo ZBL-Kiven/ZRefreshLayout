@@ -61,7 +61,7 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
     public void add(List<T> data) {
         if (data == null) return;
         this.data.addAll(data);
-        notifyItemRangeInserted(getItemCount() - this.data.size(), this.getItemCount());
+        notifyItemRangeInserted(getMaxPosition() - this.data.size(), this.getItemCount());
     }
 
     public void add(List<T> data, int position) {
@@ -85,7 +85,7 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
 
     public void clear() {
         data.clear();
-        notifyItemRangeRemoved(0, getItemCount());
+        notifyDataSetChanged();
     }
 
     public void change(List<T> data) {
