@@ -56,31 +56,33 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
         if (info == null) return;
         this.data.add(position, info);
         notifyItemInserted(position);
+        if (position != getMaxPosition()) notifyItemRangeChanged(position, getMaxPosition());
     }
 
     public void add(List<T> data) {
         if (data == null) return;
-        this.data.addAll(data);
-        notifyItemRangeInserted(getMaxPosition() - this.data.size(), this.getItemCount());
+        add(data, getMaxPosition());
     }
 
     public void add(List<T> data, int position) {
-        if (data == null) return;
+        if (data == null || position < 0) return;
+        position = Math.min(getMaxPosition(), position);
         this.data.addAll(position, data);
-        notifyItemRangeChanged(position, getItemCount());
+        int curLast = position + data.size();
+        notifyItemRangeInserted(position, curLast);
+        if (curLast != getMaxPosition()) notifyItemRangeChanged(curLast, getMaxPosition());
     }
 
     public void remove(T info) {
         if (info == null) return;
-        int position = data.indexOf(info);
-        this.data.remove(info);
-        notifyItemRangeRemoved(position, getItemCount());
+        remove(data.indexOf(info));
     }
 
     public void remove(int position) {
         if (getItemCount() <= position) return;
         this.data.remove(position);
-        notifyItemRangeRemoved(position, getItemCount());
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getMaxPosition());
     }
 
     public void clear() {
