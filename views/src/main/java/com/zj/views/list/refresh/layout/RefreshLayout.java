@@ -294,16 +294,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         ta.recycle();
     }
 
-    /**
-     * 重写 onFinishInflate 来完成特定功能
-     * 1.智能寻找 Xml 中定义的 Content、Header、Footer
-     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         final int count = super.getChildCount();
         if (count > 3) {
-            throw new RuntimeException("最多只支持3个子View，Most only support three sub view");
+            throw new RuntimeException("Most only support three sub view");
         }
 
         int contentLevel = 0;
@@ -346,12 +342,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 重写 onAttachedToWindow 来完成特定功能
-     * 1.添加默认或者全局设置的 Header 和 Footer （缺省情况下才会）
-     * 2.做 Content 为空时的 TextView 提示
-     * 3.智能开启 嵌套滚动 NestedScrollingEnabled
-     * 4.初始化 主题颜色 和 调整 Header Footer Content 的显示顺序
-     */
+     * Override onAttachedToWindow to complete specific functions
+     * 1. Add default or globally set Header and Footer (only available by default)
+     * 2. Make TextView prompt when Content is empty
+     * 3. Enable nested scrolling intelligently NestedScrollingEnabled
+     * 4. Initialize the theme color and adjust the display order of Header Footer Content
+     **/
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -432,13 +428,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 测量 Header Footer Content
-     * 1.测量代码看起来很复杂，时因为 Header Footer 有四种拉伸变换样式 {@link SpinnerStyle}，每一种样式有自己的测量方法
-     * 2.提供预览测量，可以在编辑 XML 的时候直接预览 （isInEditMode）
-     * 3.恢复水平触摸位置缓存 mLastTouchX 到屏幕中央
+     * Measuring Header Footer Content *
+     * 1. The measurement code looks very complicated, because the Header Footer has four stretch transformation styles {@link SpinnerStyle}, each style has its own measurement method*
+     * 2. Preview measurement is provided. Preview directly when editing XML (isInEditMode) * 3. Restore the horizontal touch position buffer mLastTouchX to the center of the screen*
      *
-     * @param widthMeasureSpec  水平测量参数
-     * @param heightMeasureSpec 竖直测量参数
+     * @param widthMeasureSpec  horizontal measurement parameters
+     * @param heightMeasureSpec vertical measurement parameters
      */
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
@@ -650,9 +645,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 重写 onDetachedFromWindow 来完成 smart 的特定功能
-     * 1.恢复原始状态
-     * 2.清除动画数据 （防止内存泄露）
+    * Rewrite onDetachedFromWindow to complete specific functions of smart * 1. Restore original state * 2. Clear animation data (to prevent memory leaks)
      */
     @Override
     protected void onDetachedFromWindow() {
@@ -687,9 +680,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 重写 drawChild 来完成特定功能
-     * 1.为 Header 和 Footer 绘制背景 （设置了背景才绘制）
-     * 2.为 Header 和 Footer 在 FixedBehind 样式时，做剪裁功能 mEnableClipHeaderWhenFixedBehind=true
+     * Override drawChild to complete specific functions * 1. Draw the background for the Header and Footer (only when the background is set) * 2. When the Header and Footer are in the FixedBehind style, do the clipping function mEnableClipHeaderWhenFixedBehind=true
      */
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {

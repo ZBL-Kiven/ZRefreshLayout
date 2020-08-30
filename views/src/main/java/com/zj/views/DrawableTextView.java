@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -64,6 +65,9 @@ public class DrawableTextView extends View {
     private float badgeMarginTop = 0.0f;
     private float badgeMarginBottom = 0.0f;
     private int animDuration = 0;
+
+    private String fontPath = "";
+    private int fontStyle = -1;
 
     private Paint textPaint;
     private Paint badgeTextPaint;
@@ -144,6 +148,9 @@ public class DrawableTextView extends View {
                 animDuration = ta.getInt(R.styleable.DrawableTextView_animDuration, 0);
                 gravity = ta.getInt(R.styleable.DrawableTextView_gravity, Gravity.center);
                 badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_badgeEnable, badgeEnable);
+                fontPath = ta.getString(R.styleable.DrawableTextView_textFontPath);
+                fontStyle = ta.getInt(R.styleable.DrawableTextView_textStyle, -1);
+
                 if (badgeEnable) {
                     badgeText = ta.getString(R.styleable.DrawableTextView_badgeText);
                     badgeBackground = ta.getDrawable(R.styleable.DrawableTextView_badgeBackground);
@@ -169,6 +176,25 @@ public class DrawableTextView extends View {
 
     private void initData() {
         textPaint = new Paint();
+        Typeface typeface = Typeface.DEFAULT;
+        if (!TextUtils.isEmpty(fontPath)) {
+            typeface = Typeface.createFromAsset(getContext().getAssets(), fontPath);
+        }
+        if (fontStyle >= 0) {
+            int fs;
+            switch (fontStyle) {
+                case Typeface.BOLD:
+                case Typeface.ITALIC:
+                case Typeface.NORMAL:
+                case Typeface.BOLD_ITALIC:
+                    fs = fontStyle;
+                    break;
+                default:
+                    throw new IllegalArgumentException("The font must follow the specified size and be in one of Typeface.BOLD, Typeface.ITALIC, Typeface.NORMAL, Typeface.BOLD_ITALIC");
+            }
+            typeface = Typeface.create(typeface, fs);
+        }
+        textPaint.setTypeface(typeface);
         textPaint.setAntiAlias(true);
         textPaint.setTextSize(textSize);
         textPaint.setTextAlign(Paint.Align.CENTER);

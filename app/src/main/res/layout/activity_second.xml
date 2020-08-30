@@ -12,13 +12,47 @@
         android:layout_width="match_parent"
         android:layout_height="80dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="30dp"
-        android:scrollbars="none"/>
+        android:scrollbars="none">
+
+        <com.zj.views.DrawableTextView
+            android:id="@+id/dtv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#aaa"
+            app:animDuration="3000"
+            app:badgeBackground="@drawable/ic_launcher_background"
+            app:badgeEnable="true"
+            app:badgeInGravity="TOP|RIGHT"
+            app:badgeMinHeight="15dp"
+            app:badgeMinWidth="15dp"
+            app:badgePadding="3dp"
+            app:badgeText="9"
+            app:badgeTextColor="#00A"
+            app:badgeTextSize="12dp"
+            app:drawableHeight="30dp"
+            app:drawablePadding="3dp"
+            app:drawableWidth="30dp"
+            app:orientation="top"
+            app:padding="5dp"
+            app:replaceDrawable="@mipmap/ic_launcher"
+            app:selectedDrawable="@mipmap/ic_launcher"
+            app:text="index"
+            app:textColor="#000"
+            app:textColorSelect="#fff"
+            app:textFontPath="fonts/Helvetica-Neue-Condensed-Bold_22500.ttf"
+            app:textSize="22sp"
+            app:translationTime="500"
+            app:viewHeight="200dp"
+            app:viewWidth="200dp" />
+
+    </ScrollView>
 
     <com.zj.viewMob.views.RefreshFooter
         android:layout_width="match_parent"

@@ -32,6 +32,13 @@
         <attr name="badgeMarginTop" format="dimension" />
         <attr name="badgeMarginBottom" format="dimension" />
         <attr name="animDuration" format="integer" />
+        <attr name="textFontPath" format="string" />
+        <attr name="textStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+            <enum name="bold_italic" value="3" />
+        </attr>
         <attr name="badgeInGravity" format="flags">
             <flag name="LEFT" value="2" />
             <flag name="TOP" value="4" />

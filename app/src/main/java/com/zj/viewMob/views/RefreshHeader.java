@@ -163,7 +163,7 @@ public class RefreshHeader extends SimpleComponent implements com.zj.views.list.
                 iv.setScaleY(of);
             }
         }
-        loadingPop.curFraction = f;
+        if (loadingPop != null) loadingPop.curFraction = f;
         postInvalidate();
     }
 
