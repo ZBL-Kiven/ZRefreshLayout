@@ -94,12 +94,14 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
         notifyDataSetChanged();
     }
 
-    public void change(List<T> data) {
-        clear();
-        if (data == null) {
+    public void change(List<T> d) {
+        int size = data.size();
+        data.clear();
+        notifyItemRangeRemoved(0,size);
+        if (d == null) {
             return;
         }
-        this.data.addAll(data);
+        this.data.addAll(d);
         notifyItemRangeInserted(0, getItemCount());
     }
 }
