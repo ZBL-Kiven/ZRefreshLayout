@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Layout;
@@ -33,11 +35,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.content.ContextCompat;
 
 import com.zj.views.R.styleable;
 
 import static android.text.Spanned.SPAN_INCLUSIVE_EXCLUSIVE;
 
+@SuppressWarnings("unused")
 public class FoldTextView extends AppCompatTextView implements OnClickListener {
     private int mShowMaxLine;
     private String mFoldText;
@@ -119,6 +123,17 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
             super.setText(text, type);
         }
 
+    }
+
+    public void setTipColor(int color) {
+        Integer c = null;
+        try {
+            c = ContextCompat.getColor(getContext(), color);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (c == null) c = color;
+        this.mTipColor = c;
     }
 
     private void formatText(CharSequence text, final BufferType type, final int ellipsizeCount, final int drawableWidth) {
@@ -227,7 +242,8 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     finalSpanDrawable.setColorFilter(new BlendModeColorFilter(mTipColor, BlendMode.SRC_ATOP));
                 } else {
-                    finalSpanDrawable.setColorFilter(mTipColor, PorterDuff.Mode.SRC_ATOP);
+                    ColorFilter colorFilter = new PorterDuffColorFilter(mTipColor, PorterDuff.Mode.SRC_ATOP);
+                    finalSpanDrawable.setColorFilter(colorFilter);
                 }
                 span.setSpan(new DynamicDrawableSpan() {
                     public Drawable getDrawable() {
