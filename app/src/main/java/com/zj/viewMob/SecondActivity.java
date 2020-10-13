@@ -11,6 +11,6 @@ public class SecondActivity extends Activity {
         super.onCreate(savedInstanceState);
 
 
-        setContentView(R.layout.activity_second);
+        setContentView(R.layout.activity_main);
     }
 }

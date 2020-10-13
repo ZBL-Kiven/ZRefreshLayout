@@ -8,35 +8,18 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-    <com.zj.views.DrawableTextView
+    <com.zj.views.FoldTextView
         android:id="@+id/dtv"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="#aaa"
-        app:badgeBackground="@drawable/ic_launcher_background"
-        app:badgeEnable="true"
-        app:badgeInGravity="TOP|RIGHT"
-        app:badgeMinHeight="15dp"
-        app:badgeMinWidth="15dp"
-        app:badgePadding="3dp"
-        app:badgeText="9"
-        app:badgeTextColor="#00A"
-        app:badgeTextSize="12dp"
-        app:drawableHeight="20dp"
-        app:drawablePadding="3dp"
-        app:drawableWidth="20dp"
-        app:orientation="top"
-        app:padding="5dp"
-        app:animDuration="3000"
-        app:replaceDrawable="@android:drawable/btn_dialog"
-        app:selectedDrawable="@android:drawable/btn_minus"
-        app:text="index"
-        app:textColor="#000"
-        app:textColorSelect="#fff"
-        app:textSize="12sp"
-        app:translationTime="500"
-        app:viewHeight="100dp"
-        app:viewWidth="100dp" />
+        app:drawableSize="50dp"
+        app:expandDrawable="@drawable/abc_vector_test"
+        app:foldDrawable="@drawable/abc_vector_test"
+        app:showMaxLine="2"
+        app:showTipAfterExpand="true"
+        app:tipClickable="true"
+        app:tipColor="#97c" />
 
 </LinearLayout>

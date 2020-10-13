@@ -61,6 +61,19 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="FoldTextView">
+        <attr name="showMaxLine" format="integer" />
+        <attr name="tipColor" format="reference|color" />
+        <attr name="tipClickable" format="boolean" />
+        <attr name="foldText" format="string" />
+        <attr name="expandText" format="string" />
+        <attr name="drawableSize" format="dimension" />
+        <attr name="showTipAfterExpand" format="boolean" />
+        <attr name="isSetParentClick" format="boolean" />
+        <attr name="expandDrawable" format="color|reference" />
+        <attr name="foldDrawable" format="color|reference" />
+    </declare-styleable>
+
     <declare-styleable name="RefreshLayout">
         <attr name="android:clipChildren" />
         <attr name="android:clipToPadding" />
@@ -108,7 +121,6 @@
             <enum name="FixedBehind" value="2" />
             <enum name="FixedFront" value="3" />
             <enum name="MatchLayout" value="4" />
-            />
         </attr>
         <attr name="layout_rlBackgroundColor" format="color" />
     </declare-styleable>
