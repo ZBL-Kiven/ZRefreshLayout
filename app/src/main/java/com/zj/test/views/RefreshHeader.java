@@ -1,4 +1,4 @@
-package com.zj.viewMob.views;
+package com.zj.test.views;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 
-import com.zj.viewMob.R;
+import com.zj.test.R;
 import com.zj.views.list.refresh.layout.api.RefreshKernel;
 import com.zj.views.list.refresh.layout.api.RefreshLayoutIn;
 import com.zj.views.list.refresh.layout.simple.SimpleComponent;

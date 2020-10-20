@@ -407,23 +407,26 @@ public class DrawableTextView extends View {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
         badgeText = text;
         postInvalidate();
+        requestLayout();
     }
 
     public void clearBadgeText() {
         badgeText = "";
         postInvalidate();
+        requestLayout();
     }
 
     public void setText(String s) {
         this.text = s;
         postInvalidate();
+        requestLayout();
     }
 
     public void setOrientation(@Orientation int orientation) {
         this.orientation = orientation;
         postInvalidate();
+        requestLayout();
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {

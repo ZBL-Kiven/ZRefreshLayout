@@ -22,4 +22,5 @@
         app:tipClickable="true"
         app:tipColor="#97c" />
 
+
 </LinearLayout>

@@ -8,7 +8,7 @@
     app:rlHeaderHeight="80dp"
     app:rlHeaderTriggerRate="1.5">
 
-    <com.zj.viewMob.views.RefreshHeader
+    <com.zj.test.views.RefreshHeader
         android:layout_width="match_parent"
         android:layout_height="80dp" />
 
@@ -46,15 +46,12 @@
             app:text="index"
             app:textColor="#000"
             app:textColorSelect="#fff"
-            app:textFontPath="fonts/Helvetica-Neue-Condensed-Bold_22500.ttf"
             app:textSize="22sp"
-            app:translationTime="500"
-            app:viewHeight="200dp"
-            app:viewWidth="200dp" />
+            app:translationTime="500" />
 
     </ScrollView>
 
-    <com.zj.viewMob.views.RefreshFooter
+    <com.zj.test.views.RefreshFooter
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#acc" />

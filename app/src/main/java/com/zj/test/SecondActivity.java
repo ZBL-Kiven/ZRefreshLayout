@@ -1,4 +1,4 @@
-package com.zj.viewMob;
+package com.zj.test;
 
 import android.app.Activity;
 import android.os.Bundle;
