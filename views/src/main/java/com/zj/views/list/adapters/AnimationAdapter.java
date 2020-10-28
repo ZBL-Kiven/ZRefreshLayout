@@ -25,15 +25,38 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     private int mDuration = 300;
     private Interpolator mInterpolator = new LinearInterpolator();
     private int mLastPosition = -1;
-
     private boolean isFirstOnly = true;
 
-    protected AnimationAdapter(@LayoutRes int id) {
+    public AnimationAdapter(@LayoutRes int id) {
         super(id);
     }
 
-    protected AnimationAdapter(@LayoutRes int id, List<T> data) {
+    public AnimationAdapter(@LayoutRes int id, List<T> data) {
         super(id, data);
+    }
+
+    public AnimationAdapter(View view) {
+        super(view);
+    }
+
+    public AnimationAdapter(View view, List<T> data) {
+        super(view, data);
+    }
+
+    public AnimationAdapter(ViewBuilder builder) {
+        super(builder);
+    }
+
+    public AnimationAdapter(ViewBuilder builder, List<T> data) {
+        super(builder, data);
+    }
+
+    public AnimationAdapter(LayoutBuilder builder) {
+        super(builder);
+    }
+
+    public AnimationAdapter(LayoutBuilder builder, List<T> data) {
+        super(builder, data);
     }
 
     @Override
@@ -65,7 +88,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
 
     protected abstract Animator[] getAnimators(View view);
 
-    public abstract void bindData(BaseViewHolder holder, int position,@Nullable T module, List<Object> payloads);
+    public abstract void bindData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads);
 
     public void setFirstOnly(boolean firstOnly) {
         isFirstOnly = firstOnly;

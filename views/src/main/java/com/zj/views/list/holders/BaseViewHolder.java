@@ -21,8 +21,8 @@ import com.zj.views.list.adapters.BaseRecyclerAdapter;
 @SuppressWarnings("unused")
 public class BaseViewHolder extends RecyclerView.ViewHolder {
 
-    private SparseArray<View> parseArray;
-    private BaseRecyclerAdapter mAdapter;
+    private final SparseArray<View> parseArray;
+    private final BaseRecyclerAdapter mAdapter;
 
     public BaseViewHolder(BaseRecyclerAdapter adapter, View v) {
         super(v);

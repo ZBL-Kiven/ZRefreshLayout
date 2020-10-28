@@ -2,6 +2,7 @@ package com.zj.views.list.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
@@ -18,27 +19,74 @@ import java.util.List;
 
 public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder, T> {
 
-    private final int resId;
+    private int resId = 0;
+
+    private View content = null;
+
+    private ViewBuilder viewBuilder = null;
+
+    private LayoutBuilder layoutBuilder = null;
 
     @Nullable
     protected Context context = null;
 
     private LayoutInflater inflater;
 
-    protected BaseAdapter(@LayoutRes int id) {
+    public BaseAdapter(@LayoutRes int id) {
         resId = id;
     }
 
-    BaseAdapter(@LayoutRes int id, List<T> data) {
+    public BaseAdapter(@LayoutRes int id, List<T> data) {
         resId = id;
+        change(data);
+    }
+
+    public BaseAdapter(View view) {
+        content = view;
+    }
+
+    public BaseAdapter(View view, List<T> data) {
+        content = view;
+        change(data);
+    }
+
+    public BaseAdapter(ViewBuilder builder) {
+        viewBuilder = builder;
+    }
+
+    public BaseAdapter(ViewBuilder builder, List<T> data) {
+        viewBuilder = builder;
+        change(data);
+    }
+
+    public BaseAdapter(LayoutBuilder builder) {
+        layoutBuilder = builder;
+    }
+
+    public BaseAdapter(LayoutBuilder builder, List<T> data) {
+        layoutBuilder = builder;
         change(data);
     }
 
     @Override
     public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         this.context = parent.getContext();
-        if (inflater == null) inflater = LayoutInflater.from(context);
-        return new BaseViewHolder(this, inflater.inflate(resId, parent, false));
+        BaseViewHolder holder;
+        if (content == null) {
+            if (inflater == null) inflater = LayoutInflater.from(context);
+            if (viewBuilder != null) {
+                holder = new BaseViewHolder(this, viewBuilder.onCreateView(parent, inflater, viewType));
+            } else if (layoutBuilder != null) {
+                holder = new BaseViewHolder(this, inflater.inflate(layoutBuilder.onCreateView(context, viewType), parent, false));
+            } else if (resId != 0) {
+                holder = new BaseViewHolder(this, inflater.inflate(resId, parent, false));
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            holder = new BaseViewHolder(this, content);
+        }
+        return holder;
     }
 
     @Override
@@ -54,4 +102,12 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder,
     protected abstract void initData(BaseViewHolder holder, int position, @Nullable T module, @Nullable List<Object> payloads);
 
 
+    public interface ViewBuilder {
+        View onCreateView(@NonNull ViewGroup parent, LayoutInflater inflater, int viewType);
+    }
+
+    public interface LayoutBuilder {
+        @LayoutRes
+        int onCreateView(Context context, int viewType);
+    }
 }

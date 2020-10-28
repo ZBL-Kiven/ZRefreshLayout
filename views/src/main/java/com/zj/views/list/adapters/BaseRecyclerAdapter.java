@@ -15,17 +15,17 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends RecyclerView.Adapter<VH> {
 
+    private final List<T> data;
+
+    public ItemClickListener<T> onClickListener;
+
     public BaseRecyclerAdapter() {
         data = new ArrayList<>();
     }
 
-    public ItemClickListener onClickListener;
-
     public void setOnItemClickListener(ItemClickListener<T> listener) {
         this.onClickListener = listener;
     }
-
-    private List<T> data;
 
     @Override
     public int getItemCount() {
@@ -97,7 +97,7 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
     public void change(List<T> d) {
         int size = data.size();
         data.clear();
-        notifyItemRangeRemoved(0,size);
+        notifyItemRangeRemoved(0, size);
         if (d == null) {
             return;
         }
