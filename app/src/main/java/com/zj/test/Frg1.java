@@ -30,10 +30,10 @@ public class Frg1 extends BaseLinkageFragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-//            s.append("a");
-//            dtv.setText(s.toString());
-            isSelected = !isSelected;
-            dtv.setSelected(isSelected);
+            //            s.append("a");
+            //            dtv.setText(s.toString());
+            //            isSelected = !isSelected;
+            //            dtv.setSelected(isSelected);
         }
     };
 
@@ -41,12 +41,18 @@ public class Frg1 extends BaseLinkageFragment {
     protected void onCreate() {
         super.onCreate();
         dtv = find(R.id.dtv);
+        dtv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setSelected(true);
+            }
+        });
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -153,6 +152,7 @@ public class DrawableTextView extends View {
                 gravity = ta.getInt(R.styleable.DrawableTextView_dtv_gravity, Gravity.center);
                 clearTextIfEmpty = ta.getBoolean(R.styleable.DrawableTextView_dtv_clearTextIfEmpty, false);
                 badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_dtv_badgeEnable, badgeEnable);
+                boolean selected = ta.getBoolean(R.styleable.DrawableTextView_dtv_select, isSelected);
                 fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
                 fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
 
@@ -173,6 +173,7 @@ public class DrawableTextView extends View {
                     badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginTop, badgeMargin);
                     badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginBottom, badgeMargin);
                 }
+                setSelected(selected);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -211,7 +212,6 @@ public class DrawableTextView extends View {
             badgeTextPaint.setTextSize(badgeTextSize);
             badgeTextPaint.setTextAlign(Paint.Align.CENTER);
         }
-        calculationAll();
         if (animDuration > 0) {
             animator = new DrawableValueAnimator();
             animator.setDuration(animDuration);
@@ -223,6 +223,7 @@ public class DrawableTextView extends View {
                 }
             });
         }
+        postInvalidate();
     }
 
     private PointF textStart, badgeTextStart;
@@ -237,11 +238,15 @@ public class DrawableTextView extends View {
     private void calculateViewDimension() {
         float textWidth;
         float textHeight;
-        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(textSelected)) {
+        if ((!isSelected && TextUtils.isEmpty(text)) || (isSelected && TextUtils.isEmpty(textSelected))) {
             textWidth = 0;
             textHeight = 0;
         } else {
-            textWidth = Math.max(text == null ? 0 : textPaint.measureText(text), textSelected == null ? 0 : textPaint.measureText(textSelected));
+            if (isSelected) {
+                textWidth = TextUtils.isEmpty(textSelected) ? 0 : textPaint.measureText(textSelected);
+            } else {
+                textWidth = TextUtils.isEmpty(text) ? 0 : textPaint.measureText(text);
+            }
             Paint.FontMetrics metrics = textPaint.getFontMetrics();
             textHeight = metrics.descent - metrics.ascent;
         }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DrawableTextView">
+        <attr name="dtv_select" format="boolean" />
         <attr name="dtv_viewWidth" format="dimension" />
         <attr name="dtv_viewHeight" format="dimension" />
         <attr name="dtv_drawableWidth" format="dimension" />
