@@ -15,6 +15,8 @@ import com.zj.views.DrawableTextView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class Frg1 extends BaseLinkageFragment {
     @NotNull
     @Override
@@ -23,17 +25,13 @@ public class Frg1 extends BaseLinkageFragment {
     }
 
     DrawableTextView dtv;
-    StringBuilder s = new StringBuilder();
-    boolean isSelected = false;
 
-    private final Handler handler = new Handler(Looper.myLooper()) {
+    private final Handler handler = new Handler(Objects.requireNonNull(Looper.myLooper())) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            //            s.append("a");
-            //            dtv.setText(s.toString());
-            //            isSelected = !isSelected;
-            //            dtv.setSelected(isSelected);
+            dtv.setSelected(true);
+            dtv.setVisibility(View.VISIBLE);
         }
     };
 
@@ -41,24 +39,13 @@ public class Frg1 extends BaseLinkageFragment {
     protected void onCreate() {
         super.onCreate();
         dtv = find(R.id.dtv);
+        assert dtv != null;
         dtv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                v.setSelected(true);
+                v.setSelected(!v.isSelected());
             }
         });
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    handler.sendEmptyMessage(127);
-                }
-            }
-        }).start();
+        handler.sendEmptyMessageDelayed(127, 2000);
     }
 }

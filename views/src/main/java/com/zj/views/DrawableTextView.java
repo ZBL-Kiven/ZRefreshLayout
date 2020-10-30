@@ -90,7 +90,7 @@ public class DrawableTextView extends View {
         } else {
             animator.start(isSelected());
         }
-        postInvalidate();
+        refreshAndValidate();
     }
 
     @Target(ElementType.PARAMETER)
