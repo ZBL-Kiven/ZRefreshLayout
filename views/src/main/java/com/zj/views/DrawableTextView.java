@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -57,7 +58,7 @@ public class DrawableTextView extends View {
     private int textColor = Color.GRAY, textColorSelect = Color.GRAY;
     private float viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
 
-    private boolean badgeEnable = false;
+    private boolean badgeEnable = false, clearTextIfEmpty = false;
     private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
     private float badgeTextSize = 0;
     private float badgePadding = 0.0f;
@@ -72,8 +73,7 @@ public class DrawableTextView extends View {
 
     private Paint textPaint;
     private Paint badgeTextPaint;
-
-
+    private final ArgbEvaluator evaluator = new ArgbEvaluator();
     private DrawableValueAnimator animator;
     private boolean isSelected = false;
 
@@ -151,6 +151,7 @@ public class DrawableTextView extends View {
                 orientation = ta.getInt(R.styleable.DrawableTextView_dtv_orientation, Orientation.left);
                 animDuration = ta.getInt(R.styleable.DrawableTextView_dtv_animDuration, 0);
                 gravity = ta.getInt(R.styleable.DrawableTextView_dtv_gravity, Gravity.center);
+                clearTextIfEmpty = ta.getBoolean(R.styleable.DrawableTextView_dtv_clearTextIfEmpty, false);
                 badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_dtv_badgeEnable, badgeEnable);
                 fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
                 fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
@@ -446,16 +447,16 @@ public class DrawableTextView extends View {
     }
 
     private void drawText(Canvas canvas) {
-        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(textSelected)) return;
-        int tc = textColor;
-        int tcs = textColorSelect;
         String drawText;
-        if (TextUtils.isEmpty(text)) {
-            tc = Color.TRANSPARENT;
+        if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(textSelected) || clearTextIfEmpty) {
+            drawText = isSelected ? textSelected : text;
+        } else {
+            drawText = TextUtils.isEmpty(text) ? textSelected : text;
         }
-        drawText = (isSelected && !TextUtils.isEmpty(textSelected)) ? textSelected : text;
-        ArgbEvaluator evaluator = new ArgbEvaluator();
-        int evaTextColor = (int) evaluator.evaluate(curAnimFraction, tc, textColorSelect);
+        if (TextUtils.isEmpty(drawText)) return;
+        int start = textColor;
+        int end = textColorSelect;
+        int evaTextColor = (int) evaluator.evaluate(curAnimFraction, textColor, textColorSelect);
         textPaint.setColor(evaTextColor);
         canvas.drawText(drawText, textStart.x, textStart.y, textPaint);
     }
@@ -467,7 +468,6 @@ public class DrawableTextView extends View {
     private void drawBadge(Canvas canvas) {
         if (!badgeEnable || TextUtils.isEmpty(badgeText)) return;
         drawDrawables(canvas, badgeBackgroundSelected, badgeBackground, badgeRect);
-        ArgbEvaluator evaluator = new ArgbEvaluator();
         int evaTextColor = (int) evaluator.evaluate(curAnimFraction, badgeTextColor, badgeTextColorSelected);
         badgeTextPaint.setColor(evaTextColor);
         canvas.drawText(badgeText, badgeTextStart.x, badgeTextStart.y, badgeTextPaint);

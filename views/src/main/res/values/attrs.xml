@@ -15,6 +15,7 @@
         <attr name="dtv_selectedDrawable" format="reference" />
         <attr name="dtv_text" format="reference|string" />
         <attr name="dtv_textSelected" format="reference|string" />
+        <attr name="dtv_clearTextIfEmpty" format="boolean" />
         <attr name="dtv_textSize" format="dimension" />
         <attr name="dtv_textColor" format="color|reference" />
         <attr name="dtv_textColorSelect" format="color|reference" />

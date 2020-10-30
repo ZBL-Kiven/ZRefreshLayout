@@ -30,8 +30,8 @@ public class Frg1 extends BaseLinkageFragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            s.append("a");
-            dtv.setText(s.toString());
+//            s.append("a");
+//            dtv.setText(s.toString());
             isSelected = !isSelected;
             dtv.setSelected(isSelected);
         }
@@ -46,7 +46,7 @@ public class Frg1 extends BaseLinkageFragment {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
