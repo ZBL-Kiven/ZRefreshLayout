@@ -32,10 +32,12 @@ import static com.zj.views.ut.DPUtils.dp2px;
  * Supports custom size of pictures, supports transformation, supports relative positions such as up, down, left, right, etc.
  * According to the setting of DrawableTextView.initData (0.0f / 1.0f), instant switching between two states can be realized;
  * Can also be used for gradient switching with attribute animation;
- *
- * @version v1.0.1 Badge supported , now you can set a badge in DrawableTextView, and set a String text with {@link #setBadgeText}
+ * <p>
+ * v1.0.1 Badge supported , now you can set a badge in DrawableTextView, and set a String text with {@link #setBadgeText}
  * also you should declared the badge attrs in your xml file , the property 'badgeEnable' is required . you can set the badges text color/size ,
  * background ,padding ,margin ,minWidth ,minHeight . as always , it supported to set a Gravity for badges.
+ * <p>
+ * v1.0.2 badgeBackground ,background , badgeTextColor] are supported change with animation by selected/unselected.
  */
 
 @SuppressWarnings("unused")
@@ -44,20 +46,19 @@ public class DrawableTextView extends View {
     private float drawableWidth = dp2px(20);
     private float drawableHeight = dp2px(20);
     @Nullable
-    private Drawable replaceDrawable, selectedDrawable, badgeBackground;
+    private Drawable replaceDrawable, selectedDrawable, badgeBackground, badgeBackgroundSelected, backgroundDrawable, backgroundDrawableSelected;
     private int orientation;
     private int gravity, badgeGravity;
     private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f;
     private float drawablePadding = 0.0f;
     @Nullable
-    private String text, badgeText;
+    private String text, textSelected, badgeText;
     private float textSize = dp2px(12);
-    private int textColor = Color.GRAY;
-    private int textColorSelect = Color.BLACK;
+    private int textColor = Color.GRAY, textColorSelect = Color.GRAY;
     private float viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
 
     private boolean badgeEnable = false;
-    private int badgeTextColor = Color.BLACK;
+    private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
     private float badgeTextSize = 0;
     private float badgePadding = 0.0f;
     private float badgeMarginStart = 0.0f;
@@ -128,43 +129,48 @@ public class DrawableTextView extends View {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DrawableTextView);
             try {
-                layoutWidth = ta.getDimension(R.styleable.DrawableTextView_viewWidth, 0f);
-                layoutHeight = ta.getDimension(R.styleable.DrawableTextView_viewHeight, 0f);
-                drawableWidth = ta.getDimension(R.styleable.DrawableTextView_drawableWidth, drawableWidth);
-                drawableHeight = ta.getDimension(R.styleable.DrawableTextView_drawableHeight, drawableHeight);
-                float padding = ta.getDimension(R.styleable.DrawableTextView_padding, 0f);
-                paddingLeft = ta.getDimension(R.styleable.DrawableTextView_paddingLeft, padding);
-                paddingRight = ta.getDimension(R.styleable.DrawableTextView_paddingRight, padding);
-                paddingBottom = ta.getDimension(R.styleable.DrawableTextView_paddingBottom, padding);
-                paddingTop = ta.getDimension(R.styleable.DrawableTextView_paddingTop, padding);
-                drawablePadding = ta.getDimension(R.styleable.DrawableTextView_drawablePadding, drawablePadding);
-                replaceDrawable = ta.getDrawable(R.styleable.DrawableTextView_replaceDrawable);
-                selectedDrawable = ta.getDrawable(R.styleable.DrawableTextView_selectedDrawable);
-                text = ta.getString(R.styleable.DrawableTextView_text);
-                textSize = ta.getDimension(R.styleable.DrawableTextView_textSize, textSize);
-                textColor = ta.getColor(R.styleable.DrawableTextView_textColor, textColor);
-                textColorSelect = ta.getColor(R.styleable.DrawableTextView_textColorSelect, textColorSelect);
-                orientation = ta.getInt(R.styleable.DrawableTextView_orientation, Orientation.left);
-                animDuration = ta.getInt(R.styleable.DrawableTextView_animDuration, 0);
-                gravity = ta.getInt(R.styleable.DrawableTextView_gravity, Gravity.center);
-                badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_badgeEnable, badgeEnable);
-                fontPath = ta.getString(R.styleable.DrawableTextView_textFontPath);
-                fontStyle = ta.getInt(R.styleable.DrawableTextView_textStyle, -1);
+                layoutWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
+                layoutHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
+                drawableWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableWidth, drawableWidth);
+                drawableHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableHeight, drawableHeight);
+                float padding = ta.getDimension(R.styleable.DrawableTextView_dtv_padding, 0f);
+                paddingLeft = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingLeft, padding);
+                paddingRight = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingRight, padding);
+                paddingBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingBottom, padding);
+                paddingTop = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingTop, padding);
+                drawablePadding = ta.getDimension(R.styleable.DrawableTextView_dtv_drawablePadding, drawablePadding);
+                replaceDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_replaceDrawable);
+                selectedDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_selectedDrawable);
+                backgroundDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_background);
+                backgroundDrawableSelected = ta.getDrawable(R.styleable.DrawableTextView_dtv_backgroundSelected);
+                text = ta.getString(R.styleable.DrawableTextView_dtv_text);
+                textSelected = ta.getString(R.styleable.DrawableTextView_dtv_textSelected);
+                textSize = ta.getDimension(R.styleable.DrawableTextView_dtv_textSize, textSize);
+                textColor = ta.getColor(R.styleable.DrawableTextView_dtv_textColor, textColor);
+                textColorSelect = ta.getColor(R.styleable.DrawableTextView_dtv_textColorSelect, textColorSelect);
+                orientation = ta.getInt(R.styleable.DrawableTextView_dtv_orientation, Orientation.left);
+                animDuration = ta.getInt(R.styleable.DrawableTextView_dtv_animDuration, 0);
+                gravity = ta.getInt(R.styleable.DrawableTextView_dtv_gravity, Gravity.center);
+                badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_dtv_badgeEnable, badgeEnable);
+                fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
+                fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
 
                 if (badgeEnable) {
-                    badgeText = ta.getString(R.styleable.DrawableTextView_badgeText);
-                    badgeBackground = ta.getDrawable(R.styleable.DrawableTextView_badgeBackground);
-                    badgeTextColor = ta.getColor(R.styleable.DrawableTextView_badgeTextColor, badgeTextColor);
-                    badgeTextSize = ta.getDimension(R.styleable.DrawableTextView_badgeTextSize, badgeTextSize);
-                    badgePadding = ta.getDimension(R.styleable.DrawableTextView_badgePadding, badgePadding);
-                    badgeGravity = ta.getInt(R.styleable.DrawableTextView_badgeInGravity, Gravity.center);
-                    float badgeMargin = ta.getDimension(R.styleable.DrawableTextView_badgeMargin, 0f);
-                    badgeMinWidth = ta.getDimension(R.styleable.DrawableTextView_badgeMinWidth, 0f);
-                    badgeMinHeight = ta.getDimension(R.styleable.DrawableTextView_badgeMinHeight, 0f);
-                    badgeMarginStart = ta.getDimension(R.styleable.DrawableTextView_badgeMarginStart, badgeMargin);
-                    badgeMarginEnd = ta.getDimension(R.styleable.DrawableTextView_badgeMarginEnd, badgeMargin);
-                    badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_badgeMarginTop, badgeMargin);
-                    badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_badgeMarginBottom, badgeMargin);
+                    badgeText = ta.getString(R.styleable.DrawableTextView_dtv_badgeText);
+                    badgeBackground = ta.getDrawable(R.styleable.DrawableTextView_dtv_badgeBackground);
+                    badgeBackgroundSelected = ta.getDrawable(R.styleable.DrawableTextView_dtv_badgeBackgroundSelected);
+                    badgeTextColor = ta.getColor(R.styleable.DrawableTextView_dtv_badgeTextColor, badgeTextColor);
+                    badgeTextColorSelected = ta.getColor(R.styleable.DrawableTextView_dtv_badgeTextColorSelected, badgeTextColorSelected);
+                    badgeTextSize = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeTextSize, badgeTextSize);
+                    badgePadding = ta.getDimension(R.styleable.DrawableTextView_dtv_badgePadding, badgePadding);
+                    badgeGravity = ta.getInt(R.styleable.DrawableTextView_dtv_badgeInGravity, Gravity.center);
+                    float badgeMargin = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMargin, 0f);
+                    badgeMinWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMinWidth, 0f);
+                    badgeMinHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMinHeight, 0f);
+                    badgeMarginStart = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginStart, badgeMargin);
+                    badgeMarginEnd = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginEnd, badgeMargin);
+                    badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginTop, badgeMargin);
+                    badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginBottom, badgeMargin);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -202,7 +208,6 @@ public class DrawableTextView extends View {
             badgeTextPaint = new Paint();
             badgeTextPaint.setAntiAlias(true);
             badgeTextPaint.setTextSize(badgeTextSize);
-            badgeTextPaint.setColor(badgeTextColor);
             badgeTextPaint.setTextAlign(Paint.Align.CENTER);
         }
         calculationAll();
@@ -231,11 +236,11 @@ public class DrawableTextView extends View {
     private void calculateViewDimension() {
         float textWidth;
         float textHeight;
-        if (TextUtils.isEmpty(text)) {
+        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(textSelected)) {
             textWidth = 0;
             textHeight = 0;
         } else {
-            textWidth = textPaint.measureText(text);
+            textWidth = Math.max(textPaint.measureText(text), textPaint.measureText(textSelected));
             Paint.FontMetrics metrics = textPaint.getFontMetrics();
             textHeight = metrics.descent - metrics.ascent;
         }
@@ -406,32 +411,34 @@ public class DrawableTextView extends View {
     public void setBadgeText(String text) {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
         badgeText = text;
-        postInvalidate();
-        requestLayout();
+        refreshAndValidate();
     }
 
     public void clearBadgeText() {
         badgeText = "";
-        postInvalidate();
-        requestLayout();
+        refreshAndValidate();
     }
 
     public void setText(String s) {
         this.text = s;
-        postInvalidate();
-        requestLayout();
+        refreshAndValidate();
+    }
+
+    public void setSelectedText(String s) {
+        this.textSelected = s;
+        refreshAndValidate();
     }
 
     public void setOrientation(@Orientation int orientation) {
         this.orientation = orientation;
-        postInvalidate();
-        requestLayout();
+        refreshAndValidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
         calculationAll();
+        drawBackground(canvas);
         drawText(canvas);
         drawDrawable(canvas);
         drawBadge(canvas);
@@ -439,55 +446,72 @@ public class DrawableTextView extends View {
     }
 
     private void drawText(Canvas canvas) {
-        if (TextUtils.isEmpty(text)) return;
+        if (TextUtils.isEmpty(text) && TextUtils.isEmpty(textSelected)) return;
+        int tc = textColor;
+        int tcs = textColorSelect;
+        String drawText;
+        if (TextUtils.isEmpty(text)) {
+            tc = Color.TRANSPARENT;
+        }
+        drawText = (isSelected && !TextUtils.isEmpty(textSelected)) ? textSelected : text;
         ArgbEvaluator evaluator = new ArgbEvaluator();
-        int evaTextColor = (int) evaluator.evaluate(curAnimFraction, textColor, textColorSelect);
+        int evaTextColor = (int) evaluator.evaluate(curAnimFraction, tc, textColorSelect);
         textPaint.setColor(evaTextColor);
-        canvas.drawText(text, textStart.x, textStart.y, textPaint);
+        canvas.drawText(drawText, textStart.x, textStart.y, textPaint);
     }
 
     private void drawDrawable(Canvas canvas) {
-        if (selectedDrawable == null || replaceDrawable == null) {
-            if (selectedDrawable != null) {
-                selectedDrawable.setBounds(drawableRect);
-                selectedDrawable.setAlpha(255);
-                selectedDrawable.draw(canvas);
-            }
-            if (replaceDrawable != null) {
-                replaceDrawable.setAlpha(255);
-                replaceDrawable.setBounds(drawableRect);
-                replaceDrawable.draw(canvas);
-            }
-            return;
-        }
-        replaceDrawable.setBounds(drawableRect);
-        selectedDrawable.setBounds(drawableRect);
-        int curAlpha = (int) (curAnimFraction * 255f + 0.5f);
-        replaceDrawable.setAlpha(255 - curAlpha);
-        selectedDrawable.setAlpha(curAlpha);
-        if (curAlpha > 0) {
-            selectedDrawable.draw(canvas);
-        }
-        if (curAlpha < 255) {
-            replaceDrawable.draw(canvas);
-        }
+        drawDrawables(canvas, selectedDrawable, replaceDrawable, drawableRect);
     }
 
     private void drawBadge(Canvas canvas) {
         if (!badgeEnable || TextUtils.isEmpty(badgeText)) return;
-        if (badgeBackground != null) {
-            badgeBackground.setBounds(badgeRect);
-            badgeBackground.draw(canvas);
-        }
+        drawDrawables(canvas, badgeBackgroundSelected, badgeBackground, badgeRect);
+        ArgbEvaluator evaluator = new ArgbEvaluator();
+        int evaTextColor = (int) evaluator.evaluate(curAnimFraction, badgeTextColor, badgeTextColorSelected);
+        badgeTextPaint.setColor(evaTextColor);
         canvas.drawText(badgeText, badgeTextStart.x, badgeTextStart.y, badgeTextPaint);
     }
 
+    private void drawBackground(Canvas canvas) {
+        Rect rect = new Rect();
+        getLocalVisibleRect(rect);
+        drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, rect);
+    }
+
+    private void drawDrawables(Canvas canvas, @Nullable Drawable select, @Nullable Drawable replace, Rect rect) {
+        if (select == null || replace == null) {
+            if (select != null) {
+                select.setBounds(rect);
+                select.setAlpha(255);
+                select.draw(canvas);
+            }
+            if (replace != null) {
+                replace.setAlpha(255);
+                replace.setBounds(rect);
+                replace.draw(canvas);
+            }
+            return;
+        }
+        replace.setBounds(rect);
+        select.setBounds(rect);
+        int curAlpha = (int) (curAnimFraction * 255f + 0.5f);
+        replace.setAlpha(255 - curAlpha);
+        select.setAlpha(curAlpha);
+        if (curAlpha > 0) {
+            select.draw(canvas);
+        }
+        if (curAlpha < 255) {
+            replace.draw(canvas);
+        }
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        float w = Math.max(layoutWidth, viewWidth);
-        float h = Math.max(layoutHeight, viewHeight);
+        calculationAll();
+        float w = Math.max(layoutWidth, viewWidth) + 0.5f;
+        float h = Math.max(layoutHeight, viewHeight) + 0.5f;
         setMeasuredDimension((int) w, (int) h);
     }
 
@@ -557,5 +581,9 @@ public class DrawableTextView extends View {
                 }
             });
         }
+    }
+
+    private void refreshAndValidate() {
+        requestLayout();
     }
 }

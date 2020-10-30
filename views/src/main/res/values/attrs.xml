@@ -1,58 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DrawableTextView">
-        <attr name="viewWidth" format="dimension" />
-        <attr name="viewHeight" format="dimension" />
-        <attr name="drawableWidth" format="dimension" />
-        <attr name="drawableHeight" format="dimension" />
-        <attr name="padding" format="dimension" />
-        <attr name="paddingLeft" format="dimension" />
-        <attr name="paddingRight" format="dimension" />
-        <attr name="paddingTop" format="dimension" />
-        <attr name="paddingBottom" format="dimension" />
-        <attr name="drawablePadding" format="dimension" />
-        <attr name="replaceDrawable" format="reference" />
-        <attr name="selectedDrawable" format="reference" />
-        <attr name="text" format="reference|string" />
-        <attr name="textSize" format="dimension" />
-        <attr name="textColor" format="color|reference" />
-        <attr name="textColorSelect" format="color|reference" />
-        <attr name="translationTime" format="integer" />
-        <attr name="badgeEnable" format="boolean" />
-        <attr name="badgeBackground" format="reference" />
-        <attr name="badgeText" format="string" />
-        <attr name="badgeTextColor" format="color|reference" />
-        <attr name="badgeTextSize" format="dimension" />
-        <attr name="badgePadding" format="dimension" />
-        <attr name="badgeMinWidth" format="dimension" />
-        <attr name="badgeMinHeight" format="dimension" />
-        <attr name="badgeMargin" format="dimension" />
-        <attr name="badgeMarginStart" format="dimension" />
-        <attr name="badgeMarginEnd" format="dimension" />
-        <attr name="badgeMarginTop" format="dimension" />
-        <attr name="badgeMarginBottom" format="dimension" />
-        <attr name="animDuration" format="integer" />
-        <attr name="textFontPath" format="string" />
-        <attr name="textStyle" format="enum">
+        <attr name="dtv_viewWidth" format="dimension" />
+        <attr name="dtv_viewHeight" format="dimension" />
+        <attr name="dtv_drawableWidth" format="dimension" />
+        <attr name="dtv_drawableHeight" format="dimension" />
+        <attr name="dtv_padding" format="dimension" />
+        <attr name="dtv_paddingLeft" format="dimension" />
+        <attr name="dtv_paddingRight" format="dimension" />
+        <attr name="dtv_paddingTop" format="dimension" />
+        <attr name="dtv_paddingBottom" format="dimension" />
+        <attr name="dtv_drawablePadding" format="dimension" />
+        <attr name="dtv_replaceDrawable" format="reference" />
+        <attr name="dtv_selectedDrawable" format="reference" />
+        <attr name="dtv_text" format="reference|string" />
+        <attr name="dtv_textSelected" format="reference|string" />
+        <attr name="dtv_textSize" format="dimension" />
+        <attr name="dtv_textColor" format="color|reference" />
+        <attr name="dtv_textColorSelect" format="color|reference" />
+        <attr name="dtv_translationTime" format="integer" />
+        <attr name="dtv_badgeEnable" format="boolean" />
+        <attr name="dtv_badgeBackground" format="color|reference" />
+        <attr name="dtv_badgeBackgroundSelected" format="color|reference" />
+        <attr name="dtv_background" format="color|reference" />
+        <attr name="dtv_backgroundSelected" format="color|reference" />
+        <attr name="dtv_badgeText" format="string" />
+        <attr name="dtv_badgeTextColor" format="color|reference" />
+        <attr name="dtv_badgeTextColorSelected" format="color|reference" />
+        <attr name="dtv_badgeTextSize" format="dimension" />
+        <attr name="dtv_badgePadding" format="dimension" />
+        <attr name="dtv_badgeMinWidth" format="dimension" />
+        <attr name="dtv_badgeMinHeight" format="dimension" />
+        <attr name="dtv_badgeMargin" format="dimension" />
+        <attr name="dtv_badgeMarginStart" format="dimension" />
+        <attr name="dtv_badgeMarginEnd" format="dimension" />
+        <attr name="dtv_badgeMarginTop" format="dimension" />
+        <attr name="dtv_badgeMarginBottom" format="dimension" />
+        <attr name="dtv_animDuration" format="integer" />
+        <attr name="dtv_textFontPath" format="string" />
+        <attr name="dtv_textStyle" format="enum">
             <enum name="normal" value="0" />
             <enum name="bold" value="1" />
             <enum name="italic" value="2" />
             <enum name="bold_italic" value="3" />
         </attr>
-        <attr name="badgeInGravity" format="flags">
+        <attr name="dtv_badgeInGravity" format="flags">
             <flag name="LEFT" value="2" />
             <flag name="TOP" value="4" />
             <flag name="RIGHT" value="8" />
             <flag name="BOTTOM" value="16" />
             <flag name="CENTER" value="1" />
         </attr>
-        <attr name="orientation" format="enum">
+        <attr name="dtv_orientation" format="enum">
             <enum name="left" value="0" />
             <enum name="top" value="1" />
             <enum name="right" value="2" />
             <enum name="bottom" value="3" />
         </attr>
-        <attr name="gravity" format="flags">
+        <attr name="dtv_gravity" format="flags">
             <flag name="LEFT" value="2" />
             <flag name="TOP" value="4" />
             <flag name="RIGHT" value="8" />

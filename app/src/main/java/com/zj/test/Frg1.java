@@ -24,13 +24,16 @@ public class Frg1 extends BaseLinkageFragment {
 
     DrawableTextView dtv;
     StringBuilder s = new StringBuilder();
+    boolean isSelected = false;
 
-    private Handler handler = new Handler(Looper.myLooper()) {
+    private final Handler handler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             s.append("a");
             dtv.setText(s.toString());
+            isSelected = !isSelected;
+            dtv.setSelected(isSelected);
         }
     };
 
@@ -43,7 +46,7 @@ public class Frg1 extends BaseLinkageFragment {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(300);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
