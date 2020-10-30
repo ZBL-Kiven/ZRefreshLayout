@@ -240,7 +240,7 @@ public class DrawableTextView extends View {
             textWidth = 0;
             textHeight = 0;
         } else {
-            textWidth = Math.max(textPaint.measureText(text), textPaint.measureText(textSelected));
+            textWidth = Math.max(text == null ? 0 : textPaint.measureText(text), textSelected == null ? 0 : textPaint.measureText(textSelected));
             Paint.FontMetrics metrics = textPaint.getFontMetrics();
             textHeight = metrics.descent - metrics.ascent;
         }
