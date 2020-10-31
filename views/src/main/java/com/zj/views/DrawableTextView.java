@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -479,8 +480,8 @@ public class DrawableTextView extends View {
     }
 
     private void drawBackground(Canvas canvas) {
-        Rect rect = new Rect();
-        getLocalVisibleRect(rect);
+        Point p = getViewRect();
+        Rect rect = new Rect(0, 0, p.x, p.y);
         drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, rect);
     }
 
@@ -515,9 +516,14 @@ public class DrawableTextView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         calculationAll();
+        Point p = getViewRect();
+        setMeasuredDimension(p.x, p.y);
+    }
+
+    private Point getViewRect() {
         float w = Math.max(layoutWidth, viewWidth) + 0.5f;
         float h = Math.max(layoutHeight, viewHeight) + 0.5f;
-        setMeasuredDimension((int) w, (int) h);
+        return new Point((int) w, (int) h);
     }
 
     private interface OnAnimListener {
