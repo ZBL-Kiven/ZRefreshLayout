@@ -55,7 +55,7 @@ public class DrawableTextView extends View {
     @Nullable
     private String text, textSelected, badgeText;
     private float textSize = dp2px(12);
-    private int textColor = Color.GRAY, textColorSelect = Color.GRAY;
+    private int textColor = Color.GRAY, textColorSelect = -1;
     private float viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
 
     private boolean badgeEnable = false, clearTextIfEmpty = false;
@@ -156,7 +156,6 @@ public class DrawableTextView extends View {
                 boolean selected = ta.getBoolean(R.styleable.DrawableTextView_dtv_select, isSelected);
                 fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
                 fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
-
                 if (badgeEnable) {
                     badgeText = ta.getString(R.styleable.DrawableTextView_dtv_badgeText);
                     badgeBackground = ta.getDrawable(R.styleable.DrawableTextView_dtv_badgeBackground);
@@ -174,6 +173,10 @@ public class DrawableTextView extends View {
                     badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginTop, badgeMargin);
                     badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginBottom, badgeMargin);
                 }
+                if (TextUtils.isEmpty(textSelected)) textSelected = text;
+                if (textColorSelect == -1) textColorSelect = textColor;
+                if (badgeTextColorSelected == -1) badgeTextColorSelected = badgeTextColor;
+
                 setSelected(selected);
             } catch (Exception e) {
                 e.printStackTrace();
