@@ -38,15 +38,17 @@ public final class EmptyRecyclerView<T> extends RecyclerView {
         super(context, attrs, defStyle);
     }
 
+    public BaseAdapter<T> getAdapter() {
+        return adapter;
+    }
 
     public void setData(@LayoutRes int itemViewId, boolean isLoadMore, @Nullable List<T> data, @Nullable final BaseAdapterDataSet<T> adapterDataSet) {
         setOverScrollMode(OVER_SCROLL_NEVER);
-        if (getLayoutManager() == null)
-            setLayoutManager(new LinearLayoutManager(getContext()));
+        if (getLayoutManager() == null) setLayoutManager(new LinearLayoutManager(getContext()));
         if (adapter == null) {
             adapter = new BaseAdapter<T>(itemViewId) {
                 @Override
-                protected void initData(BaseViewHolder holder, int position,@Nullable T module, List<Object> payloads) {
+                protected void initData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads) {
                     if (adapterDataSet != null) adapterDataSet.initData(holder, position, module);
                 }
             };
