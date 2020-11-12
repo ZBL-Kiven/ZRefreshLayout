@@ -42,7 +42,7 @@ public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends 
 
     @Nullable
     public T getItem(int position) {
-        if (data == null || data.isEmpty() || position < 0 || position >= data.size()) return null;
+        if (data.isEmpty() || position < 0 || position >= data.size()) return null;
         return data.get(position);
     }
 

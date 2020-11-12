@@ -90,9 +90,7 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder,
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
-        BaseAdapter.this.onBindViewHolder(holder, position, null);
-    }
+    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) { }
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position, @Nullable List<Object> payloads) {
