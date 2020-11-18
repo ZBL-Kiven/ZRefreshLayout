@@ -75,6 +75,7 @@
         <attr name="foldText" format="string" />
         <attr name="expandText" format="string" />
         <attr name="drawableSize" format="dimension" />
+        <attr name="foldTextSize" format="dimension" />
         <attr name="showTipAfterExpand" format="boolean" />
         <attr name="isSetParentClick" format="boolean" />
         <attr name="expandDrawable" format="color|reference" />

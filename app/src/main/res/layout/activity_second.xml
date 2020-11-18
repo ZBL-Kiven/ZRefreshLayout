@@ -45,7 +45,7 @@
             app:dtv_padding="5dp"
             app:dtv_replaceDrawable="@mipmap/ic_launcher"
             app:dtv_selectedDrawable="@mipmap/ic_launcher_round"
-            app:dtv_text="addsc"
+            app:dtv_text="addsc\n asdqs\n"
             app:dtv_textColor="#a00"
             app:dtv_textSize="22sp"
             app:dtv_translationTime="500" />

@@ -20,6 +20,7 @@ import android.text.NoCopySpan.Concrete;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
 import android.text.method.ScrollingMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ClickableSpan;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ForegroundColorSpan;
@@ -43,6 +44,8 @@ import static android.text.Spanned.SPAN_INCLUSIVE_EXCLUSIVE;
 
 @SuppressWarnings("unused")
 public class FoldTextView extends AppCompatTextView implements OnClickListener {
+
+    private static final String ellipse = "\u2026", placeholder = "\u0020";
     private int mShowMaxLine;
     private String mFoldText;
     private String mExpandText;
@@ -57,7 +60,8 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
     private boolean isShowTipAfterExpand;
     private boolean isExpandSpanClick;
     private boolean isParentClick;
-    private float drawableSize;
+    private float foldTextSize, foldDrawableSize;
+    private int mFoldWidth, mFoldSize;
     private OnClickListener listener;
 
     public FoldTextView(Context context) {
@@ -76,7 +80,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
         super(context, attrs, defStyleAttr);
         this.mFoldText = "";
         this.mExpandText = "";
-        this.drawableSize = 0.0F;
+        this.foldTextSize = 0.0f;
         this.mShowMaxLine = 4;
         this.mSpan = new FoldTextView.ExpandSpan();
         TypedArray arr = context.obtainStyledAttributes(attrs, styleable.FoldTextView);
@@ -86,13 +90,23 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                 this.mShowMaxLine = arr.getInt(styleable.FoldTextView_showMaxLine, 4);
                 this.mTipColor = arr.getColor(styleable.FoldTextView_tipColor, -1);
                 this.mTipClickable = arr.getBoolean(styleable.FoldTextView_tipClickable, false);
-                this.mFoldText = arr.getString(styleable.FoldTextView_foldText);
                 this.mFoldDrawable = arr.getDrawable(styleable.FoldTextView_foldDrawable);
                 this.mExpandDrawable = arr.getDrawable(styleable.FoldTextView_expandDrawable);
+                this.mFoldText = arr.getString(styleable.FoldTextView_foldText);
                 this.mExpandText = arr.getString(styleable.FoldTextView_expandText);
-                this.drawableSize = arr.getDimension(styleable.FoldTextView_drawableSize, this.getTextSize());
+                this.foldTextSize = arr.getDimension(styleable.FoldTextView_foldTextSize, this.getTextSize());
+                this.foldDrawableSize = arr.getDimension(styleable.FoldTextView_drawableSize, this.getTextSize());
                 this.isShowTipAfterExpand = arr.getBoolean(styleable.FoldTextView_showTipAfterExpand, false);
                 this.isParentClick = arr.getBoolean(styleable.FoldTextView_isSetParentClick, false);
+                if (mFoldDrawable == null || mExpandDrawable == null) {
+                    if (mFoldDrawable == null) mFoldDrawable = mExpandDrawable;
+                    if (mExpandDrawable == null) mExpandDrawable = mFoldDrawable;
+                }
+                if (TextUtils.isEmpty(mFoldText) || TextUtils.isEmpty(mExpandText)) {
+                    if (TextUtils.isEmpty(mFoldText)) mFoldText = mExpandText;
+                    if (TextUtils.isEmpty(mExpandText)) mExpandText = mFoldText;
+                }
+                if (mFoldDrawable != null && !TextUtils.isEmpty(mFoldText)) throw new IllegalArgumentException("unable to use both of text & drawable fold span");
             }
         } finally {
             arr.recycle();
@@ -100,29 +114,22 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
     }
 
     public void setText(final CharSequence text, final BufferType type) {
-        if (!TextUtils.isEmpty(text) && this.mShowMaxLine != 0) {
-            String s = text.toString().charAt(0) + "";
-            float simpleTextSize = this.getPaint().measureText(s);
-            String str = !TextUtils.isEmpty(this.mFoldText) ? "...".concat(this.mFoldText) : "...";
-            float textWidth = this.getTextWidth(str) / simpleTextSize + 0.5F;
-            final float drawableWidth = this.drawableSize / simpleTextSize + 0.5F;
-            final int ellipsizeCount = (int) (textWidth + drawableWidth);
+        if (!TextUtils.isEmpty(text) && this.mShowMaxLine > 0 && this.mShowMaxLine < getMaxLines()) {
             if (!this.flag) {
                 this.getViewTreeObserver().addOnPreDrawListener(new OnPreDrawListener() {
                     public boolean onPreDraw() {
                         FoldTextView.this.getViewTreeObserver().removeOnPreDrawListener(this);
                         FoldTextView.this.flag = true;
-                        FoldTextView.this.formatText(text, type, ellipsizeCount, (int) drawableWidth);
+                        FoldTextView.this.formatText(text, type);
                         return true;
                     }
                 });
             } else {
-                this.formatText(text, type, ellipsizeCount, (int) drawableWidth);
+                this.formatText(text, type);
             }
         } else {
             super.setText(text, type);
         }
-
     }
 
     public void setTipColor(int color) {
@@ -136,70 +143,97 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
         this.mTipColor = c;
     }
 
-    private void formatText(CharSequence text, final BufferType type, final int ellipsizeCount, final int drawableWidth) {
+    private void formatText(final CharSequence text, final BufferType type) {
         this.mOriginalText = text;
         Layout layout = this.getLayout();
         if (layout == null || !layout.getText().equals(this.mOriginalText)) {
             super.setText(this.mOriginalText, type);
             layout = this.getLayout();
         }
-
         if (layout == null) {
             this.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
                     FoldTextView.this.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    if (FoldTextView.this.isExpand) {
-                        FoldTextView.this.translateMaxText(type, drawableWidth);
-                    } else {
-                        FoldTextView.this.translateText(FoldTextView.this.getLayout(), type, ellipsizeCount, drawableWidth);
-                    }
-
+                    FoldTextView.this.translateText(text, FoldTextView.this.getLayout(), type);
                 }
             });
-        } else if (this.isExpand) {
-            this.translateMaxText(type, drawableWidth);
         } else {
-            this.translateText(layout, type, ellipsizeCount, drawableWidth);
+            this.translateText(text, layout, type);
         }
-
     }
 
-    private void translateText(Layout layout, BufferType type, int ellipsizeWidth, int drawableWidth) {
+    private void translateText(CharSequence text, Layout layout, BufferType type) {
         int lineCount = layout.getLineCount();
-        if (this.isExpand || lineCount > this.mShowMaxLine) {
-            SpannableStringBuilder span = new SpannableStringBuilder();
-            int end = layout.getLineVisibleEnd(this.isExpand ? lineCount - 1 : this.mShowMaxLine - 1);
-            end -= ellipsizeWidth;
-            CharSequence ellipsize = this.mOriginalText.subSequence(0, end);
-            span.append(ellipsize);
-            span.append("...");
-            for (int i = 0; i < drawableWidth; ++i) {
-                span.append(" ");
-            }
-            this.addTip(span, type, drawableWidth);
+        if (this.mShowMaxLine > lineCount) {
+            super.setText(text, type);
+            return;
         }
+        float simpleSize = getPaint().measureText(placeholder);
+        if (!TextUtils.isEmpty(mFoldText)) {
+            String txt = this.isExpand ? mExpandText : mFoldText;
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setTextSize(foldTextSize);
+            mFoldSize = (int) (paint.measureText(txt) + 0.5f);
+        } else if (mFoldDrawable != null) {
+            mFoldSize = (int) (foldDrawableSize + 0.5f);
+        }
+        mFoldWidth = (int) (this.mFoldSize * 1f / simpleSize + 0.5f);
+        SpannableStringBuilder sp = fullMaxLine(layout, this.isExpand ? lineCount - 1 : this.mShowMaxLine - 1);
+        this.addTip(sp, type);
     }
 
-    private void translateMaxText(BufferType type, int drawableWidth) {
+    private SpannableStringBuilder fullMaxLine(Layout layout, int line) {
+        SpannableStringBuilder finalSb = new SpannableStringBuilder();
+        int start = layout.getLineStart(line);
+        int end = layout.getLineEnd(line);
+        final float dw = this.mFoldSize;
+        String str = this.mOriginalText.subSequence(0, start).toString();
+        String matchText = replaceEndTN(this.mOriginalText.subSequence(start, end).toString());
+        StringBuilder lineSb = new StringBuilder(matchText);
+        float x = (float) (this.getWidth() - this.getPaddingLeft() - this.getPaddingRight());
+        float lineW = (lineSb.length() == 0 ? 0.0F : this.getTextWidth(lineSb.toString()));
+        StringBuilder appending = new StringBuilder();
+        float sg = this.getTextWidth(placeholder);
+        float appendingWidth = 0;
         if (this.isExpand) {
-            Layout layout = this.getLayout();
-            int lineCount = layout.getLineCount();
-            layout.getLineStart(lineCount - 1);
-            int end = layout.getLineVisibleEnd(lineCount - 1);
-            StringBuilder sb = new StringBuilder();
-            float x = (float) (this.getWidth() - this.getPaddingLeft() - this.getPaddingRight());
-
-            while (layout.getPrimaryHorizontal(end) + (sb.length() == 0 ? 0.0F : this.getTextWidth(sb.toString())) + this.drawableSize < x) {
-                sb.append(" ");
+            if (lineW + dw > x) {
+                lineW = 0;
+                lineSb.append("\n");
             }
-
-            SpannableStringBuilder span = new SpannableStringBuilder();
-            span.append(this.mOriginalText).append(sb);
-            this.addTip(span, type, drawableWidth);
+            while (lineW + dw + appendingWidth + sg < x) {
+                appending.append(placeholder);
+                appendingWidth = this.getTextWidth(appending.toString());
+            }
+            if (TextUtils.isEmpty(mFoldText) && mFoldDrawable != null) for (int i = 0; i < mFoldWidth; i++) appending.append(placeholder);
+            return finalSb.append(str).append(lineSb).append(appending);
+        } else {
+            float ellW = this.getTextWidth(ellipse);
+            if (lineW == 0 && dw + ellW > x) throw new IllegalArgumentException("the fold-drawable width + ellipse-text width must be small than FoldTextView width!");
+            if (lineW + dw + ellW > x) {
+                while (lineW + dw + ellW > x) {
+                    lineSb.setLength(lineSb.length() - 1);
+                    lineW = (lineSb.length() == 0 ? 0.0F : this.getTextWidth(lineSb.toString()));
+                }
+            } else {
+                while (lineW + dw + ellW + appendingWidth + sg < x) {
+                    appending.append(placeholder);
+                    appendingWidth = this.getTextWidth(appending.toString());
+                }
+            }
+            if (TextUtils.isEmpty(mFoldText) && mFoldDrawable != null) for (int i = 0; i < mFoldWidth; i++) appending.append(placeholder);
+            return finalSb.append(str).append(lineSb).append(ellipse).append(appending);
         }
     }
 
-    private void addTip(SpannableStringBuilder span, BufferType type, int drawableWidth) {
+    private String replaceEndTN(String text) {
+        while (text.endsWith("\n") || text.endsWith(" ")) {
+            int end = Math.max(text.lastIndexOf("\n"), text.lastIndexOf(" "));
+            text = text.substring(0, end);
+        }
+        return text;
+    }
+
+    private void addTip(SpannableStringBuilder span, BufferType type) {
         if (!this.isExpand || this.isShowTipAfterExpand) {
             boolean isTextSpan = false;
             Drawable spanDrawable = null;
@@ -210,7 +244,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                     length = this.mExpandText.length();
                     isTextSpan = true;
                 } else {
-                    length = drawableWidth;
+                    length = mFoldWidth;
                     spanDrawable = this.mExpandDrawable;
                 }
             } else if (!TextUtils.isEmpty(this.mFoldText)) {
@@ -218,7 +252,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                 length = this.mFoldText.length();
                 isTextSpan = true;
             } else {
-                length = drawableWidth;
+                length = mFoldWidth;
                 spanDrawable = this.mFoldDrawable;
             }
 
@@ -233,11 +267,11 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                     this.setMovementMethod(LinkMovementMethod.getInstance());
                 }
             }
-
             if (isTextSpan) {
                 span.setSpan(new ForegroundColorSpan(this.mTipColor), span.length() - length, span.length(), SPAN_INCLUSIVE_EXCLUSIVE);
+                span.setSpan(new AbsoluteSizeSpan((int) (this.foldTextSize + 0.5f)), span.length() - length, span.length(), SPAN_INCLUSIVE_EXCLUSIVE);
             } else {
-                spanDrawable.setBounds(0, 0, (int) this.drawableSize, (int) this.drawableSize);
+                spanDrawable.setBounds(0, 0, mFoldSize, mFoldSize);
                 final Drawable finalSpanDrawable = spanDrawable.mutate();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     finalSpanDrawable.setColorFilter(new BlendModeColorFilter(mTipColor, BlendMode.SRC_ATOP));
@@ -263,7 +297,6 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
         } else {
             this.listener.onClick(v);
         }
-
     }
 
     @Override
@@ -456,7 +489,6 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
             } else {
                 text.removeSpan(FROM_BELOW);
             }
-
         }
 
         public static MovementMethod getInstance() {
@@ -469,8 +501,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
     }
 
     private class ExpandSpan extends ClickableSpan {
-        private ExpandSpan() {
-        }
+        private ExpandSpan() { }
 
         public void onClick(@NonNull View widget) {
             if (FoldTextView.this.mTipClickable) {
@@ -478,7 +509,6 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
                 FoldTextView.this.isExpandSpanClick = true;
                 FoldTextView.this.setText(FoldTextView.this.mOriginalText);
             }
-
         }
 
         public void updateDrawState(TextPaint ds) {
