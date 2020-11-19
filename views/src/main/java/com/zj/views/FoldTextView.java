@@ -114,7 +114,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
     }
 
     public void setText(final CharSequence text, final BufferType type) {
-        if (!TextUtils.isEmpty(text) && this.mShowMaxLine > 0 && this.mShowMaxLine < getMaxLines()) {
+        if (!TextUtils.isEmpty(text) && this.mShowMaxLine > 0 && this.mShowMaxLine <= getMaxLines()) {
             if (!this.flag) {
                 this.getViewTreeObserver().addOnPreDrawListener(new OnPreDrawListener() {
                     public boolean onPreDraw() {
@@ -164,7 +164,7 @@ public class FoldTextView extends AppCompatTextView implements OnClickListener {
 
     private void translateText(CharSequence text, Layout layout, BufferType type) {
         int lineCount = layout.getLineCount();
-        if (this.mShowMaxLine > lineCount) {
+        if (this.mShowMaxLine >= lineCount) {
             super.setText(text, type);
             return;
         }

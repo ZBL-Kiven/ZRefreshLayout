@@ -17,7 +17,7 @@
         app:drawableSize="20dp"
         app:expandDrawable="@drawable/abc_vector_test"
         app:foldDrawable="@drawable/abc_vector_test"
-        app:showMaxLine="3"
+        app:showMaxLine="2"
         app:showTipAfterExpand="true"
         app:tipClickable="true"
         app:tipColor="#97c" />
