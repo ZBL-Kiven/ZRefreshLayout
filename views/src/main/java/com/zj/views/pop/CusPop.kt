@@ -50,12 +50,12 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         })
     }
 
-    fun show(init: (root: View) -> Unit) {
+    fun show(init: (root: View, pop: CusPop) -> Unit) {
         val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), popConfig.animInRes)
         rootView.startAnimation(animEnter)
         withAnim(true, animEnter, popConfig.dimColor)
         showAtLocation(popConfig.v, Gravity.NO_GRAVITY, 0, 0)
-        @Suppress("LeakingThis") init(rootView)
+        @Suppress("LeakingThis") init(rootView, this)
     }
 
     init {
@@ -178,7 +178,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return CusPop(this)
         }
 
-        fun show(init: (root: View) -> Unit) {
+        fun show(init: (root: View, pop: CusPop) -> Unit) {
             instance().show(init)
         }
     }
