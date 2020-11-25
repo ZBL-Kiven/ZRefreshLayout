@@ -56,7 +56,11 @@ public class DrawableTextView extends View {
     private String text, textSelected, badgeText;
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;
-    private float defaultWidth, defaultHeight, viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
+    /**
+     * default: the basic width and height affected by system attributes. layout: the actual measured width and height
+     */
+    private float defaultWidth, defaultHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
+    //The actual drawing area of ​​the content (excluding badges)
     private final RectF contentRect = new RectF();
     private boolean badgeEnable = false, clearTextIfEmpty = false;
     private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
@@ -67,10 +71,9 @@ public class DrawableTextView extends View {
     private float badgeMarginTop = 0.0f;
     private float badgeMarginBottom = 0.0f;
     private int animDuration = 0;
-
+    //Must be a .ttf file address with a valid path
     private String fontPath = "";
     private int fontStyle = -1;
-
     private Paint textPaint;
     private Paint badgeTextPaint;
     private final ArgbEvaluator evaluator = new ArgbEvaluator();
@@ -253,6 +256,8 @@ public class DrawableTextView extends View {
             Paint.FontMetrics metrics = textPaint.getFontMetrics();
             textHeight = metrics.descent - metrics.ascent;
         }
+        float viewHeight;
+        float viewWidth;
         if (orientation == Orientation.top || orientation == Orientation.bottom) {
             viewWidth = Math.max(textWidth, drawableWidth) + paddingLeft + paddingRight;
             viewHeight = textHeight + drawableHeight + paddingTop + paddingBottom + drawablePadding;
@@ -360,9 +365,10 @@ public class DrawableTextView extends View {
         final float textWidth = badgeTextPaint.measureText(badgeText);
         float badgeWidth = Math.max(badgeMinWidth, textWidth) + badgePadding * 2f;
         float badgeHeight = Math.max(badgeMinHeight, textHeight) + badgePadding * 2f;
-        float left = paddingLeft, top = paddingTop;
-        float widthOffset = Math.max(viewWidth, layoutWidth) - paddingLeft - paddingRight;
-        float heightOffset = Math.max(viewHeight, layoutHeight) - paddingTop - paddingBottom;
+        float left = 0, top = 0;
+        float widthOffset = layoutWidth;
+        float heightOffset = layoutHeight;
+        if (widthOffset <= 0 && heightOffset <= 0) return;
         try {
             if ((badgeGravity & Gravity.left) != 0) {
                 widthOffset = 0;

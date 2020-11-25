@@ -22,7 +22,7 @@
 
         <com.zj.views.DrawableTextView
             android:id="@+id/dtv"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:dtv_animDuration="500"
@@ -34,22 +34,26 @@
             app:dtv_badgeInGravity="TOP|RIGHT"
             app:dtv_badgeMarginEnd="20dp"
             app:dtv_badgeMarginTop="-20dp"
-            app:dtv_badgeMinHeight="45dp"
-            app:dtv_badgeMinWidth="45dp"
+            app:dtv_badgeMinHeight="15dp"
+            app:dtv_badgeMinWidth="15dp"
             app:dtv_badgePadding="3dp"
             app:dtv_badgeText="8"
             app:dtv_badgeTextColor="#00A"
-            app:dtv_badgeTextSize="42dp"
-            app:dtv_drawableHeight="130dp"
+            app:dtv_badgeTextSize="12dp"
+            app:dtv_drawableHeight="30dp"
             app:dtv_drawablePadding="13dp"
-            app:dtv_drawableWidth="130dp"
+            app:dtv_drawableWidth="30dp"
             app:dtv_orientation="left"
+            app:dtv_paddingBottom="115dp"
+            app:dtv_paddingLeft="120dp"
+            app:dtv_paddingRight="120dp"
+            app:dtv_paddingTop="110dp"
             app:dtv_replaceDrawable="@mipmap/ic_launcher"
             app:dtv_select="true"
             app:dtv_selectedDrawable="@mipmap/ic_launcher_round"
             app:dtv_text="ad-sad"
             app:dtv_textColor="#a00"
-            app:dtv_textSize="42sp" />
+            app:dtv_textSize="22sp" />
 
     </ScrollView>
 
