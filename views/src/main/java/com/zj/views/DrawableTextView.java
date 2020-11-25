@@ -72,8 +72,8 @@ public class DrawableTextView extends View {
     private float badgeMarginBottom = 0.0f;
     private int animDuration = 0;
     //Must be a .ttf file address with a valid path
-    private String fontPath = "";
-    private int fontStyle = -1;
+    private String fontPath = "", badgeFontPath = "";
+    private int fontStyle = -1, badgeFontStyle = -1;
     private Paint textPaint;
     private Paint badgeTextPaint;
     private final ArgbEvaluator evaluator = new ArgbEvaluator();
@@ -159,6 +159,8 @@ public class DrawableTextView extends View {
                 boolean selected = ta.getBoolean(R.styleable.DrawableTextView_dtv_select, isSelected);
                 fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
                 fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
+                badgeFontPath = ta.getString(R.styleable.DrawableTextView_dtv_badgeTextFontPath);
+                badgeFontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_badgeTextStyle, -1);
                 if (badgeEnable) {
                     badgeText = ta.getString(R.styleable.DrawableTextView_dtv_badgeText);
                     badgeBackground = ta.getDrawable(R.styleable.DrawableTextView_dtv_badgeBackground);
@@ -213,8 +215,27 @@ public class DrawableTextView extends View {
         textPaint.setTextSize(textSize);
         textPaint.setTextAlign(Paint.Align.CENTER);
         if (badgeEnable) {
+            Typeface badgeTypeface = Typeface.DEFAULT;
+            if (!TextUtils.isEmpty(badgeFontPath)) {
+                badgeTypeface = Typeface.createFromAsset(getContext().getAssets(), badgeFontPath);
+            }
+            if (badgeFontStyle >= 0) {
+                int fs;
+                switch (badgeFontStyle) {
+                    case Typeface.BOLD:
+                    case Typeface.ITALIC:
+                    case Typeface.NORMAL:
+                    case Typeface.BOLD_ITALIC:
+                        fs = fontStyle;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("The font must follow the specified size and be in one of Typeface.BOLD, Typeface.ITALIC, Typeface.NORMAL, Typeface.BOLD_ITALIC");
+                }
+                badgeTypeface = Typeface.create(typeface, fs);
+            }
             badgeTextPaint = new Paint();
             badgeTextPaint.setAntiAlias(true);
+            badgeTextPaint.setTypeface(badgeTypeface);
             badgeTextPaint.setTextSize(badgeTextSize);
             badgeTextPaint.setTextAlign(Paint.Align.CENTER);
         }
