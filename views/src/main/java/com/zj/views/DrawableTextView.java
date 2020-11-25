@@ -44,8 +44,8 @@ import static com.zj.views.ut.DPUtils.dp2px;
 @SuppressWarnings("unused")
 public class DrawableTextView extends View {
 
-    private float drawableWidth = dp2px(20);
-    private float drawableHeight = dp2px(20);
+    private float drawableWidth = 0;
+    private float drawableHeight = 0;
     @Nullable
     private Drawable replaceDrawable, selectedDrawable, badgeBackground, badgeBackgroundSelected, backgroundDrawable, backgroundDrawableSelected;
     private int orientation;
@@ -131,8 +131,8 @@ public class DrawableTextView extends View {
             try {
                 layoutWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
                 layoutHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
-                drawableWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableWidth, drawableWidth);
-                drawableHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableHeight, drawableHeight);
+                drawableWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableWidth, 0f);
+                drawableHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableHeight, 0f);
                 float padding = ta.getDimension(R.styleable.DrawableTextView_dtv_padding, 0f);
                 paddingLeft = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingLeft, padding);
                 paddingRight = ta.getDimension(R.styleable.DrawableTextView_dtv_paddingRight, padding);
@@ -417,33 +417,6 @@ public class DrawableTextView extends View {
 
     private float curAnimFraction;
 
-    //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
-    public void setBadgeText(String text) {
-        if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
-        badgeText = text;
-        refreshAndValidate();
-    }
-
-    public void clearBadgeText() {
-        badgeText = "";
-        refreshAndValidate();
-    }
-
-    public void setText(String s) {
-        this.text = s;
-        refreshAndValidate();
-    }
-
-    public void setSelectedText(String s) {
-        this.textSelected = s;
-        refreshAndValidate();
-    }
-
-    public void setOrientation(@Orientation int orientation) {
-        this.orientation = orientation;
-        refreshAndValidate();
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.save();
@@ -595,6 +568,233 @@ public class DrawableTextView extends View {
                 }
             });
         }
+    }
+
+    //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
+    public void setBadgeText(String text) {
+        if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
+        badgeText = text;
+        refreshAndValidate();
+    }
+
+    public void clearBadgeText() {
+        badgeText = "";
+        refreshAndValidate();
+    }
+
+    public void setText(String s) {
+        this.text = s;
+        refreshAndValidate();
+    }
+
+    public void setTextColor(int color) {
+        this.textColor = color;
+        refreshAndValidate();
+    }
+
+    public void setDrawableBackground(Drawable drawable) {
+        this.backgroundDrawable = drawable;
+        refreshAndValidate();
+    }
+
+    public void setSelectedText(String s) {
+        this.textSelected = s;
+        refreshAndValidate();
+    }
+
+    public void setOrientation(@Orientation int orientation) {
+        this.orientation = orientation;
+        refreshAndValidate();
+    }
+
+    public void setDrawableWidth(float drawableWidth) {
+        this.drawableWidth = drawableWidth;
+        refreshAndValidate();
+    }
+
+    public void setDrawableHeight(float drawableHeight) {
+        this.drawableHeight = drawableHeight;
+        refreshAndValidate();
+    }
+
+    public void setReplaceDrawable(@Nullable Drawable replaceDrawable) {
+        this.replaceDrawable = replaceDrawable;
+        refreshAndValidate();
+    }
+
+    public void setSelectedDrawable(@Nullable Drawable selectedDrawable) {
+        this.selectedDrawable = selectedDrawable;
+        refreshAndValidate();
+    }
+
+    public void setBadgeBackground(@Nullable Drawable badgeBackground) {
+        this.badgeBackground = badgeBackground;
+        refreshAndValidate();
+    }
+
+    public void setBadgeBackgroundSelected(@Nullable Drawable badgeBackgroundSelected) {
+        this.badgeBackgroundSelected = badgeBackgroundSelected;
+        refreshAndValidate();
+    }
+
+    public void setBackgroundDrawableSelected(@Nullable Drawable backgroundDrawableSelected) {
+        this.backgroundDrawableSelected = backgroundDrawableSelected;
+        refreshAndValidate();
+    }
+
+    public void setGravity(@Gravity int gravity) {
+        this.gravity = gravity;
+        refreshAndValidate();
+    }
+
+    public void setBadgeGravity(int badgeGravity) {
+        this.badgeGravity = badgeGravity;
+        refreshAndValidate();
+    }
+
+    public void setPaddingLeft(float paddingLeft) {
+        this.paddingLeft = paddingLeft;
+        refreshAndValidate();
+    }
+
+    public void setPaddingTop(float paddingTop) {
+        this.paddingTop = paddingTop;
+        refreshAndValidate();
+    }
+
+    public void setPaddingRight(float paddingRight) {
+        this.paddingRight = paddingRight;
+        refreshAndValidate();
+    }
+
+    public void setPaddingBottom(float paddingBottom) {
+        this.paddingBottom = paddingBottom;
+        refreshAndValidate();
+    }
+
+    public void setDrawablePadding(float drawablePadding) {
+        this.drawablePadding = drawablePadding;
+        refreshAndValidate();
+    }
+
+    public void setTextSelected(@Nullable String textSelected) {
+        this.textSelected = textSelected;
+        refreshAndValidate();
+    }
+
+    public void setTextSize(float textSize) {
+        this.textSize = textSize;
+        refreshAndValidate();
+    }
+
+    public void setTextColorSelect(int textColorSelect) {
+        this.textColorSelect = textColorSelect;
+        refreshAndValidate();
+    }
+
+    public void setViewWidth(float viewWidth) {
+        this.viewWidth = viewWidth;
+        refreshAndValidate();
+    }
+
+    public void setViewHeight(float viewHeight) {
+        this.viewHeight = viewHeight;
+        refreshAndValidate();
+    }
+
+    public void setLayoutWidth(float layoutWidth) {
+        this.layoutWidth = layoutWidth;
+        refreshAndValidate();
+    }
+
+    public void setLayoutHeight(float layoutHeight) {
+        this.layoutHeight = layoutHeight;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMinWidth(float badgeMinWidth) {
+        this.badgeMinWidth = badgeMinWidth;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMinHeight(float badgeMinHeight) {
+        this.badgeMinHeight = badgeMinHeight;
+        refreshAndValidate();
+    }
+
+    public void setBadgeEnable(boolean badgeEnable) {
+        this.badgeEnable = badgeEnable;
+        refreshAndValidate();
+    }
+
+    public void setBadgeTextColor(int badgeTextColor) {
+        this.badgeTextColor = badgeTextColor;
+        refreshAndValidate();
+    }
+
+    public void setBadgeTextColorSelected(int badgeTextColorSelected) {
+        this.badgeTextColorSelected = badgeTextColorSelected;
+        refreshAndValidate();
+    }
+
+    public void setBadgeTextSize(float badgeTextSize) {
+        this.badgeTextSize = badgeTextSize;
+        refreshAndValidate();
+    }
+
+    public void setBadgePadding(float badgePadding) {
+        this.badgePadding = badgePadding;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMarginStart(float badgeMarginStart) {
+        this.badgeMarginStart = badgeMarginStart;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMarginEnd(float badgeMarginEnd) {
+        this.badgeMarginEnd = badgeMarginEnd;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMarginTop(float badgeMarginTop) {
+        this.badgeMarginTop = badgeMarginTop;
+        refreshAndValidate();
+    }
+
+    public void setBadgeMarginBottom(float badgeMarginBottom) {
+        this.badgeMarginBottom = badgeMarginBottom;
+        refreshAndValidate();
+    }
+
+    public void setAnimDuration(int animDuration) {
+        this.animDuration = animDuration;
+        refreshAndValidate();
+    }
+
+    public void setFontPath(String fontPath) {
+        this.fontPath = fontPath;
+        refreshAndValidate();
+    }
+
+    public void setFontStyle(int fontStyle) {
+        this.fontStyle = fontStyle;
+        refreshAndValidate();
+    }
+
+    public void setTextPaint(Paint textPaint) {
+        this.textPaint = textPaint;
+        refreshAndValidate();
+    }
+
+    public void setBadgeTextPaint(Paint badgeTextPaint) {
+        this.badgeTextPaint = badgeTextPaint;
+        refreshAndValidate();
+    }
+
+    public void setAnimator(DrawableValueAnimator animator) {
+        this.animator = animator;
+        refreshAndValidate();
     }
 
     private void refreshAndValidate() {
