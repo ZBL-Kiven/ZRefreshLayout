@@ -7,9 +7,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -56,8 +56,8 @@ public class DrawableTextView extends View {
     private String text, textSelected, badgeText;
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;
-    private float viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
-
+    private float defaultWidth, defaultHeight, viewWidth, viewHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
+    private final RectF contentRect = new RectF();
     private boolean badgeEnable = false, clearTextIfEmpty = false;
     private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
     private float badgeTextSize = 0;
@@ -129,8 +129,8 @@ public class DrawableTextView extends View {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DrawableTextView);
             try {
-                layoutWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
-                layoutHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
+                defaultWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
+                defaultHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
                 drawableWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableWidth, 0f);
                 drawableHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableHeight, 0f);
                 float padding = ta.getDimension(R.styleable.DrawableTextView_dtv_padding, 0f);
@@ -176,7 +176,6 @@ public class DrawableTextView extends View {
                 if (TextUtils.isEmpty(textSelected)) textSelected = text;
                 if (textColorSelect == -1) textColorSelect = textColor;
                 if (badgeTextColorSelected == -1) badgeTextColorSelected = badgeTextColor;
-
                 setSelected(selected);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -254,13 +253,12 @@ public class DrawableTextView extends View {
             Paint.FontMetrics metrics = textPaint.getFontMetrics();
             textHeight = metrics.descent - metrics.ascent;
         }
-        float vw, vh;
         if (orientation == Orientation.top || orientation == Orientation.bottom) {
-            vw = Math.max(textWidth, drawableWidth) + paddingLeft + paddingRight;
-            vh = textHeight + drawableHeight + paddingTop + paddingBottom + drawablePadding;
+            viewWidth = Math.max(textWidth, drawableWidth) + paddingLeft + paddingRight;
+            viewHeight = textHeight + drawableHeight + paddingTop + paddingBottom + drawablePadding;
         } else {
-            vh = Math.max(textHeight, drawableHeight) + paddingTop + paddingBottom;
-            vw = textWidth + drawableWidth + paddingLeft + paddingRight + drawablePadding;
+            viewHeight = Math.max(textHeight, drawableHeight) + paddingTop + paddingBottom;
+            viewWidth = textWidth + drawableWidth + paddingLeft + paddingRight + drawablePadding;
         }
         Paint.FontMetrics metrics = textPaint.getFontMetrics();
         final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
@@ -268,12 +266,16 @@ public class DrawableTextView extends View {
         final float badgeTextHalfWidth = badgeDisabled ? 0 : Math.max(badgeMinWidth, badgeTextPaint.measureText(badgeText)) / 2f;
         final boolean isAlignBottom = !badgeDisabled && (badgeGravity & Gravity.bottom) != 0;
         final boolean isAlignRight = !badgeDisabled && (badgeGravity & Gravity.right) != 0;
-        final float bml = badgeDisabled ? 0 : isAlignRight ? (badgeTextHalfWidth - badgeMarginStart > vh ? badgeTextHalfWidth - badgeMarginStart - vh : 0f) : (badgeMarginStart > 0 ? 0 : Math.abs(badgeMarginStart));
-        final float bmr = badgeDisabled ? 0 : isAlignRight ? (badgeMarginEnd < 0 ? 0 : badgeMarginEnd) : (badgeMarginEnd + badgeTextHalfWidth > vh ? badgeMarginEnd + badgeTextHalfWidth - vh : 0f);
-        final float bmt = badgeDisabled ? 0 : isAlignBottom ? (badgeTextHalfHeight - badgeMarginTop > vh ? badgeTextHalfHeight - badgeMarginTop - vh : 0f) : (badgeMarginTop > 0 ? 0 : Math.abs(badgeMarginTop));
-        final float bmb = badgeDisabled ? 0 : isAlignBottom ? (badgeMarginBottom < 0 ? 0 : badgeMarginBottom) : (badgeMarginBottom + badgeTextHalfHeight > vh ? badgeMarginBottom + badgeTextHalfHeight - vh : 0f);
-        viewWidth = vw + bml + bmr;
-        viewHeight = vh + bmt + bmb;
+        final float bml = badgeDisabled ? 0 : isAlignRight ? (badgeTextHalfWidth - badgeMarginStart > viewWidth ? badgeTextHalfWidth - badgeMarginStart - viewWidth : 0f) : (badgeMarginStart > 0 ? 0 : Math.abs(badgeMarginStart));
+        final float bmr = badgeDisabled ? 0 : isAlignRight ? (badgeMarginEnd < 0 ? 0 : badgeMarginEnd) : (badgeMarginEnd + badgeTextHalfWidth > viewWidth ? badgeMarginEnd + badgeTextHalfWidth - viewWidth : 0f);
+        final float bmt = badgeDisabled ? 0 : isAlignBottom ? (badgeTextHalfHeight - badgeMarginTop > viewHeight ? badgeTextHalfHeight - badgeMarginTop - viewHeight : 0f) : (badgeMarginTop > 0 ? 0 : Math.abs(badgeMarginTop));
+        final float bmb = badgeDisabled ? 0 : isAlignBottom ? (badgeMarginBottom < 0 ? 0 : badgeMarginBottom) : (badgeMarginBottom + badgeTextHalfHeight > viewHeight ? badgeMarginBottom + badgeTextHalfHeight - viewHeight : 0f);
+        contentRect.set(bml, bmt, viewWidth + bml, viewHeight + bmt);
+        if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) contentRect.left += badgeMarginStart;
+        layoutWidth = viewWidth + bml + bmr;
+        layoutHeight = viewHeight + bmt + bmb;
+        if (defaultWidth == 0) defaultWidth = layoutWidth;
+        if (defaultHeight == 0) defaultHeight = layoutHeight;
         int drawableLeft = 0, drawableRight = 0, drawableTop = 0, drawableBottom = 0;
         float textX = 0, textY = 0;
         switch (orientation) {
@@ -315,16 +317,14 @@ public class DrawableTextView extends View {
     }
 
     private void calculateGravityBounds() {
-        float widthOffset = layoutWidth - viewWidth;
-        float heightOffset = layoutHeight - viewHeight;
+        float widthOffset = defaultWidth - layoutWidth;
+        float heightOffset = defaultHeight - layoutHeight;
         if (widthOffset <= 0 && heightOffset <= 0) return;
 
         if ((gravity & Gravity.left) != 0) {
             widthOffset = 0;
             if ((gravity & Gravity.center) != 0) {
-                textStart.y += heightOffset / 2f;
-                drawableRect.top += heightOffset / 2f;
-                drawableRect.bottom += heightOffset / 2f;
+                contentRect.offset(0, heightOffset / 2f);
                 return;
             }
         }
@@ -336,28 +336,20 @@ public class DrawableTextView extends View {
         if ((gravity & Gravity.center) != 0) {
             if (widthOffset > 0) {
                 isCenterXSet = true;
-                textStart.x += widthOffset / 2f;
-                drawableRect.left += widthOffset / 2f;
-                drawableRect.right += widthOffset / 2f;
+                contentRect.offset(widthOffset / 2f, 0);
             }
             if (heightOffset > 0) {
                 isCenterYSet = true;
-                textStart.y += heightOffset / 2f;
-                drawableRect.top += heightOffset / 2f;
-                drawableRect.bottom += heightOffset / 2f;
+                contentRect.offset(0, heightOffset / 2f);
             }
         }
         if ((gravity & Gravity.right) != 0) {
             float xo = isCenterXSet ? widthOffset / 2f : widthOffset;
-            textStart.x += xo;
-            drawableRect.left += xo;
-            drawableRect.right += xo;
+            contentRect.offset(xo, 0);
         }
         if ((gravity & Gravity.bottom) != 0) {
             float yo = isCenterYSet ? heightOffset / 2f : heightOffset;
-            textStart.y += yo;
-            drawableRect.top += yo;
-            drawableRect.bottom += yo;
+            contentRect.offset(0, yo);
         }
     }
 
@@ -403,10 +395,13 @@ public class DrawableTextView extends View {
                 top += yo;
             }
         } finally {
-            int l = (int) (left + 0.5f);
-            int r = (int) (left + badgeWidth + 0.5f);
-            int t = (int) (top + 0.5f);
-            int b = (int) (top + badgeHeight + 0.5f);
+            final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
+            final boolean isAlignBottom = !badgeDisabled && (badgeGravity & Gravity.bottom) != 0;
+            int offsetY = (int) ((!badgeDisabled && isAlignBottom) ? (contentRect.top) : 0);
+            int l = (int) (left + 0.5f + contentRect.left);
+            int r = (int) (left + badgeWidth + 0.5f + contentRect.left);
+            int t = (int) (top + 0.5f + offsetY);
+            int b = (int) (top + badgeHeight + 0.5f + offsetY);
             badgeRect = new Rect(l, t, r, b);
             float textX = badgeRect.centerX();
             Paint.FontMetrics m = badgeTextPaint.getFontMetrics();
@@ -440,10 +435,11 @@ public class DrawableTextView extends View {
         int end = textColorSelect;
         int evaTextColor = (int) evaluator.evaluate(curAnimFraction, textColor, textColorSelect);
         textPaint.setColor(evaTextColor);
-        canvas.drawText(drawText, textStart.x, textStart.y, textPaint);
+        canvas.drawText(drawText, textStart.x + contentRect.left, textStart.y + contentRect.top, textPaint);
     }
 
     private void drawDrawable(Canvas canvas) {
+        drawableRect.offset((int) (contentRect.left + 0.5f), (int) (contentRect.top + 0.5f));
         drawDrawables(canvas, selectedDrawable, replaceDrawable, drawableRect);
     }
 
@@ -456,9 +452,12 @@ public class DrawableTextView extends View {
     }
 
     private void drawBackground(Canvas canvas) {
-        Point p = getViewRect();
-        Rect rect = new Rect(0, 0, p.x, p.y);
-        drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, rect);
+        Rect r = new Rect();
+        contentRect.roundOut(r);
+        final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
+        final boolean isAlignRight = !badgeDisabled && (badgeGravity & Gravity.right) != 0;
+        if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) r.left += (int) (Math.abs(badgeMarginStart + 0.5f));
+        drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, r);
     }
 
     private void drawDrawables(Canvas canvas, @Nullable Drawable select, @Nullable Drawable replace, Rect rect) {
@@ -492,14 +491,25 @@ public class DrawableTextView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         calculationAll();
-        Point p = getViewRect();
-        setMeasuredDimension(p.x, p.y);
-    }
-
-    private Point getViewRect() {
-        float w = Math.max(layoutWidth, viewWidth) + 0.5f;
-        float h = Math.max(layoutHeight, viewHeight) + 0.5f;
-        return new Point((int) w, (int) h);
+        float w, h;
+        int widthSpec = MeasureSpec.makeMeasureSpec(0, widthMeasureSpec);
+        int heightSpec = MeasureSpec.makeMeasureSpec(0, heightMeasureSpec);
+        if (widthSpec == MeasureSpec.EXACTLY) {
+            w = getMeasuredWidth();
+        } else {
+            w = Math.max(layoutWidth, defaultWidth);
+        }
+        if (heightSpec == MeasureSpec.EXACTLY) {
+            h = getMeasuredHeight();
+        } else {
+            h = Math.max(layoutHeight, defaultHeight);
+        }
+        if (w > 0 && h > 0) setMeasuredDimension((int) w, (int) h);
+        if (w != defaultWidth || h != defaultHeight) {
+            defaultWidth = w;
+            defaultHeight = h;
+            refreshAndValidate();
+        }
     }
 
     private interface OnAnimListener {
@@ -689,26 +699,6 @@ public class DrawableTextView extends View {
 
     public void setTextColorSelect(int textColorSelect) {
         this.textColorSelect = textColorSelect;
-        refreshAndValidate();
-    }
-
-    public void setViewWidth(float viewWidth) {
-        this.viewWidth = viewWidth;
-        refreshAndValidate();
-    }
-
-    public void setViewHeight(float viewHeight) {
-        this.viewHeight = viewHeight;
-        refreshAndValidate();
-    }
-
-    public void setLayoutWidth(float layoutWidth) {
-        this.layoutWidth = layoutWidth;
-        refreshAndValidate();
-    }
-
-    public void setLayoutHeight(float layoutHeight) {
-        this.layoutHeight = layoutHeight;
         refreshAndValidate();
     }
 

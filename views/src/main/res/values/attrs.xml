@@ -20,7 +20,6 @@
         <attr name="dtv_textSize" format="dimension" />
         <attr name="dtv_textColor" format="color|reference" />
         <attr name="dtv_textColorSelect" format="color|reference" />
-        <attr name="dtv_translationTime" format="integer" />
         <attr name="dtv_badgeEnable" format="boolean" />
         <attr name="dtv_badgeBackground" format="color|reference" />
         <attr name="dtv_badgeBackgroundSelected" format="color|reference" />
