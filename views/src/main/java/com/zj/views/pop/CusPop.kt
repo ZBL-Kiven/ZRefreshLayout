@@ -16,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.PopupWindow
 import androidx.annotation.AnimRes
 import androidx.annotation.ColorRes
+import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import com.zj.views.R
@@ -34,26 +35,37 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     private var vAnim: ValueAnimator? = null
 
     override fun dismiss() {
-        val animOut = AnimationUtils.loadAnimation(popConfig.getContext(), popConfig.animOutRes)
-        rootView.startAnimation(animOut)
-        withAnim(false, animOut, popConfig.dimColor)
-        animOut.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationRepeat(animation: Animation?) {}
+        val animE = popConfig.animInRes
+        if (animE != 0) {
+            val animOut = AnimationUtils.loadAnimation(popConfig.getContext(), popConfig.animOutRes)
+            rootView.startAnimation(animOut)
+            withAnim(false, animOut, popConfig.dimColor)
+            animOut.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {}
 
-            override fun onAnimationEnd(animation: Animation?) {
-                super@CusPop.dismiss()
-            }
+                override fun onAnimationEnd(animation: Animation?) {
+                    super@CusPop.dismiss()
+                }
 
-            override fun onAnimationStart(animation: Animation?) {
-                contentView.isEnabled = false
-            }
-        })
+                override fun onAnimationStart(animation: Animation?) {
+                    contentView.isEnabled = false
+                }
+            })
+        } else {
+            setBgColor(true, 0.0f, popConfig.dimColor)
+            super@CusPop.dismiss()
+        }
     }
 
     fun show(init: (root: View, pop: CusPop) -> Unit) {
-        val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), popConfig.animInRes)
-        rootView.startAnimation(animEnter)
-        withAnim(true, animEnter, popConfig.dimColor)
+        val animIn = popConfig.animInRes
+        if (animIn != 0) {
+            val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), animIn)
+            rootView.startAnimation(animEnter)
+            withAnim(true, animEnter, popConfig.dimColor)
+        } else {
+            setBgColor(true, 1.0f, popConfig.dimColor)
+        }
         showAtLocation(popConfig.v, Gravity.NO_GRAVITY, 0, 0)
         @Suppress("LeakingThis") init(rootView, this)
     }
@@ -86,16 +98,20 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     private fun withAnim(show: Boolean, anim: Animation, targetColor: Int) {
-        val ce = ArgbEvaluator()
         vAnim?.end()
         vAnim?.cancel()
         vAnim = ValueAnimator.ofFloat(0.0f, 1.0f).setDuration(anim.duration)
         vAnim?.addUpdateListener {
-            val f = if (show) it.animatedFraction else 1.0f - it.animatedFraction
-            val color = ce.evaluate(f, Color.TRANSPARENT, targetColor) as Int
-            vgParent.setBackgroundColor(color)
+            setBgColor(show, it.animatedFraction, targetColor)
         }
         vAnim?.start()
+    }
+
+    private fun setBgColor(show: Boolean, @FloatRange(from = 0.0, to = 1.0) fraction: Float, target: Int) {
+        val ce = ArgbEvaluator()
+        val f = if (show) fraction else 1.0f - fraction
+        val color = ce.evaluate(f, Color.TRANSPARENT, target) as Int
+        vgParent.setBackgroundColor(color)
     }
 
     class PopConfig(val v: View) {
