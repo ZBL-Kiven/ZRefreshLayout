@@ -50,7 +50,7 @@ public class DrawableTextView extends View {
     private Drawable replaceDrawable, selectedDrawable, badgeBackground, badgeBackgroundSelected, backgroundDrawable, backgroundDrawableSelected;
     private int orientation;
     private int gravity, badgeGravity;
-    private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f;
+    private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f, minWidthOffset = 0f, minHeightOffset = 0f;
     private float drawablePadding = 0.0f;
     @Nullable
     private String text, textSelected, badgeText;
@@ -59,17 +59,12 @@ public class DrawableTextView extends View {
     /**
      * default: the basic width and height affected by system attributes. layout: the actual measured width and height
      */
-    private float defaultWidth, defaultHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
+    private float defaultWidth, defaultHeight, minWidth, minHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
     //The actual drawing area of ​​the content (excluding badges)
     private final RectF contentRect = new RectF();
     private boolean badgeEnable = false, clearTextIfEmpty = false;
     private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
-    private float badgeTextSize = 0;
-    private float badgePadding = 0.0f;
-    private float badgeMarginStart = 0.0f;
-    private float badgeMarginEnd = 0.0f;
-    private float badgeMarginTop = 0.0f;
-    private float badgeMarginBottom = 0.0f;
+    private float badgeTextSize = 0, badgePadding = 0.0f, badgeMarginStart = 0.0f, badgeMarginEnd = 0.0f, badgeMarginTop = 0.0f, badgeMarginBottom = 0.0f;
     private int animDuration = 0;
     //Must be a .ttf file address with a valid path
     private String fontPath = "", badgeFontPath = "";
@@ -132,8 +127,8 @@ public class DrawableTextView extends View {
         if (attrs != null) {
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DrawableTextView);
             try {
-                defaultWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
-                defaultHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
+                minWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_viewWidth, 0f);
+                minHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_viewHeight, 0f);
                 drawableWidth = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableWidth, 0f);
                 drawableHeight = ta.getDimension(R.styleable.DrawableTextView_dtv_drawableHeight, 0f);
                 float padding = ta.getDimension(R.styleable.DrawableTextView_dtv_padding, 0f);
@@ -302,46 +297,52 @@ public class DrawableTextView extends View {
         final float bmr = badgeDisabled ? 0 : isAlignRight ? (badgeMarginEnd < 0 ? 0 : badgeMarginEnd) : (badgeMarginEnd + badgeTextHalfWidth > viewWidth ? badgeMarginEnd + badgeTextHalfWidth - viewWidth : 0f);
         final float bmt = badgeDisabled ? 0 : isAlignBottom ? (badgeTextHalfHeight - badgeMarginTop > viewHeight ? badgeTextHalfHeight - badgeMarginTop - viewHeight : 0f) : (badgeMarginTop > 0 ? 0 : Math.abs(badgeMarginTop));
         final float bmb = badgeDisabled ? 0 : isAlignBottom ? (badgeMarginBottom < 0 ? 0 : badgeMarginBottom) : (badgeMarginBottom + badgeTextHalfHeight > viewHeight ? badgeMarginBottom + badgeTextHalfHeight - viewHeight : 0f);
-        contentRect.set(bml, bmt, viewWidth + bml, viewHeight + bmt);
+        if (bml * 2f + viewWidth < minWidth) {
+            minWidthOffset = (minWidth - (bml * 2f + viewWidth)) / 2.0f;
+        }
+        if (bmt * 2f + viewHeight < minHeight) {
+            minHeightOffset = (minHeight - (bmt * 2f + viewHeight)) / 2.0f;
+        }
+        contentRect.set(bml, bmt, viewWidth + bml + minWidthOffset * 2.0f, viewHeight + bmt + minHeightOffset * 2.0f);
         if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) contentRect.left += badgeMarginStart;
-        layoutWidth = viewWidth + bml + bmr;
-        layoutHeight = viewHeight + bmt + bmb;
+        layoutWidth = viewWidth + bml + bmr + minWidthOffset * 2f;
+        layoutHeight = viewHeight + bmt + bmb + minHeightOffset * 2f;
         if (defaultWidth == 0) defaultWidth = layoutWidth;
         if (defaultHeight == 0) defaultHeight = layoutHeight;
         int drawableLeft = 0, drawableRight = 0, drawableTop = 0, drawableBottom = 0;
         float textX = 0, textY = 0;
         switch (orientation) {
             case Orientation.left:
-                drawableLeft = (int) (paddingLeft + bml);
-                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f);
+                drawableLeft = (int) (paddingLeft + bml + minWidthOffset);
+                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
                 textX = drawableRight + drawableP + textWidth / 2f;
-                textY = viewHeight / 2.0f + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
+                textY = viewHeight / 2.0f + minHeightOffset + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.right:
-                drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f);
-                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f);
+                drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f + minWidthOffset + bml);
+                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = paddingLeft + textWidth / 2f;
-                textY = viewHeight / 2.0f + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
+                textX = paddingLeft + textWidth / 2f + minWidthOffset + bml;
+                textY = viewHeight / 2.0f + minHeightOffset + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.top:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f);
-                drawableTop = (int) (paddingTop + bmt);
+                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
+                drawableTop = (int) (paddingTop + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = viewWidth / 2f;
+                textX = viewWidth / 2f + minWidthOffset + bml;
                 textY = drawableBottom + drawableP + (textHeight - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.bottom:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f);
-                drawableTop = (int) (paddingTop + textHeight + drawableP);
+                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
+                drawableTop = (int) (paddingTop + textHeight + drawableP + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = viewWidth / 2f;
-                textY = paddingTop + (textHeight - textPaint.getFontMetrics().descent);
+                textX = viewWidth / 2f + minWidthOffset + bml;
+                textY = paddingTop + minHeightOffset + (textHeight - textPaint.getFontMetrics().descent);
                 break;
         }
         drawableRect = new Rect(drawableLeft, drawableTop, drawableRight, drawableBottom);
