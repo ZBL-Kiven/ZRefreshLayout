@@ -279,12 +279,18 @@ public class DrawableTextView extends View {
         }
         float viewHeight;
         float viewWidth;
+        float drawableW = 0f, drawableH = 0f, drawableP = 0f;
+        if ((isSelected && selectedDrawable != null) || (!isSelected && replaceDrawable != null)) {
+            drawableW = drawableWidth;
+            drawableH = drawableHeight;
+            drawableP = drawablePadding;
+        }
         if (orientation == Orientation.top || orientation == Orientation.bottom) {
-            viewWidth = Math.max(textWidth, drawableWidth) + paddingLeft + paddingRight;
-            viewHeight = textHeight + drawableHeight + paddingTop + paddingBottom + drawablePadding;
+            viewWidth = Math.max(textWidth, drawableW) + paddingLeft + paddingRight;
+            viewHeight = textHeight + paddingTop + paddingBottom + drawableH + drawableP;
         } else {
-            viewHeight = Math.max(textHeight, drawableHeight) + paddingTop + paddingBottom;
-            viewWidth = textWidth + drawableWidth + paddingLeft + paddingRight + drawablePadding;
+            viewHeight = Math.max(textHeight, drawableH) + paddingTop + paddingBottom;
+            viewWidth = textWidth + paddingLeft + paddingRight + drawableW + drawableP;
         }
         Paint.FontMetrics metrics = textPaint.getFontMetrics();
         final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
@@ -307,33 +313,33 @@ public class DrawableTextView extends View {
         switch (orientation) {
             case Orientation.left:
                 drawableLeft = (int) (paddingLeft + bml);
-                drawableTop = (int) (viewHeight / 2.0f - drawableHeight / 2.0f + 0.5f);
-                drawableRight = (int) (drawableLeft + drawableWidth);
-                drawableBottom = (int) (drawableTop + drawableHeight);
-                textX = drawableRight + drawablePadding + textWidth / 2f;
+                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f);
+                drawableRight = (int) (drawableLeft + drawableW);
+                drawableBottom = (int) (drawableTop + drawableH);
+                textX = drawableRight + drawableP + textWidth / 2f;
                 textY = viewHeight / 2.0f + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.right:
-                drawableLeft = (int) (paddingLeft + textWidth + drawablePadding + 0.5f);
-                drawableTop = (int) (viewHeight / 2.0f - drawableHeight / 2.0f + 0.5f);
-                drawableRight = (int) (drawableLeft + drawableWidth);
-                drawableBottom = (int) (drawableTop + drawableHeight);
+                drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f);
+                drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f);
+                drawableRight = (int) (drawableLeft + drawableW);
+                drawableBottom = (int) (drawableTop + drawableH);
                 textX = paddingLeft + textWidth / 2f;
                 textY = viewHeight / 2.0f + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.top:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableWidth / 2.0f + 0.5f);
+                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f);
                 drawableTop = (int) (paddingTop + bmt);
-                drawableRight = (int) (drawableLeft + drawableWidth);
-                drawableBottom = (int) (drawableTop + drawableHeight);
+                drawableRight = (int) (drawableLeft + drawableW);
+                drawableBottom = (int) (drawableTop + drawableH);
                 textX = viewWidth / 2f;
-                textY = drawableBottom + drawablePadding + (textHeight - textPaint.getFontMetrics().descent);
+                textY = drawableBottom + drawableP + (textHeight - textPaint.getFontMetrics().descent);
                 break;
             case Orientation.bottom:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableWidth / 2.0f + 0.5f);
-                drawableTop = (int) (paddingTop + textHeight + drawablePadding);
-                drawableRight = (int) (drawableLeft + drawableWidth);
-                drawableBottom = (int) (drawableTop + drawableHeight);
+                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f);
+                drawableTop = (int) (paddingTop + textHeight + drawableP);
+                drawableRight = (int) (drawableLeft + drawableW);
+                drawableBottom = (int) (drawableTop + drawableH);
                 textX = viewWidth / 2f;
                 textY = paddingTop + (textHeight - textPaint.getFontMetrics().descent);
                 break;
@@ -467,12 +473,12 @@ public class DrawableTextView extends View {
 
     private void drawDrawable(Canvas canvas) {
         drawableRect.offset((int) (contentRect.left + 0.5f), (int) (contentRect.top + 0.5f));
-        drawDrawables(canvas, selectedDrawable, replaceDrawable, drawableRect);
+        drawDrawables(canvas, selectedDrawable, replaceDrawable, drawableRect, false);
     }
 
     private void drawBadge(Canvas canvas) {
         if (!badgeEnable || TextUtils.isEmpty(badgeText)) return;
-        drawDrawables(canvas, badgeBackgroundSelected, badgeBackground, badgeRect);
+        drawDrawables(canvas, badgeBackgroundSelected, badgeBackground, badgeRect, true);
         int evaTextColor = (int) evaluator.evaluate(curAnimFraction, badgeTextColor, badgeTextColorSelected);
         badgeTextPaint.setColor(evaTextColor);
         canvas.drawText(badgeText, badgeTextStart.x, badgeTextStart.y, badgeTextPaint);
@@ -484,20 +490,20 @@ public class DrawableTextView extends View {
         final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
         final boolean isAlignRight = !badgeDisabled && (badgeGravity & Gravity.right) != 0;
         if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) r.left += (int) (Math.abs(badgeMarginStart + 0.5f));
-        drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, r);
+        drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, r, false);
     }
 
-    private void drawDrawables(Canvas canvas, @Nullable Drawable select, @Nullable Drawable replace, Rect rect) {
+    private void drawDrawables(Canvas canvas, @Nullable Drawable select, @Nullable Drawable replace, Rect rect, boolean drawAlways) {
         if (select == null || replace == null) {
             if (select != null) {
                 select.setBounds(rect);
                 select.setAlpha(255);
-                select.draw(canvas);
+                if (drawAlways || isSelected) select.draw(canvas);
             }
             if (replace != null) {
                 replace.setAlpha(255);
                 replace.setBounds(rect);
-                replace.draw(canvas);
+                if (drawAlways || !isSelected) replace.draw(canvas);
             }
             return;
         }

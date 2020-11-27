@@ -49,7 +49,7 @@
             app:dtv_paddingRight="120dp"
             app:dtv_paddingTop="110dp"
             app:dtv_replaceDrawable="@mipmap/ic_launcher"
-            app:dtv_select="true"
+            app:dtv_select="false"
             app:dtv_selectedDrawable="@mipmap/ic_launcher_round"
             app:dtv_text="ad-sad"
             app:dtv_textColor="#a00"
