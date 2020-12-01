@@ -21,7 +21,7 @@ public class Frg1 extends BaseLinkageFragment {
     @NotNull
     @Override
     protected View getView(@NotNull LayoutInflater layoutInflater, @Nullable ViewGroup viewGroup) {
-        return layoutInflater.inflate(R.layout.activity_second, viewGroup, false);
+        return layoutInflater.inflate(R.layout.fg_first, viewGroup, false);
     }
 
     DrawableTextView dtv;

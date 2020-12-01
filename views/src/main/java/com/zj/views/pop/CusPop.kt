@@ -6,10 +6,12 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Point
+import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
@@ -58,15 +60,22 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     fun show(init: (root: View, pop: CusPop) -> Unit) {
-        val animIn = popConfig.animInRes
-        if (animIn != 0) {
-            val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), animIn)
-            rootView.startAnimation(animEnter)
-            withAnim(true, animEnter, popConfig.dimColor)
-        } else {
-            setBgColor(true, 1.0f, popConfig.dimColor)
-        }
-        showAtLocation(popConfig.v, Gravity.NO_GRAVITY, 0, 0)
+        this.show(Gravity.NO_GRAVITY, init = init)
+    }
+
+    fun show(showGravity: Int, init: (root: View, pop: CusPop) -> Unit) {
+        startAnim()
+        showAtLocation(popConfig.v, showGravity, popConfig.xOffset, popConfig.yOffset)
+        @Suppress("LeakingThis") init(rootView, this)
+    }
+
+    fun showIn(init: (root: View, pop: CusPop) -> Unit) {
+        this.showIn(popConfig.gravity, init = init)
+    }
+
+    fun showIn(showGravity: Int, init: (root: View, pop: CusPop) -> Unit) {
+        startAnim()
+        showAsDropDown(popConfig.v, popConfig.xOffset, popConfig.yOffset, showGravity)
         @Suppress("LeakingThis") init(rootView, this)
     }
 
@@ -78,7 +87,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         rootView = View.inflate(popConfig.getContext(), popConfig.contentId, null)
         vgParent.removeAllViews()
         val lp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
-        lp.gravity = Gravity.CENTER
+        lp.gravity = popConfig.gravity
         vgParent.setBackgroundColor(Color.TRANSPARENT)
         vgParent.addView(rootView, lp)
         contentView = vgParent
@@ -95,6 +104,17 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
 
     enum class DimMode {
         CONTENT, FULL_STATUS, FULL_SCREEN
+    }
+
+    private fun startAnim() {
+        val animIn = popConfig.animInRes
+        if (animIn != 0) {
+            val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), animIn)
+            rootView.startAnimation(animEnter)
+            withAnim(true, animEnter, popConfig.dimColor)
+        } else {
+            setBgColor(true, 1.0f, popConfig.dimColor)
+        }
     }
 
     private fun withAnim(show: Boolean, anim: Animation, targetColor: Int) {
@@ -115,14 +135,16 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     class PopConfig(val v: View) {
-
         internal var w = 0; private set
         internal var h = 0; private set
+        internal var xOffset = 0; private set
+        internal var yOffset = 0; private set
         private var dimMode: DimMode = DimMode.FULL_STATUS
         internal var dimColor: Int = Color.parseColor("#50000000"); private set
         internal var animInRes: Int = R.anim.cus_pop_animation_in; private set
         internal var animOutRes: Int = R.anim.cus_pop_animation_out; private set
         internal var contentId: Int = -1; private set
+        internal var gravity: Int = Gravity.CENTER; private set
         internal var focusAble = true; private set
         internal var outsideTouchAble = true; private set
         internal var outsideTouchDismiss = true; private set
@@ -153,6 +175,11 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return this
         }
 
+        fun gravity(gravity: Int): PopConfig {
+            this.gravity = gravity
+            return this
+        }
+
         fun focusAble(focusAble: Boolean): PopConfig {
             this.focusAble = focusAble
             return this
@@ -168,26 +195,42 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return this
         }
 
+        fun offset(x: Int, y: Int): PopConfig {
+            this.xOffset = x
+            this.yOffset = y
+            return this
+        }
+
         internal fun getContext(): Context {
             return v.context
         }
 
         fun instance(): CusPop {
-            val act = (v.context as Activity)
-            val dm = DisplayMetrics()
-            val p = when (dimMode) {
-                DimMode.CONTENT -> {
-                    act.windowManager.defaultDisplay.getMetrics(dm)
-                    Point(dm.widthPixels, dm.heightPixels)
+            val act = (getContext() as? Activity)
+            val p: Point
+            if (act != null) {
+                p = when (dimMode) {
+                    DimMode.CONTENT -> {
+                        val r = Rect()
+                        v.getGlobalVisibleRect(r)
+                        Point(r.right, r.bottom)
+                    }
+                    DimMode.FULL_STATUS -> {
+                        val r = Rect()
+                        act.window.decorView.getWindowVisibleDisplayFrame(r)
+                        Point(r.right, r.bottom)
+                    }
+                    DimMode.FULL_SCREEN -> {
+                        val dm = DisplayMetrics()
+                        act.windowManager.defaultDisplay.getRealMetrics(dm)
+                        Point(dm.widthPixels, dm.heightPixels)
+                    }
                 }
-                DimMode.FULL_STATUS -> {
-                    val v = act.findViewById<View>(android.R.id.content)
-                    Point(v.width, v.height)
-                }
-                DimMode.FULL_SCREEN -> {
-                    act.windowManager.defaultDisplay.getRealMetrics(dm)
-                    Point(dm.widthPixels, dm.heightPixels)
-                }
+            } else {
+                val dm = DisplayMetrics()
+                val wm = getContext().getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+                wm?.defaultDisplay?.getRealMetrics(dm)
+                p = Point(dm.widthPixels, dm.heightPixels)
             }
             w = p.x
             h = p.y
@@ -195,7 +238,19 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         }
 
         fun show(init: (root: View, pop: CusPop) -> Unit) {
-            instance().show(init)
+            this.show(Gravity.NO_GRAVITY, init = init)
+        }
+
+        fun show(showGravity: Int, init: (root: View, pop: CusPop) -> Unit) {
+            instance().show(showGravity, init = init)
+        }
+
+        fun showIn(init: (root: View, pop: CusPop) -> Unit) {
+            this.showIn(gravity, init = init)
+        }
+
+        fun showIn(showGravity: Int = gravity, init: (root: View, pop: CusPop) -> Unit) {
+            instance().showIn(showGravity, init = init)
         }
     }
 }
