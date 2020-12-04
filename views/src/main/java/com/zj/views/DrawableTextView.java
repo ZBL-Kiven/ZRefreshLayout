@@ -61,7 +61,8 @@ public class DrawableTextView extends View {
      */
     private float defaultWidth;
     private float defaultHeight;
-
+    private PointF textStart, badgeTextStart;
+    private Rect drawableRect, badgeRect;
     private float minWidth;
     private float minHeight;
     private float layoutWidth;
@@ -255,9 +256,6 @@ public class DrawableTextView extends View {
         }
         postInvalidate();
     }
-
-    private PointF textStart, badgeTextStart;
-    private Rect drawableRect, badgeRect;
 
     private void calculationAll() {
         calculateViewDimension();
@@ -620,6 +618,22 @@ public class DrawableTextView extends View {
                 }
             });
         }
+    }
+
+    public float getContentWidth() {
+        return contentRect.width();
+    }
+
+    public float getContentHeight() {
+        return contentRect.height();
+    }
+
+    public float getBadgeWidth() {
+        return badgeRect.width();
+    }
+
+    public float getBadgeHeight() {
+        return badgeRect.height();
     }
 
     public void setMinWidth(float minWidth) {
