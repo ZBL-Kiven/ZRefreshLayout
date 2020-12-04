@@ -59,7 +59,15 @@ public class DrawableTextView extends View {
     /**
      * default: the basic width and height affected by system attributes. layout: the actual measured width and height
      */
-    private float defaultWidth, defaultHeight, minWidth, minHeight, layoutWidth, layoutHeight, badgeMinWidth, badgeMinHeight;
+    private float defaultWidth;
+    private float defaultHeight;
+
+    private float minWidth;
+    private float minHeight;
+    private float layoutWidth;
+    private float layoutHeight;
+    private float badgeMinWidth;
+    private float badgeMinHeight;
     //The actual drawing area of ​​the content (excluding badges)
     private final RectF contentRect = new RectF();
     private boolean badgeEnable = false, clearTextIfEmpty = false;
@@ -612,6 +620,16 @@ public class DrawableTextView extends View {
                 }
             });
         }
+    }
+
+    public void setMinWidth(float minWidth) {
+        this.minWidth = minWidth;
+        refreshAndValidate();
+    }
+
+    public void setMinHeight(float minHeight) {
+        this.minHeight = minHeight;
+        refreshAndValidate();
     }
 
     //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
