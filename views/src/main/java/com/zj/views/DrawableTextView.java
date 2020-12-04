@@ -621,18 +621,22 @@ public class DrawableTextView extends View {
     }
 
     public float getContentWidth() {
+        if (contentRect == null) return 0;
         return contentRect.width();
     }
 
     public float getContentHeight() {
+        if (contentRect == null) return 0;
         return contentRect.height();
     }
 
     public float getBadgeWidth() {
+        if (badgeRect == null) return 0;
         return badgeRect.width();
     }
 
     public float getBadgeHeight() {
+        if (badgeRect == null) return 0;
         return badgeRect.height();
     }
 
