@@ -1,6 +1,5 @@
 package com.zj.test;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +58,11 @@ public class Frg2 extends BaseLinkageFragment {
 
     private UploadingState state;
 
+    public void setContent(String path, String desc) {
+        tvDesc.setText(desc);
+        //        Glide.with(ivPic).load(path).thumbnil(0.1f).into(ivPic);
+    }
+
     public void setState(UploadingState state) {
         this.state = state;
         initWithState();
@@ -71,6 +75,7 @@ public class Frg2 extends BaseLinkageFragment {
         this.close = close;
         this.retry = retry;
         initWithState();
+        progress.setProgress(state.progress);
     }
 
     private void initWithState() {
