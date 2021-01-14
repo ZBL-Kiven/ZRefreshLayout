@@ -1,79 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="42dp"
-    android:layout_marginEnd="21dp"
-    android:layout_marginBottom="30dp"
-    android:background="@drawable/personal_follow_btn_bg_selected"
-    android:clipToPadding="false"
-    android:elevation="20dp">
+    android:fitsSystemWindows="false">
 
-    <ImageView
-        android:id="@+id/upload_pop_uploading_iv_pic"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="15dp"
-        android:background="#acc"
-        android:contentDescription="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/upload_pop_uploading_tv_desc"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#333"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
-        app:layout_constraintEnd_toStartOf="@id/upload_pop_uploading_v_retry"
-        app:layout_constraintStart_toEndOf="@id/upload_pop_uploading_iv_pic"
-        app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic"
-        tools:text="as q d q f " />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="42dp"
+        android:layout_marginEnd="21dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/personal_follow_btn_bg_selected"
+        android:clipToPadding="false"
+        android:elevation="20dp">
 
-    <SeekBar
-        android:id="@+id/upload_pop_uploading_sb_progress"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:focusable="false"
-        android:progressTint="#fea03f"
-        android:thumb="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:progress="50" />
+        <ImageView
+            android:id="@+id/upload_pop_uploading_iv_pic"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="#acc"
+            android:contentDescription="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/upload_pop_uploading_v_retry"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:contentDescription="@null"
-        android:padding="5.5dp"
-        android:src="@mipmap/ic_video_upload_fail_refesh_logo"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
-        app:layout_constraintEnd_toStartOf="@id/upload_pop_uploading_v_close"
-        app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic" />
+        <TextView
+            android:id="@+id/upload_pop_uploading_tv_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#333"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
+            app:layout_constraintEnd_toStartOf="@id/upload_pop_uploading_v_retry"
+            app:layout_constraintStart_toEndOf="@id/upload_pop_uploading_iv_pic"
+            app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic"
+            tools:text="as q d q f " />
 
-    <ImageView
-        android:id="@+id/upload_pop_uploading_v_close"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="15dp"
-        android:contentDescription="@null"
-        android:padding="8dp"
-        android:src="@mipmap/ic_video_upload_fail_close_logo"
-        app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic" />
+        <SeekBar
+            android:id="@+id/upload_pop_uploading_sb_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:progressTint="#fea03f"
+            android:thumb="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:progress="50" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/upload_pop_uploading_v_retry"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="@null"
+            android:padding="5.5dp"
+            android:src="@mipmap/ic_video_upload_fail_refesh_logo"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
+            app:layout_constraintEnd_toStartOf="@id/upload_pop_uploading_v_close"
+            app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic" />
+
+        <ImageView
+            android:id="@+id/upload_pop_uploading_v_close"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="15dp"
+            android:contentDescription="@null"
+            android:padding="8dp"
+            android:src="@mipmap/ic_video_upload_fail_close_logo"
+            app:layout_constraintBottom_toBottomOf="@id/upload_pop_uploading_iv_pic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/upload_pop_uploading_iv_pic" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

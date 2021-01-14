@@ -9,7 +9,9 @@ import android.graphics.Color
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.*
+import android.view.View.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
@@ -45,7 +47,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
                 override fun onAnimationRepeat(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    super@CusPop.dismiss()
+                    superDisMiss()
                 }
 
                 override fun onAnimationStart(animation: Animation?) {
@@ -54,7 +56,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             })
         } else {
             setBgColor(true, 0.0f, popConfig.dimColor)
-            super@CusPop.dismiss()
+            superDisMiss()
         }
     }
 
@@ -63,40 +65,65 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     fun show(showGravity: Int, init: (root: View, pop: CusPop) -> Unit) {
-        startAnim()
-        showAtLocation(popConfig.v, showGravity, popConfig.xOffset, popConfig.yOffset)
+        try {
+            startAnim()
+            showAtLocation(popConfig.v, showGravity, popConfig.xOffset, popConfig.yOffset)
+        } catch (e: Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        } catch (e: java.lang.Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        }
         @Suppress("LeakingThis") init(rootView, this)
     }
 
     fun showIn(showGravity: Int, init: (root: View, pop: CusPop) -> Unit) {
-        startAnim()
-        showAsDropDown(popConfig.v, popConfig.xOffset, popConfig.yOffset, showGravity)
+        try {
+            startAnim()
+            showAsDropDown(popConfig.v, popConfig.xOffset, popConfig.yOffset, showGravity)
+        } catch (e: Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        } catch (e: java.lang.Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        }
         @Suppress("LeakingThis") init(rootView, this)
+    }
+
+    fun superDisMiss() {
+        try {
+            super@CusPop.dismiss()
+        } catch (e: Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        } catch (e: java.lang.Exception) {
+            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+        }
     }
 
     init {
         val context = popConfig.getContext()
-        isFocusable = popConfig.focusAble
         isOutsideTouchable = popConfig.outsideTouchAble
+        isFocusable = popConfig.focusAble
         isClippingEnabled = false
         vParent = LayoutInflater.from(context).inflate(R.layout.cus_pop_parent, null, false) as FrameLayout
         contentView = vParent
-        vParent.removeAllViews()
-        rootView = View.inflate(context, popConfig.contentId, vParent)
-        vParent.setBackgroundColor(Color.TRANSPARENT)
         contentView.setPadding(0, 0, 0, 0)
+        vParent.removeAllViews()
+        rootView = inflate(context, popConfig.contentId, vParent)
+        vParent.setBackgroundColor(Color.TRANSPARENT)
         initView()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
-        vParent.setOnClickListener {
-            if (popConfig.outsideTouchDismiss) dismiss()
-            if (!popConfig.outsideTouchAble) return@setOnClickListener
+        if (!isOutsideTouchable) vParent.setOnTouchListener { _, _ ->
+            return@setOnTouchListener if (isOutsideTouchable) {
+                if (popConfig.outsideTouchDismiss) dismiss()
+                false
+            } else true
         }
     }
 
     enum class DimMode {
-        CONTENT, FULL_STATUS, FULL_SCREEN
+        CONTENT, FULL_STATUS, FULL_SCREEN, NONE
     }
 
     private fun startAnim() {
@@ -138,7 +165,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         internal var animOutRes: Int = R.anim.cus_pop_animation_out; private set
         internal var contentId: Int = -1; private set
         internal var focusAble = true; private set
-        internal var outsideTouchAble = true; private set
+        internal var outsideTouchAble = false; private set
         internal var outsideTouchDismiss = true; private set
 
         fun dimMode(m: DimMode): PopConfig {
@@ -211,6 +238,9 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
                         val dm = DisplayMetrics()
                         act.windowManager.defaultDisplay.getRealMetrics(dm)
                         Point(dm.widthPixels, dm.heightPixels)
+                    }
+                    DimMode.NONE -> {
+                        Point(-2, -2)
                     }
                 }
             } else {
