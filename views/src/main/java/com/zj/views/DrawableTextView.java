@@ -569,7 +569,7 @@ public class DrawableTextView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 onTouchDownPoint = new PointF(event.getX(), event.getY());
-               return true;
+                return true;
             case MotionEvent.ACTION_UP:
                 if (onTouchDownPoint == null) return super.onTouchEvent(event);
                 if (Math.abs(event.getX() - onTouchDownPoint.x) <= 30 && Math.abs(event.getY() - onTouchDownPoint.y) <= 30) {
@@ -585,9 +585,13 @@ public class DrawableTextView extends View {
                 performClick();
                 return true;
             case MotionEvent.ACTION_MOVE:
+                if (Math.abs(event.getX() - onTouchDownPoint.x) > 30 || Math.abs(event.getY() - onTouchDownPoint.y) > 30) {
+                    ViewParent vp = getParent();
+                    if (vp != null) vp.requestDisallowInterceptTouchEvent(false);
+                    return false;
+                }
+                break;
             case MotionEvent.ACTION_CANCEL:
-                ViewParent vp = getParent();
-                if (vp != null) vp.requestDisallowInterceptTouchEvent(false);
                 onTouchDownPoint = null;
                 break;
         }
