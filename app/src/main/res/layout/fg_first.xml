@@ -35,7 +35,7 @@
             app:dtv_badgeInGravity="TOP|RIGHT"
             app:dtv_badgeMinHeight="15dp"
             app:dtv_badgeMinWidth="15dp"
-            app:dtv_badgePadding="3dp"
+            app:dtv_badgePadding="30dp"
             app:dtv_badgeText="8"
             app:dtv_badgeTextColor="#00A"
             app:dtv_badgeTextSize="12dp"

@@ -3,6 +3,7 @@ package com.zj.test;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,20 @@ public class Frg1 extends BaseLinkageFragment {
         dtv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e("===== ", " 11111 ");
                 v.setSelected(!v.isSelected());
+            }
+        });
+        dtv.setOnBadgeClickListener(new DrawableTextView.BadgeClickListener() {
+            @Override
+            public void onClick(DrawableTextView v) {
+                Log.e("===== ", " 22222 ");
+            }
+        });
+        dtv.setOnDrawableClickListener(new DrawableTextView.DrawableClickListener() {
+            @Override
+            public void onClick(DrawableTextView v) {
+                Log.e("===== ", " 33333 ");
             }
         });
         handler.sendEmptyMessageDelayed(127, 2000);

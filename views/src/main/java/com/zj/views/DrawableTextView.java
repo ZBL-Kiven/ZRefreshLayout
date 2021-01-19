@@ -14,7 +14,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import androidx.annotation.Nullable;
@@ -83,6 +85,9 @@ public class DrawableTextView extends View {
     private final ArgbEvaluator evaluator = new ArgbEvaluator();
     private DrawableValueAnimator animator;
     private boolean isSelected = false;
+    private BadgeClickListener badgeClickListener;
+    private DrawableClickListener drawableClickListener;
+    private PointF onTouchDownPoint;
 
     @Override
     public boolean isSelected() {
@@ -558,6 +563,42 @@ public class DrawableTextView extends View {
         }
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (badgeClickListener == null && drawableClickListener == null) return super.onTouchEvent(event);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                onTouchDownPoint = new PointF(event.getX(), event.getY());
+                break;
+            case MotionEvent.ACTION_UP:
+                if (onTouchDownPoint == null) return super.onTouchEvent(event);
+                if (Math.abs(event.getX() - onTouchDownPoint.x) <= 30 && Math.abs(event.getY() - onTouchDownPoint.y) <= 30) {
+                    if (badgeClickListener != null && badgeRect.contains((int) onTouchDownPoint.x, (int) onTouchDownPoint.y)) {
+                        badgeClickListener.onClick(this);
+                        return true;
+                    }
+                    if (drawableClickListener != null && drawableRect.contains((int) onTouchDownPoint.x, (int) onTouchDownPoint.y)) {
+                        drawableClickListener.onClick(this);
+                        return true;
+                    }
+                }
+                performClick();
+                return true;
+            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_CANCEL:
+                ViewParent vp = getParent();
+                if (vp != null) vp.requestDisallowInterceptTouchEvent(false);
+                onTouchDownPoint = null;
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
     private interface OnAnimListener {
         void onAnimFraction(float fraction);
     }
@@ -644,6 +685,151 @@ public class DrawableTextView extends View {
     public float getBadgeHeight() {
         if (badgeRect == null) return 0;
         return badgeRect.height();
+    }
+
+    public float getDrawableWidth() {
+        return drawableWidth;
+    }
+
+    public float getDrawableHeight() {
+        return drawableHeight;
+    }
+
+    @Nullable
+    public Drawable getReplaceDrawable() {
+        return replaceDrawable;
+    }
+
+    @Nullable
+    public Drawable getSelectedDrawable() {
+        return selectedDrawable;
+    }
+
+    @Nullable
+    public Drawable getBadgeBackground() {
+        return badgeBackground;
+    }
+
+    @Nullable
+    public Drawable getBadgeBackgroundSelected() {
+        return badgeBackgroundSelected;
+    }
+
+    @Nullable
+    public Drawable getBackgroundDrawable() {
+        return backgroundDrawable;
+    }
+
+    @Nullable
+    public Drawable getBackgroundDrawableSelected() {
+        return backgroundDrawableSelected;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public int getGravity() {
+        return gravity;
+    }
+
+    public int getBadgeGravity() {
+        return badgeGravity;
+    }
+
+    @Nullable
+    public String getText() {
+        return text;
+    }
+
+    @Nullable
+    public String getTextSelected() {
+        return textSelected;
+    }
+
+    @Nullable
+    public String getBadgeText() {
+        return badgeText;
+    }
+
+    public float getTextSize() {
+        return textSize;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public int getTextColorSelect() {
+        return textColorSelect;
+    }
+
+    public float getMinWidth() {
+        return minWidth;
+    }
+
+    public float getMinHeight() {
+        return minHeight;
+    }
+
+    public float getLayoutWidth() {
+        return layoutWidth;
+    }
+
+    public float getLayoutHeight() {
+        return layoutHeight;
+    }
+
+    public float getBadgeMinWidth() {
+        return badgeMinWidth;
+    }
+
+    public float getBadgeMinHeight() {
+        return badgeMinHeight;
+    }
+
+    public boolean isBadgeEnable() {
+        return badgeEnable;
+    }
+
+    public int getBadgeTextColor() {
+        return badgeTextColor;
+    }
+
+    public int getBadgeTextColorSelected() {
+        return badgeTextColorSelected;
+    }
+
+    public float getBadgeTextSize() {
+        return badgeTextSize;
+    }
+
+    public float getBadgePadding() {
+        return badgePadding;
+    }
+
+    public float getBadgeMarginStart() {
+        return badgeMarginStart;
+    }
+
+    public float getBadgeMarginEnd() {
+        return badgeMarginEnd;
+    }
+
+    public float getBadgeMarginTop() {
+        return badgeMarginTop;
+    }
+
+    public float getBadgeMarginBottom() {
+        return badgeMarginBottom;
+    }
+
+    public Paint getTextPaint() {
+        return textPaint;
+    }
+
+    public Paint getBadgeTextPaint() {
+        return badgeTextPaint;
     }
 
     public void setMinWidth(float minWidth) {
@@ -863,7 +1049,23 @@ public class DrawableTextView extends View {
         refreshAndValidate();
     }
 
+    public void setOnBadgeClickListener(BadgeClickListener badgeClickListener) {
+        this.badgeClickListener = badgeClickListener;
+    }
+
+    public void setOnDrawableClickListener(DrawableClickListener drawableClickListener) {
+        this.drawableClickListener = drawableClickListener;
+    }
+
     private void refreshAndValidate() {
         requestLayout();
+    }
+
+    public interface BadgeClickListener {
+        void onClick(DrawableTextView v);
+    }
+
+    public interface DrawableClickListener {
+        void onClick(DrawableTextView v);
     }
 }
