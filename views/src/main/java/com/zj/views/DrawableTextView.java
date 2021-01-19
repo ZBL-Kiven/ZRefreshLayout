@@ -569,7 +569,7 @@ public class DrawableTextView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 onTouchDownPoint = new PointF(event.getX(), event.getY());
-                break;
+               return true;
             case MotionEvent.ACTION_UP:
                 if (onTouchDownPoint == null) return super.onTouchEvent(event);
                 if (Math.abs(event.getX() - onTouchDownPoint.x) <= 30 && Math.abs(event.getY() - onTouchDownPoint.y) <= 30) {
