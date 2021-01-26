@@ -16,10 +16,14 @@
         <attr name="dtv_selectedDrawable" format="reference" />
         <attr name="dtv_text" format="reference|string" />
         <attr name="dtv_textSelected" format="reference|string" />
-        <attr name="dtv_clearTextIfEmpty" format="boolean" />
         <attr name="dtv_textSize" format="dimension" />
         <attr name="dtv_textColor" format="color|reference" />
         <attr name="dtv_textColorSelect" format="color|reference" />
+        <attr name="dtv_textLineSpacing" format="dimension" />
+        <attr name="dtv_maxTextLength" format="integer" />
+        <attr name="dtv_maxLength" format="dimension" />
+        <attr name="dtv_maxLine" format="integer" />
+        <attr name="dtv_clearTextIfEmpty" format="boolean" />
         <attr name="dtv_badgeEnable" format="boolean" />
         <attr name="dtv_badgeBackground" format="color|reference" />
         <attr name="dtv_badgeBackgroundSelected" format="color|reference" />
@@ -40,6 +44,11 @@
         <attr name="dtv_animDuration" format="integer" />
         <attr name="dtv_textFontPath" format="string" />
         <attr name="dtv_badgeTextFontPath" format="string" />
+        <attr name="dtv_textGravity" format="enum">
+            <enum name="center" value="0" />
+            <enum name="left" value="1" />
+            <enum name="right" value="2" />
+        </attr>
         <attr name="dtv_textStyle" format="enum">
             <enum name="normal" value="0" />
             <enum name="bold" value="1" />

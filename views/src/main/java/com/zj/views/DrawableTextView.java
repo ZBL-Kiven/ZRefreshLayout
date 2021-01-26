@@ -19,10 +19,13 @@ import android.view.View;
 import android.view.ViewParent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.zj.views.ut.DPUtils.dp2px;
 
@@ -45,7 +48,7 @@ import static com.zj.views.ut.DPUtils.dp2px;
 
 @SuppressWarnings("unused")
 public class DrawableTextView extends View {
-
+    private static final String ellipse = "\u2026";
     private float drawableWidth = 0;
     private float drawableHeight = 0;
     @Nullable
@@ -56,8 +59,13 @@ public class DrawableTextView extends View {
     private float drawablePadding = 0.0f;
     @Nullable
     private String text, textSelected, badgeText;
+    private List<TextInfo> drawTextInfoList;
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;
+    private float maxLength = -1, textLineSpacing = 0.1f;
+    private int textGravity = TextGravity.center;
+    private final float defaultTextSpacing = dp2px(10);
+    private int maxTextLength = -1, maxLines = -1;
     /**
      * default: the basic width and height affected by system attributes. layout: the actual measured width and height
      */
@@ -73,7 +81,7 @@ public class DrawableTextView extends View {
     private float badgeMinHeight;
     //The actual drawing area of ​​the content (excluding badges)
     private final RectF contentRect = new RectF();
-    private boolean badgeEnable = false, clearTextIfEmpty = false;
+    private boolean badgeEnable = false;
     private int badgeTextColor, badgeTextColorSelected = Color.BLACK;
     private float badgeTextSize = 0, badgePadding = 0.0f, badgeMarginStart = 0.0f, badgeMarginEnd = 0.0f, badgeMarginTop = 0.0f, badgeMarginBottom = 0.0f;
     private int animDuration = 0;
@@ -112,6 +120,13 @@ public class DrawableTextView extends View {
         int top = 1;
         int right = 2;
         int bottom = 3;
+    }
+
+    @Target(ElementType.PARAMETER)
+    public @interface TextGravity {
+        int center = 0;
+        int left = 1;
+        int right = 2;
     }
 
     @Target(ElementType.PARAMETER)
@@ -160,11 +175,16 @@ public class DrawableTextView extends View {
                 textSize = ta.getDimension(R.styleable.DrawableTextView_dtv_textSize, textSize);
                 textColor = ta.getColor(R.styleable.DrawableTextView_dtv_textColor, textColor);
                 textColorSelect = ta.getColor(R.styleable.DrawableTextView_dtv_textColorSelect, textColorSelect);
+                textLineSpacing = ta.getDimension(R.styleable.DrawableTextView_dtv_textLineSpacing, .1f);
+                textGravity = ta.getInt(R.styleable.DrawableTextView_dtv_textGravity, TextGravity.center);
+                maxLines = ta.getInt(R.styleable.DrawableTextView_dtv_maxLine, -1);
+                maxLength = ta.getDimension(R.styleable.DrawableTextView_dtv_maxLength, -1f);
+                maxTextLength = ta.getInt(R.styleable.DrawableTextView_dtv_maxTextLength, -1);
                 orientation = ta.getInt(R.styleable.DrawableTextView_dtv_orientation, Orientation.left);
                 animDuration = ta.getInt(R.styleable.DrawableTextView_dtv_animDuration, 0);
                 gravity = ta.getInt(R.styleable.DrawableTextView_dtv_gravity, Gravity.center);
-                clearTextIfEmpty = ta.getBoolean(R.styleable.DrawableTextView_dtv_clearTextIfEmpty, false);
                 badgeEnable = ta.getBoolean(R.styleable.DrawableTextView_dtv_badgeEnable, badgeEnable);
+                boolean clearTextIfEmpty = ta.getBoolean(R.styleable.DrawableTextView_dtv_clearTextIfEmpty, false);
                 boolean selected = ta.getBoolean(R.styleable.DrawableTextView_dtv_select, isSelected);
                 fontPath = ta.getString(R.styleable.DrawableTextView_dtv_textFontPath);
                 fontStyle = ta.getInt(R.styleable.DrawableTextView_dtv_textStyle, -1);
@@ -187,7 +207,7 @@ public class DrawableTextView extends View {
                     badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginTop, badgeMargin);
                     badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginBottom, badgeMargin);
                 }
-                if (TextUtils.isEmpty(textSelected)) textSelected = text;
+                if (!clearTextIfEmpty && TextUtils.isEmpty(textSelected)) textSelected = text;
                 if (textColorSelect == -1) textColorSelect = textColor;
                 if (badgeTextColorSelected == -1) badgeTextColorSelected = badgeTextColor;
                 setSelected(selected);
@@ -201,6 +221,7 @@ public class DrawableTextView extends View {
 
     private void initData() {
         textPaint = new Paint();
+        drawTextInfoList = new ArrayList<>();
         Typeface typeface = Typeface.DEFAULT;
         if (!TextUtils.isEmpty(fontPath)) {
             typeface = Typeface.createFromAsset(getContext().getAssets(), fontPath);
@@ -271,17 +292,14 @@ public class DrawableTextView extends View {
     private void calculateViewDimension() {
         float textWidth;
         float textHeight;
+        drawTextInfoList.clear();
         if ((!isSelected && TextUtils.isEmpty(text)) || (isSelected && TextUtils.isEmpty(textSelected))) {
             textWidth = 0;
             textHeight = 0;
         } else {
-            if (isSelected) {
-                textWidth = TextUtils.isEmpty(textSelected) ? 0 : textPaint.measureText(textSelected);
-            } else {
-                textWidth = TextUtils.isEmpty(text) ? 0 : textPaint.measureText(text);
-            }
-            Paint.FontMetrics metrics = textPaint.getFontMetrics();
-            textHeight = metrics.descent - metrics.ascent;
+            PointF textInfo = measureTextSize(isSelected ? textSelected : text);
+            textWidth = textInfo.x;
+            textHeight = textInfo.y;
         }
         float viewHeight;
         float viewWidth;
@@ -298,6 +316,7 @@ public class DrawableTextView extends View {
             viewHeight = Math.max(textHeight, drawableH) + paddingTop + paddingBottom;
             viewWidth = textWidth + paddingLeft + paddingRight + drawableW + drawableP;
         }
+        for (TextInfo tInfo : drawTextInfoList) tInfo.update(textWidth, viewWidth, textGravity, paddingLeft, orientation);
         Paint.FontMetrics metrics = textPaint.getFontMetrics();
         final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
         final float badgeTextHalfHeight = badgeDisabled ? 0 : Math.max(badgeMinHeight, metrics.descent - metrics.ascent) / 2f;
@@ -329,32 +348,32 @@ public class DrawableTextView extends View {
                 drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = drawableRight + drawableP + textWidth / 2f;
-                textY = viewHeight / 2.0f + minHeightOffset + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
+                textX = drawableRight + drawableP;
+                textY = viewHeight / 2.0f + minHeightOffset - textHeight / 2f;
                 break;
             case Orientation.right:
                 drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f + minWidthOffset + bml);
                 drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = paddingLeft + textWidth / 2f + minWidthOffset + bml;
-                textY = viewHeight / 2.0f + minHeightOffset + (textHeight / 2.0f - textPaint.getFontMetrics().descent);
+                textX = paddingLeft + minWidthOffset + bml;
+                textY = viewHeight / 2.0f + minHeightOffset - textHeight / 2.0f;
                 break;
             case Orientation.top:
                 drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
                 drawableTop = (int) (paddingTop + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = viewWidth / 2f + minWidthOffset + bml;
-                textY = drawableBottom + drawableP + (textHeight - textPaint.getFontMetrics().descent);
+                textX = minWidthOffset + bml;
+                textY = drawableBottom + drawableP;
                 break;
             case Orientation.bottom:
                 drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
                 drawableTop = (int) (paddingTop + textHeight + drawableP + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
-                textX = viewWidth / 2f + minWidthOffset + bml;
-                textY = paddingTop + minHeightOffset + (textHeight - textPaint.getFontMetrics().descent);
+                textX = minWidthOffset + bml;
+                textY = paddingTop + minHeightOffset;
                 break;
         }
         drawableRect = new Rect(drawableLeft, drawableTop, drawableRight, drawableBottom);
@@ -461,6 +480,52 @@ public class DrawableTextView extends View {
         }
     }
 
+    @NonNull
+    private PointF measureTextSize(String s) {
+        if (TextUtils.isEmpty(s)) {
+            return new PointF(0f, 0f);
+        } else {
+            Paint.FontMetrics metrics = textPaint.getFontMetrics();
+            float sth = metrics.descent - metrics.ascent;
+            float textLen = textPaint.measureText(s);
+            float textWidth;
+            int lines;
+            if ((maxLength <= 0 && maxTextLength <= 0) || (maxTextLength > 0 && maxLength <= 0 && s.length() <= maxTextLength) || (maxTextLength <= 0 && textLen <= maxLength)) {
+                TextInfo ti = new TextInfo(s, 0, textLen, textPaint);
+                drawTextInfoList.add(ti);
+                return new PointF(textLen, sth + textPaint.getFontMetrics().descent);
+            } else if (maxLength > 0 && maxTextLength > 0) {
+                throw new IllegalArgumentException("unsupported to set both of 'maxLength' and 'maxTextLength' , Because the priority cannot be determined in different environments.");
+            } else {
+                int countOfLines;
+                if (maxTextLength > 0) {
+                    textWidth = textPaint.measureText(s.substring(0, maxTextLength));
+                    lines = (int) (Math.ceil(s.length() * 1.0f / maxTextLength));
+                    countOfLines = maxTextLength;
+                } else {
+                    textWidth = maxLength;
+                    lines = (int) (Math.ceil(textLen / maxLength));
+                    countOfLines = textPaint.breakText(s, false, maxLength, null);
+                }
+                boolean isOverLine = lines > maxLines;
+                lines = Math.min(lines, maxLines);
+                int lc = lines * countOfLines - ((isOverLine) ? ellipse.length() : 0);
+                String breakText = (lc >= s.length()) ? s : s.substring(0, lc) + ellipse;
+                float textHeight = sth;
+                for (int i = 0; i < lines; i++) {
+                    if (TextUtils.isEmpty(breakText)) break;
+                    String singleLineText = (countOfLines >= breakText.length()) ? breakText : breakText.substring(0, countOfLines);
+                    textHeight = sth * (i + 1) + textLineSpacing * defaultTextSpacing * Math.max(0, i - 1) - sth / 2f;
+                    TextInfo ti = new TextInfo(singleLineText, textHeight, textWidth, textPaint);
+                    textWidth = Math.max(textWidth, ti.textWidth);
+                    drawTextInfoList.add(ti);
+                    breakText = (countOfLines >= breakText.length()) ? null : breakText.substring(countOfLines);
+                }
+                return new PointF(textWidth, textHeight + textPaint.getFontMetrics().descent);
+            }
+        }
+    }
+
     private float curAnimFraction;
 
     @Override
@@ -475,18 +540,18 @@ public class DrawableTextView extends View {
     }
 
     private void drawText(Canvas canvas) {
-        String drawText;
-        if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(textSelected) || clearTextIfEmpty) {
-            drawText = isSelected ? textSelected : text;
-        } else {
-            drawText = TextUtils.isEmpty(text) ? textSelected : text;
+        if (drawTextInfoList == null || drawTextInfoList.isEmpty()) {
+            return;
         }
-        if (TextUtils.isEmpty(drawText)) return;
         int start = textColor;
         int end = textColorSelect;
         int evaTextColor = (int) evaluator.evaluate(curAnimFraction, textColor, textColorSelect);
         textPaint.setColor(evaTextColor);
-        canvas.drawText(drawText, textStart.x + contentRect.left, textStart.y + contentRect.top, textPaint);
+        for (TextInfo info : drawTextInfoList) {
+            if (TextUtils.isEmpty(info.text)) continue;
+            float x = info.textX + textStart.x + contentRect.left;
+            canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
+        }
     }
 
     private void drawDrawable(Canvas canvas) {
@@ -495,7 +560,7 @@ public class DrawableTextView extends View {
     }
 
     private void drawBadge(Canvas canvas) {
-        if (!badgeEnable || TextUtils.isEmpty(badgeText)) return;
+        if (!badgeEnable || badgeRect == null || TextUtils.isEmpty(badgeText)) return;
         drawDrawables(canvas, badgeBackgroundSelected, badgeBackground, badgeRect, true);
         int evaTextColor = (int) evaluator.evaluate(curAnimFraction, badgeTextColor, badgeTextColorSelected);
         badgeTextPaint.setColor(evaTextColor);
@@ -573,7 +638,7 @@ public class DrawableTextView extends View {
             case MotionEvent.ACTION_UP:
                 if (onTouchDownPoint == null) return super.onTouchEvent(event);
                 if (Math.abs(event.getX() - onTouchDownPoint.x) <= 30 && Math.abs(event.getY() - onTouchDownPoint.y) <= 30) {
-                    if (badgeClickListener != null && badgeRect.contains((int) onTouchDownPoint.x, (int) onTouchDownPoint.y)) {
+                    if (badgeClickListener != null && badgeRect != null && badgeRect.contains((int) onTouchDownPoint.x, (int) onTouchDownPoint.y)) {
                         badgeClickListener.onClick(this);
                         return true;
                     }
@@ -605,70 +670,6 @@ public class DrawableTextView extends View {
 
     private interface OnAnimListener {
         void onAnimFraction(float fraction);
-    }
-
-    private static class DrawableValueAnimator {
-
-        private OnAnimListener onAnimListener;
-        private ValueAnimator valueAnimator;
-
-        private long curDuration;
-        private float curFraction;
-
-        private long maxDuration;
-        private float maxFraction;
-        private long animDuration;
-        private boolean isSelected;
-
-        void setDuration(long duration) {
-            this.animDuration = duration;
-        }
-
-        void setOnAnimListener(OnAnimListener listener) {
-            this.onAnimListener = listener;
-        }
-
-        void start(boolean isSelected) {
-            this.isSelected = isSelected;
-            boolean isRunning = valueAnimator != null && valueAnimator.isRunning();
-            if (valueAnimator != null) valueAnimator.cancel();
-            if (valueAnimator == null || !valueAnimator.isRunning()) {
-                valueAnimator = getAnim(isRunning);
-                valueAnimator.start();
-                return;
-            }
-
-            valueAnimator = getAnim(true);
-            valueAnimator.start();
-        }
-
-        private ValueAnimator getAnim(boolean isRunning) {
-            maxFraction = isRunning ? curFraction : 1.0f;
-            maxDuration = isRunning ? curDuration : animDuration;
-            ValueAnimator animator = new ValueAnimator();
-            animator.setInterpolator(new AccelerateDecelerateInterpolator());
-            setValues(animator);
-            setListener(animator);
-            return animator;
-        }
-
-        private void setValues(ValueAnimator animator) {
-            curFraction = 0;
-            curDuration = 0;
-            animator.setDuration(maxDuration);
-            animator.setFloatValues(0.0f, maxFraction);
-        }
-
-        private void setListener(ValueAnimator animator) {
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    curDuration = Math.min(animDuration, animation.getCurrentPlayTime());
-                    curFraction = isSelected ? animation.getAnimatedFraction() : Math.max(0, maxFraction - animation.getAnimatedFraction());
-                    if (onAnimListener != null) onAnimListener.onAnimFraction(curFraction);
-                }
-            });
-        }
     }
 
     public float getContentWidth() {
@@ -847,6 +848,7 @@ public class DrawableTextView extends View {
     }
 
     //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
+
     public void setBadgeText(String text) {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
         badgeText = text;
@@ -1066,10 +1068,99 @@ public class DrawableTextView extends View {
     }
 
     public interface BadgeClickListener {
+
         void onClick(DrawableTextView v);
     }
 
     public interface DrawableClickListener {
+
         void onClick(DrawableTextView v);
+    }
+
+    private static class DrawableValueAnimator {
+
+        private OnAnimListener onAnimListener;
+        private ValueAnimator valueAnimator;
+
+        private long curDuration;
+        private float curFraction;
+
+        private long maxDuration;
+        private float maxFraction;
+        private long animDuration;
+        private boolean isSelected;
+
+        void setDuration(long duration) {
+            this.animDuration = duration;
+        }
+
+        void setOnAnimListener(OnAnimListener listener) {
+            this.onAnimListener = listener;
+        }
+
+        void start(boolean isSelected) {
+            this.isSelected = isSelected;
+            boolean isRunning = valueAnimator != null && valueAnimator.isRunning();
+            if (valueAnimator != null) valueAnimator.cancel();
+            if (valueAnimator == null || !valueAnimator.isRunning()) {
+                valueAnimator = getAnim(isRunning);
+                valueAnimator.start();
+                return;
+            }
+
+            valueAnimator = getAnim(true);
+            valueAnimator.start();
+        }
+
+        private ValueAnimator getAnim(boolean isRunning) {
+            maxFraction = isRunning ? curFraction : 1.0f;
+            maxDuration = isRunning ? curDuration : animDuration;
+            ValueAnimator animator = new ValueAnimator();
+            animator.setInterpolator(new AccelerateDecelerateInterpolator());
+            setValues(animator);
+            setListener(animator);
+            return animator;
+        }
+
+        private void setValues(ValueAnimator animator) {
+            curFraction = 0;
+            curDuration = 0;
+            animator.setDuration(maxDuration);
+            animator.setFloatValues(0.0f, maxFraction);
+        }
+
+        private void setListener(ValueAnimator animator) {
+            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    curDuration = Math.min(animDuration, animation.getCurrentPlayTime());
+                    curFraction = isSelected ? animation.getAnimatedFraction() : Math.max(0, maxFraction - animation.getAnimatedFraction());
+                    if (onAnimListener != null) onAnimListener.onAnimFraction(curFraction);
+                }
+            });
+        }
+    }
+
+    private static class TextInfo {
+        private float textX;
+        private final float textY;
+        private final String text;
+        private final float textWidth;
+
+        TextInfo(String text, float textY, float maxWidth, Paint paint) {
+            this.text = text;
+            this.textY = textY;
+            textWidth = paint.measureText(text);
+        }
+
+        void update(float maxWidth, float viewWidth, int gravity, float padding, int orientation) {
+            if (gravity == TextGravity.center) {
+                textX = (orientation == Orientation.left || orientation == Orientation.right) ? maxWidth / 2f : viewWidth / 2f;
+            } else if (gravity == TextGravity.left) {
+                textX = (orientation == Orientation.left || orientation == Orientation.right) ? textWidth / 2f : textWidth / 2f + padding;
+            } else if (gravity == TextGravity.right) {
+                textX = (maxWidth - textWidth) / 2f + maxWidth / 2f + ((orientation == Orientation.left || orientation == Orientation.right) ? 0 : padding);
+            } else throw new IllegalArgumentException("TextGravity only support one of the enum options center(0) left(1) right(2)");
+        }
     }
 }
