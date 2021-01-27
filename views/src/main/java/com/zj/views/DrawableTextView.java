@@ -552,8 +552,6 @@ public class DrawableTextView extends View {
         for (TextInfo info : drawTextInfoList) {
             if (TextUtils.isEmpty(info.text)) continue;
             canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
-            canvas.drawLine(0, textStart.y + contentRect.top + info.textY - 1, layoutWidth, textStart.y + contentRect.top + info.textY + 1, textPaint);
-            canvas.drawLine(info.textX + textStart.x + contentRect.left - 1, 0, info.textX + textStart.x + contentRect.left + 1, layoutHeight, textPaint);
         }
     }
 
