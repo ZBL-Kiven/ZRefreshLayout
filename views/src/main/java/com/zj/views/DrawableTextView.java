@@ -124,9 +124,11 @@ public class DrawableTextView extends View {
 
     @Target(ElementType.PARAMETER)
     public @interface TextGravity {
-        int center = 0;
-        int left = 1;
-        int right = 2;
+        int center = 1;
+        int left = 2;
+        int right = 4;
+        int top = 8;
+        int bottom = 16;
     }
 
     @Target(ElementType.PARAMETER)
@@ -316,7 +318,7 @@ public class DrawableTextView extends View {
             viewHeight = Math.max(textHeight, drawableH) + paddingTop + paddingBottom;
             viewWidth = textWidth + paddingLeft + paddingRight + drawableW + drawableP;
         }
-        for (TextInfo tInfo : drawTextInfoList) tInfo.update(textWidth, viewWidth, textGravity, paddingLeft, orientation);
+        for (TextInfo tInfo : drawTextInfoList) tInfo.update(textWidth, textHeight, viewWidth, textGravity, paddingLeft, orientation, textPaint);
         Paint.FontMetrics metrics = textPaint.getFontMetrics();
         final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
         final float badgeTextHalfHeight = badgeDisabled ? 0 : Math.max(badgeMinHeight, metrics.descent - metrics.ascent) / 2f;
@@ -349,7 +351,7 @@ public class DrawableTextView extends View {
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
                 textX = drawableRight + drawableP;
-                textY = viewHeight / 2.0f + minHeightOffset - textHeight / 2f;
+                textY = viewHeight / 2.0f + minHeightOffset;
                 break;
             case Orientation.right:
                 drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f + minWidthOffset + bml);
@@ -357,7 +359,7 @@ public class DrawableTextView extends View {
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
                 textX = paddingLeft + minWidthOffset + bml;
-                textY = viewHeight / 2.0f + minHeightOffset - textHeight / 2.0f;
+                textY = viewHeight / 2.0f + minHeightOffset;
                 break;
             case Orientation.top:
                 drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
@@ -491,7 +493,7 @@ public class DrawableTextView extends View {
             float textWidth;
             int lines;
             if ((maxLength <= 0 && maxTextLength <= 0) || (maxTextLength > 0 && maxLength <= 0 && s.length() <= maxTextLength) || (maxTextLength <= 0 && textLen <= maxLength)) {
-                TextInfo ti = new TextInfo(s, 0, textLen, textPaint);
+                TextInfo ti = new TextInfo(s, sth / 2f, textLen, textPaint);
                 drawTextInfoList.add(ti);
                 return new PointF(textLen, sth + textPaint.getFontMetrics().descent);
             } else if (maxLength > 0 && maxTextLength > 0) {
@@ -549,8 +551,9 @@ public class DrawableTextView extends View {
         textPaint.setColor(evaTextColor);
         for (TextInfo info : drawTextInfoList) {
             if (TextUtils.isEmpty(info.text)) continue;
-            float x = info.textX + textStart.x + contentRect.left;
             canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
+            canvas.drawLine(0, textStart.y + contentRect.top + info.textY - 1, layoutWidth, textStart.y + contentRect.top + info.textY + 1, textPaint);
+            canvas.drawLine(info.textX + textStart.x + contentRect.left - 1, 0, info.textX + textStart.x + contentRect.left + 1, layoutHeight, textPaint);
         }
     }
 
@@ -1143,7 +1146,7 @@ public class DrawableTextView extends View {
 
     private static class TextInfo {
         private float textX;
-        private final float textY;
+        private float textY;
         private final String text;
         private final float textWidth;
 
@@ -1153,14 +1156,35 @@ public class DrawableTextView extends View {
             textWidth = paint.measureText(text);
         }
 
-        void update(float maxWidth, float viewWidth, int gravity, float padding, int orientation) {
-            if (gravity == TextGravity.center) {
+        void update(float maxWidth, float maxHeight, float viewWidth, int gravity, float padding, int orientation, Paint paint) {
+            if (((gravity & TextGravity.center) != 0 && (gravity & TextGravity.left) != 0) || ((gravity & TextGravity.left) != 0 && (gravity & TextGravity.right) != 0) || ((gravity & TextGravity.center) != 0 && (gravity & TextGravity.right) != 0)) {
+                throw new IllegalArgumentException("Only one of the horizontal arrangements of left, right and center is allowed to take effect");
+            }
+            Paint.FontMetrics metrics = paint.getFontMetrics();
+            if (orientation == Orientation.left || orientation == Orientation.right) {
+                textY -= (maxHeight - metrics.descent) / 2f;
+                if ((gravity & TextGravity.bottom) != 0 && (gravity & TextGravity.top) != 0) {
+                    throw new IllegalArgumentException("Can't support setting gravity to up and down at the same time");
+                }
+                if ((gravity & TextGravity.left) != 0 && (gravity & TextGravity.right) != 0) {
+                    throw new IllegalArgumentException("Can't support setting gravity to left and right at the same time");
+                }
+                if ((gravity & TextGravity.bottom) != 0) {
+                    textY += maxHeight / 2f - 1.75f * metrics.descent;
+                }
+                if ((gravity & TextGravity.top) != 0) {
+                    textY -= maxHeight / 2f - 1.5f * metrics.descent;
+                }
+            } else {
+                if (orientation == Orientation.top) textY += metrics.descent;
+            }
+            if ((gravity & TextGravity.center) != 0 || ((gravity & TextGravity.center) == 0 || ((gravity & TextGravity.top) != 0 || (gravity & TextGravity.bottom) != 0))) {
                 textX = (orientation == Orientation.left || orientation == Orientation.right) ? maxWidth / 2f : viewWidth / 2f;
-            } else if (gravity == TextGravity.left) {
+            } else if ((gravity & TextGravity.left) != 0) {
                 textX = (orientation == Orientation.left || orientation == Orientation.right) ? textWidth / 2f : textWidth / 2f + padding;
-            } else if (gravity == TextGravity.right) {
+            } else if ((gravity & TextGravity.right) != 0) {
                 textX = (maxWidth - textWidth) / 2f + maxWidth / 2f + ((orientation == Orientation.left || orientation == Orientation.right) ? 0 : padding);
-            } else throw new IllegalArgumentException("TextGravity only support one of the enum options center(0) left(1) right(2)");
+            }
         }
     }
 }
