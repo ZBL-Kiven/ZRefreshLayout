@@ -53,7 +53,7 @@ public class DrawableTextView extends View {
     private float drawableHeight = 0;
     @Nullable
     private Drawable replaceDrawable, selectedDrawable, badgeBackground, badgeBackgroundSelected, backgroundDrawable, backgroundDrawableSelected;
-    private int orientation;
+    private int orientation, drawableOrientation = DrawableOrientation.none;
     private int gravity, badgeGravity;
     private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f, minWidthOffset = 0f, minHeightOffset = 0f;
     private float drawablePadding = 0.0f;
@@ -63,7 +63,7 @@ public class DrawableTextView extends View {
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;
     private float maxLength = -1, textLineSpacing = 0.1f;
-    private int textGravity = TextGravity.center;
+    private int textGravity = TextGravity.left;
     private final float defaultTextSpacing = dp2px(10);
     private int maxTextLength = -1, maxLines = -1;
     /**
@@ -123,12 +123,19 @@ public class DrawableTextView extends View {
     }
 
     @Target(ElementType.PARAMETER)
+    public @interface DrawableOrientation {
+        int left = 0;
+        int top = 1;
+        int right = 2;
+        int bottom = 3;
+        int none = -1;
+    }
+
+    @Target(ElementType.PARAMETER)
     public @interface TextGravity {
         int center = 1;
         int left = 2;
         int right = 4;
-        int top = 8;
-        int bottom = 16;
     }
 
     @Target(ElementType.PARAMETER)
@@ -171,6 +178,7 @@ public class DrawableTextView extends View {
                 replaceDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_replaceDrawable);
                 selectedDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_selectedDrawable);
                 backgroundDrawable = ta.getDrawable(R.styleable.DrawableTextView_dtv_background);
+                drawableOrientation = ta.getInt(R.styleable.DrawableTextView_dtv_drawableOrientation, DrawableOrientation.none);
                 backgroundDrawableSelected = ta.getDrawable(R.styleable.DrawableTextView_dtv_backgroundSelected);
                 text = ta.getString(R.styleable.DrawableTextView_dtv_text);
                 textSelected = ta.getString(R.styleable.DrawableTextView_dtv_textSelected);
@@ -178,8 +186,8 @@ public class DrawableTextView extends View {
                 textColor = ta.getColor(R.styleable.DrawableTextView_dtv_textColor, textColor);
                 textColorSelect = ta.getColor(R.styleable.DrawableTextView_dtv_textColorSelect, textColorSelect);
                 textLineSpacing = ta.getDimension(R.styleable.DrawableTextView_dtv_textLineSpacing, .1f);
-                textGravity = ta.getInt(R.styleable.DrawableTextView_dtv_textGravity, TextGravity.center);
-                maxLines = ta.getInt(R.styleable.DrawableTextView_dtv_maxLine, -1);
+                textGravity = ta.getInt(R.styleable.DrawableTextView_dtv_textGravity, TextGravity.left);
+                maxLines = ta.getInt(R.styleable.DrawableTextView_dtv_maxLine, Integer.MAX_VALUE);
                 maxLength = ta.getDimension(R.styleable.DrawableTextView_dtv_maxLength, -1f);
                 maxTextLength = ta.getInt(R.styleable.DrawableTextView_dtv_maxTextLength, -1);
                 orientation = ta.getInt(R.styleable.DrawableTextView_dtv_orientation, Orientation.left);
@@ -348,6 +356,7 @@ public class DrawableTextView extends View {
             case Orientation.left:
                 drawableLeft = (int) (paddingLeft + bml + minWidthOffset);
                 drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
+                drawableTop = (int) calculateHWithDrawableOrientation(drawableTop, textHeight, drawableH, metrics);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
                 textX = drawableRight + drawableP;
@@ -356,13 +365,15 @@ public class DrawableTextView extends View {
             case Orientation.right:
                 drawableLeft = (int) (paddingLeft + textWidth + drawableP + 0.5f + minWidthOffset + bml);
                 drawableTop = (int) (viewHeight / 2.0f - drawableH / 2.0f + 0.5f + minHeightOffset);
+                drawableTop = (int) calculateHWithDrawableOrientation(drawableTop, textHeight, drawableH, metrics);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
                 textX = paddingLeft + minWidthOffset + bml;
                 textY = viewHeight / 2.0f + minHeightOffset;
                 break;
             case Orientation.top:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
+                float dl = viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml;
+                drawableLeft = (int) calculateWWithDrawableOrientation(dl, textWidth, drawableW);
                 drawableTop = (int) (paddingTop + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
@@ -370,7 +381,8 @@ public class DrawableTextView extends View {
                 textY = drawableBottom + drawableP;
                 break;
             case Orientation.bottom:
-                drawableLeft = (int) (viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml);
+                float dl1 = viewWidth / 2.0f - drawableW / 2.0f + 0.5f + minWidthOffset + bml;
+                drawableLeft = (int) calculateWWithDrawableOrientation(dl1, textWidth, drawableW);
                 drawableTop = (int) (paddingTop + textHeight + drawableP + minHeightOffset);
                 drawableRight = (int) (drawableLeft + drawableW);
                 drawableBottom = (int) (drawableTop + drawableH);
@@ -380,6 +392,28 @@ public class DrawableTextView extends View {
         }
         drawableRect = new Rect(drawableLeft, drawableTop, drawableRight, drawableBottom);
         textStart = new PointF(textX, textY);
+    }
+
+    private float calculateHWithDrawableOrientation(float drawableTop, float textHeight, float drawableH, Paint.FontMetrics metrics) {
+        if (drawableOrientation == DrawableOrientation.top || drawableOrientation == DrawableOrientation.bottom) {
+            if (drawableOrientation == DrawableOrientation.top) {
+                drawableTop -= textHeight / 2f - drawableH / 2f + metrics.descent;
+            } else {
+                drawableTop += textHeight / 2f - drawableH / 2f + metrics.descent;
+            }
+        }
+        return drawableTop;
+    }
+
+    private float calculateWWithDrawableOrientation(float drawableLeft, float textWidth, float drawableW) {
+        if (drawableOrientation == DrawableOrientation.left || drawableOrientation == DrawableOrientation.right) {
+            if (drawableOrientation == DrawableOrientation.left) {
+                drawableLeft -= textWidth / 2f - drawableW / 2f + textPaint.measureText("\u0020") / 2f;
+            } else {
+                drawableLeft += textWidth / 2f - drawableW / 2f - textPaint.measureText("\u0020") / 2f;
+            }
+        }
+        return drawableLeft;
     }
 
     private void calculateGravityBounds() {
@@ -495,7 +529,7 @@ public class DrawableTextView extends View {
             if ((maxLength <= 0 && maxTextLength <= 0) || (maxTextLength > 0 && maxLength <= 0 && s.length() <= maxTextLength) || (maxTextLength <= 0 && textLen <= maxLength)) {
                 TextInfo ti = new TextInfo(s, sth / 2f, textLen, textPaint);
                 drawTextInfoList.add(ti);
-                return new PointF(textLen, sth + textPaint.getFontMetrics().descent);
+                return new PointF(textLen, sth);
             } else if (maxLength > 0 && maxTextLength > 0) {
                 throw new IllegalArgumentException("unsupported to set both of 'maxLength' and 'maxTextLength' , Because the priority cannot be determined in different environments.");
             } else {
@@ -517,7 +551,7 @@ public class DrawableTextView extends View {
                 for (int i = 0; i < lines; i++) {
                     if (TextUtils.isEmpty(breakText)) break;
                     String singleLineText = (countOfLines >= breakText.length()) ? breakText : breakText.substring(0, countOfLines);
-                    textHeight = sth * (i + 1) + textLineSpacing * defaultTextSpacing * Math.max(0, i - 1) - sth / 2f;
+                    textHeight = sth * i + textLineSpacing * defaultTextSpacing * Math.max(0, i - 1) + sth / 2f;
                     TextInfo ti = new TextInfo(singleLineText, textHeight, textWidth, textPaint);
                     textWidth = Math.max(textWidth, ti.textWidth);
                     drawTextInfoList.add(ti);
@@ -552,6 +586,19 @@ public class DrawableTextView extends View {
         for (TextInfo info : drawTextInfoList) {
             if (TextUtils.isEmpty(info.text)) continue;
             canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
+            float y = textStart.y + contentRect.top + info.textY;
+            Paint p = new Paint();
+            p.setTextSize(textSize);
+            p.setColor(Color.CYAN);
+            Paint.FontMetrics pm = p.getFontMetrics();
+            canvas.drawLine(0, y + pm.ascent - 1, layoutWidth, y + pm.ascent + 1, p);
+            p.setColor(Color.YELLOW);
+            canvas.drawLine(0, y - pm.descent - 1, layoutWidth, y - pm.descent + 1, p);
+            p.setColor(Color.RED);
+            canvas.drawLine(0, y - 1, layoutWidth, y + 1, p);
+            p.setColor(Color.BLUE);
+            canvas.drawLine(0, y + pm.descent - 1, layoutWidth, y + pm.descent + 1, p);
+            p.reset();
         }
     }
 
@@ -1160,23 +1207,12 @@ public class DrawableTextView extends View {
             }
             Paint.FontMetrics metrics = paint.getFontMetrics();
             if (orientation == Orientation.left || orientation == Orientation.right) {
-                textY -= (maxHeight - metrics.descent) / 2f;
-                if ((gravity & TextGravity.bottom) != 0 && (gravity & TextGravity.top) != 0) {
-                    throw new IllegalArgumentException("Can't support setting gravity to up and down at the same time");
-                }
-                if ((gravity & TextGravity.left) != 0 && (gravity & TextGravity.right) != 0) {
-                    throw new IllegalArgumentException("Can't support setting gravity to left and right at the same time");
-                }
-                if ((gravity & TextGravity.bottom) != 0) {
-                    textY += maxHeight / 2f - 1.75f * metrics.descent;
-                }
-                if ((gravity & TextGravity.top) != 0) {
-                    textY -= maxHeight / 2f - 1.5f * metrics.descent;
-                }
+                textY -= (maxHeight / 2f) - metrics.descent / 1.5f;
             } else {
                 if (orientation == Orientation.top) textY += metrics.descent;
+                else textY += metrics.descent / 2f;
             }
-            if ((gravity & TextGravity.center) != 0 || ((gravity & TextGravity.center) == 0 || ((gravity & TextGravity.top) != 0 || (gravity & TextGravity.bottom) != 0))) {
+            if ((gravity & TextGravity.center) != 0 || (((gravity & TextGravity.center) == 0 && (gravity & TextGravity.left) == 0 && (gravity & TextGravity.right) == 0))) {
                 textX = (orientation == Orientation.left || orientation == Orientation.right) ? maxWidth / 2f : viewWidth / 2f;
             } else if ((gravity & TextGravity.left) != 0) {
                 textX = (orientation == Orientation.left || orientation == Orientation.right) ? textWidth / 2f : textWidth / 2f + padding;

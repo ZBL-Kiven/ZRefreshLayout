@@ -48,8 +48,6 @@
             <flag name="center" value="1" />
             <flag name="left" value="2" />
             <flag name="right" value="4" />
-            <flag name="top" value="8" />
-            <flag name="bottom" value="16" />
         </attr>
         <attr name="dtv_textStyle" format="enum">
             <enum name="normal" value="0" />
@@ -71,6 +69,12 @@
             <flag name="CENTER" value="1" />
         </attr>
         <attr name="dtv_orientation" format="enum">
+            <enum name="left" value="0" />
+            <enum name="top" value="1" />
+            <enum name="right" value="2" />
+            <enum name="bottom" value="3" />
+        </attr>
+        <attr name="dtv_drawableOrientation" format="enum">
             <enum name="left" value="0" />
             <enum name="top" value="1" />
             <enum name="right" value="2" />
