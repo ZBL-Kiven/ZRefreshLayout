@@ -586,29 +586,12 @@ public class DrawableTextView extends View {
         for (TextInfo info : drawTextInfoList) {
             if (TextUtils.isEmpty(info.text)) continue;
             canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
-            float y = textStart.y + contentRect.top + info.textY;
-            Paint p = new Paint();
-            p.setTextSize(textSize);
-            p.setColor(Color.CYAN);
-            Paint.FontMetrics pm = p.getFontMetrics();
-            canvas.drawLine(0, y + pm.ascent - 1, layoutWidth, y + pm.ascent + 1, p);
-            p.setColor(Color.YELLOW);
-            canvas.drawLine(0, y - pm.descent - 1, layoutWidth, y - pm.descent + 1, p);
-            p.setColor(Color.RED);
-            canvas.drawLine(0, y - 1, layoutWidth, y + 1, p);
-            p.setColor(Color.BLUE);
-            canvas.drawLine(0, y + pm.descent - 1, layoutWidth, y + pm.descent + 1, p);
-            p.reset();
         }
     }
 
     private void drawDrawable(Canvas canvas) {
         drawableRect.offset((int) (contentRect.left + 0.5f), (int) (contentRect.top + 0.5f));
         drawDrawables(canvas, selectedDrawable, replaceDrawable, drawableRect, false);
-        Paint p = new Paint();
-        p.setTextSize(textSize);
-        p.setColor(Color.BLACK);
-        canvas.drawLine(0, drawableRect.centerY() - 1, layoutWidth, drawableRect.centerY() + 1, p);
     }
 
     private void drawBadge(Canvas canvas) {
