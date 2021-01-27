@@ -39,10 +39,9 @@
             app:dtv_badgeTextColor="#500A"
             app:dtv_badgeTextSize="12dp"
             app:dtv_drawableHeight="30dp"
-            app:dtv_drawablePadding="10dp"
             app:dtv_drawableWidth="30dp"
             app:dtv_maxLine="3"
-            app:dtv_maxTextLength="15"
+            app:dtv_maxTextLength="10"
             app:dtv_orientation="left"
             app:dtv_paddingBottom="15dp"
             app:dtv_paddingLeft="20dp"
@@ -51,7 +50,7 @@
             app:dtv_replaceDrawable="@mipmap/ic_launcher"
             app:dtv_select="false"
             app:dtv_selectedDrawable="@mipmap/ic_launcher_round"
-            app:dtv_text="gf gg gg a sd qsf asfsdqsfasdfasd asfdasd"
+            app:dtv_text="gf gg gg am sd qs fa 9i oo kj gf"
             app:dtv_textColor="#a00"
             app:dtv_textSize="20sp" />
 

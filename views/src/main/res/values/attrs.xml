@@ -12,8 +12,8 @@
         <attr name="dtv_paddingTop" format="dimension" />
         <attr name="dtv_paddingBottom" format="dimension" />
         <attr name="dtv_drawablePadding" format="dimension" />
-        <attr name="dtv_replaceDrawable" format="reference" />
-        <attr name="dtv_selectedDrawable" format="reference" />
+        <attr name="dtv_replaceDrawable" format="color|reference" />
+        <attr name="dtv_selectedDrawable" format="color|reference" />
         <attr name="dtv_text" format="reference|string" />
         <attr name="dtv_textSelected" format="reference|string" />
         <attr name="dtv_textSize" format="dimension" />
