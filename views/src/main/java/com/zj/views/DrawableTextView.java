@@ -186,7 +186,7 @@ public class DrawableTextView extends View {
                 textColor = ta.getColor(R.styleable.DrawableTextView_dtv_textColor, textColor);
                 textColorSelect = ta.getColor(R.styleable.DrawableTextView_dtv_textColorSelect, textColorSelect);
                 textLineSpacing = ta.getDimension(R.styleable.DrawableTextView_dtv_textLineSpacing, .1f);
-                textGravity = ta.getInt(R.styleable.DrawableTextView_dtv_textGravity, TextGravity.left);
+                textGravity = ta.getInt(R.styleable.DrawableTextView_dtv_textGravity, TextGravity.center);
                 maxLines = ta.getInt(R.styleable.DrawableTextView_dtv_maxLine, Integer.MAX_VALUE);
                 maxLength = ta.getDimension(R.styleable.DrawableTextView_dtv_maxLength, -1f);
                 maxTextLength = ta.getInt(R.styleable.DrawableTextView_dtv_maxTextLength, -1);
@@ -527,7 +527,8 @@ public class DrawableTextView extends View {
             float textWidth;
             int lines;
             if ((maxLength <= 0 && maxTextLength <= 0) || (maxTextLength > 0 && maxLength <= 0 && s.length() <= maxTextLength) || (maxTextLength <= 0 && textLen <= maxLength)) {
-                TextInfo ti = new TextInfo(s, sth / 2f, textLen, textPaint);
+                float ty = sth / 2f + metrics.descent / 1.5f;
+                TextInfo ti = new TextInfo(s, ty, textLen, textPaint);
                 drawTextInfoList.add(ti);
                 return new PointF(textLen, sth);
             } else if (maxLength > 0 && maxTextLength > 0) {
@@ -586,19 +587,19 @@ public class DrawableTextView extends View {
         for (TextInfo info : drawTextInfoList) {
             if (TextUtils.isEmpty(info.text)) continue;
             canvas.drawText(info.text, info.textX + textStart.x + contentRect.left, textStart.y + contentRect.top + info.textY, textPaint);
-            float y = textStart.y + contentRect.top + info.textY;
-            Paint p = new Paint();
-            p.setTextSize(textSize);
-            p.setColor(Color.CYAN);
-            Paint.FontMetrics pm = p.getFontMetrics();
-            canvas.drawLine(0, y + pm.ascent - 1, layoutWidth, y + pm.ascent + 1, p);
-            p.setColor(Color.YELLOW);
-            canvas.drawLine(0, y - pm.descent - 1, layoutWidth, y - pm.descent + 1, p);
-            p.setColor(Color.RED);
-            canvas.drawLine(0, y - 1, layoutWidth, y + 1, p);
-            p.setColor(Color.BLUE);
-            canvas.drawLine(0, y + pm.descent - 1, layoutWidth, y + pm.descent + 1, p);
-            p.reset();
+            //            float y = textStart.y + contentRect.top + info.textY;
+            //            Paint p = new Paint();
+            //            p.setTextSize(textSize);
+            //            p.setColor(Color.CYAN);
+            //            Paint.FontMetrics pm = p.getFontMetrics();
+            //            canvas.drawLine(0, y + pm.ascent - 1, layoutWidth, y + pm.ascent + 1, p);
+            //            p.setColor(Color.YELLOW);
+            //            canvas.drawLine(0, y - pm.descent - 1, layoutWidth, y - pm.descent + 1, p);
+            //            p.setColor(Color.RED);
+            //            canvas.drawLine(0, y - 1, layoutWidth, y + 1, p);
+            //            p.setColor(Color.BLUE);
+            //            canvas.drawLine(0, y + pm.descent - 1, layoutWidth, y + pm.descent + 1, p);
+            //            p.reset();
         }
     }
 
