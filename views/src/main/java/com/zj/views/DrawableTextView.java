@@ -1184,7 +1184,7 @@ public class DrawableTextView extends View {
 
         TextInfo(String text, float textY, float maxWidth, Paint paint) {
             this.text = text;
-            this.textY = textY;
+            this.textY = textY + paint.getFontMetrics().descent / 2f;
             textWidth = paint.measureText(text);
         }
 
