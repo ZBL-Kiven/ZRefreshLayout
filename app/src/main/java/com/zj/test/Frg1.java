@@ -1,5 +1,7 @@
 package com.zj.test;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.zj.cf.fragments.BaseLinkageFragment;
 import com.zj.views.DrawableTextView;
@@ -31,8 +34,8 @@ public class Frg1 extends BaseLinkageFragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            dtv.setSelected(true);
-            dtv.setVisibility(View.VISIBLE);
+            //            dtv.setSelected(true);
+            //            dtv.setVisibility(View.VISIBLE);
         }
     };
 
@@ -45,7 +48,10 @@ public class Frg1 extends BaseLinkageFragment {
             @Override
             public void onClick(View v) {
                 Log.e("===== ", " 11111 ");
-                v.setSelected(!v.isSelected());
+                dtv.setDrawableBackground(new ColorDrawable(Color.CYAN));
+                dtv.setBadgeText("");
+                dtv.setReplaceDrawable(ContextCompat.getDrawable(v.getContext(), R.mipmap.ic_launcher));
+                dtv.postInvalidate();
             }
         });
         dtv.setOnBadgeClickListener(new DrawableTextView.BadgeClickListener() {

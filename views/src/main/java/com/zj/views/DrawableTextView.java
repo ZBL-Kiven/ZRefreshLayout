@@ -883,7 +883,6 @@ public class DrawableTextView extends View {
     }
 
     //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
-
     public void setBadgeText(String text) {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
         badgeText = text;
@@ -1087,6 +1086,33 @@ public class DrawableTextView extends View {
 
     public void setAnimator(DrawableValueAnimator animator) {
         this.animator = animator;
+        refreshAndValidate();
+    }
+
+    public float getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(float maxLength) {
+        this.maxLength = maxLength;
+        refreshAndValidate();
+    }
+
+    public int getMaxTextLength() {
+        return maxTextLength;
+    }
+
+    public void setMaxTextLength(int maxTextLength) {
+        this.maxTextLength = maxTextLength;
+        refreshAndValidate();
+    }
+
+    public int getMaxLines() {
+        return maxLines;
+    }
+
+    public void setMaxLines(int maxLines) {
+        this.maxLines = maxLines;
         refreshAndValidate();
     }
 
