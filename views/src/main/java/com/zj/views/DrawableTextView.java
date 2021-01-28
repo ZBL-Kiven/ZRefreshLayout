@@ -327,16 +327,15 @@ public class DrawableTextView extends View {
             viewWidth = textWidth + drawableW + drawableP;
         }
         for (TextInfo tInfo : drawTextInfoList) tInfo.update(textWidth, textHeight, viewWidth, textGravity, paddingLeft, orientation, textPaint);
-        final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
-        final float badgeTextHalfHeight = badgeDisabled ? 0 : Math.max(badgeMinHeight, badgeTextPaint.getFontMetrics().descent - badgeTextPaint.getFontMetrics().ascent) / 2f;
-        final float badgeTextHalfWidth = badgeDisabled ? 0 : Math.max(badgeMinWidth, badgeTextPaint.measureText(badgeText)) / 2f;
-        final boolean isAlignBottom = !badgeDisabled && (badgeGravity & Gravity.bottom) != 0;
-        final boolean isAlignRight = !badgeDisabled && (badgeGravity & Gravity.right) != 0;
-        final boolean isAlignCenter = !badgeDisabled && (badgeGravity & Gravity.center) != 0;
-        final float bml = badgeDisabled ? 0 : isAlignRight ? (badgeTextHalfWidth - badgeMarginStart > viewWidth ? badgeTextHalfWidth - badgeMarginStart - viewWidth : 0f) : (isAlignCenter || badgeMarginStart > 0 ? 0 : Math.abs(badgeMarginStart));
-        final float bmr = badgeDisabled ? 0 : isAlignRight ? (badgeMarginEnd < 0 ? 0 : badgeMarginEnd) : ((badgeMarginEnd + badgeTextHalfWidth > viewWidth && !isAlignCenter) ? badgeMarginEnd + badgeTextHalfWidth - viewWidth : 0f);
-        final float bmt = badgeDisabled ? 0 : isAlignBottom ? (badgeTextHalfHeight - badgeMarginTop > viewHeight ? badgeTextHalfHeight - badgeMarginTop - viewHeight : 0f) : (isAlignCenter || badgeMarginTop > 0 ? 0 : Math.abs(badgeMarginTop));
-        final float bmb = badgeDisabled ? 0 : isAlignBottom ? (badgeMarginBottom < 0 ? 0 : badgeMarginBottom) : ((badgeMarginBottom + badgeTextHalfHeight > viewHeight && !isAlignCenter) ? badgeMarginBottom + badgeTextHalfHeight - viewHeight : 0f);
+        final float badgeTextHalfHeight = !badgeEnable ? 0 : Math.max(badgeMinHeight, badgeTextPaint.getFontMetrics().descent - badgeTextPaint.getFontMetrics().ascent) / 2f;
+        final float badgeTextHalfWidth = !badgeEnable ? 0 : Math.max(badgeMinWidth, badgeTextPaint.measureText(badgeText)) / 2f;
+        final boolean isAlignBottom = badgeEnable && (badgeGravity & Gravity.bottom) != 0;
+        final boolean isAlignRight = badgeEnable && (badgeGravity & Gravity.right) != 0;
+        final boolean isAlignCenter = badgeEnable && (badgeGravity & Gravity.center) != 0;
+        final float bml = !badgeEnable ? 0 : isAlignRight ? (badgeTextHalfWidth - badgeMarginStart > viewWidth ? badgeTextHalfWidth - badgeMarginStart - viewWidth : 0f) : (isAlignCenter || badgeMarginStart > 0 ? 0 : Math.abs(badgeMarginStart));
+        final float bmr = !badgeEnable ? 0 : isAlignRight ? (badgeMarginEnd < 0 ? 0 : badgeMarginEnd) : ((badgeMarginEnd + badgeTextHalfWidth > viewWidth && !isAlignCenter) ? badgeMarginEnd + badgeTextHalfWidth - viewWidth : 0f);
+        final float bmt = !badgeEnable ? 0 : isAlignBottom ? (badgeTextHalfHeight - badgeMarginTop > viewHeight ? badgeTextHalfHeight - badgeMarginTop - viewHeight : 0f) : (isAlignCenter || badgeMarginTop > 0 ? 0 : Math.abs(badgeMarginTop));
+        final float bmb = !badgeEnable ? 0 : isAlignBottom ? (badgeMarginBottom < 0 ? 0 : badgeMarginBottom) : ((badgeMarginBottom + badgeTextHalfHeight > viewHeight && !isAlignCenter) ? badgeMarginBottom + badgeTextHalfHeight - viewHeight : 0f);
         if (bml * 2f + viewWidth < minWidth) {
             minWidthOffset = (minWidth - (bml * 2f + viewWidth)) / 2.0f;
         }
@@ -344,7 +343,7 @@ public class DrawableTextView extends View {
             minHeightOffset = (minHeight - (bmt * 2f + viewHeight)) / 2.0f;
         }
         contentRect.set(bml, bmt, viewWidth + bml + minWidthOffset * 2.0f + paddingLeft + paddingRight, viewHeight + bmt + minHeightOffset * 2.0f + paddingTop + paddingBottom);
-        if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) contentRect.left += badgeMarginStart;
+        if (badgeEnable && !isAlignRight && badgeMarginStart < 0) contentRect.left += badgeMarginStart;
         layoutWidth = viewWidth + bml + bmr + minWidthOffset * 2f + paddingLeft + paddingRight;
         layoutHeight = viewHeight + bmt + bmb + minHeightOffset * 2f + paddingTop + paddingBottom;
         if (defaultWidth == 0) defaultWidth = layoutWidth;
@@ -453,7 +452,7 @@ public class DrawableTextView extends View {
     }
 
     private void calculateBadgeBounds() {
-        if (!badgeEnable || TextUtils.isEmpty(badgeText)) return;
+        if (!badgeEnable) return;
         Paint.FontMetrics metrics = badgeTextPaint.getFontMetrics();
         final float textHeight = metrics.descent - metrics.ascent;
         final float textWidth = badgeTextPaint.measureText(badgeText);
@@ -495,10 +494,9 @@ public class DrawableTextView extends View {
                 top += yo;
             }
         } finally {
-            final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
-            final boolean isAlignBottom = !badgeDisabled && (badgeGravity & Gravity.bottom) != 0;
-            final boolean isAlignCenter = !badgeDisabled && (badgeGravity & Gravity.center) != 0;
-            int offsetY = (int) ((!badgeDisabled && isAlignBottom) ? (contentRect.top) : 0);
+            final boolean isAlignBottom = badgeEnable && (badgeGravity & Gravity.bottom) != 0;
+            final boolean isAlignCenter = badgeEnable && (badgeGravity & Gravity.center) != 0;
+            int offsetY = (int) ((badgeEnable && isAlignBottom) ? (contentRect.top) : 0);
             if (isAlignCenter) {
                 left += badgeMarginStart + badgeMarginEnd;
                 top += badgeMarginTop + badgeMarginBottom;
@@ -605,9 +603,8 @@ public class DrawableTextView extends View {
     private void drawBackground(Canvas canvas) {
         Rect r = new Rect();
         contentRect.roundOut(r);
-        final boolean badgeDisabled = !badgeEnable || TextUtils.isEmpty(badgeText);
-        final boolean isAlignRight = !badgeDisabled && (badgeGravity & Gravity.right) != 0;
-        if (!badgeDisabled && !isAlignRight && badgeMarginStart < 0) r.left += (int) (Math.abs(badgeMarginStart + 0.5f));
+        final boolean isAlignRight = badgeEnable && (badgeGravity & Gravity.right) != 0;
+        if (badgeEnable && !isAlignRight && badgeMarginStart < 0) r.left += (int) (Math.abs(badgeMarginStart + 0.5f));
         drawDrawables(canvas, backgroundDrawableSelected, backgroundDrawable, r, false);
     }
 

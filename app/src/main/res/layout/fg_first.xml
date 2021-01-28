@@ -46,7 +46,6 @@
             app:dtv_paddingLeft="20dp"
             app:dtv_paddingRight="30dp"
             app:dtv_paddingTop="15dp"
-
             app:dtv_select="false"
             app:dtv_selectedDrawable="@mipmap/ic_launcher_round"
             app:dtv_text="阿巴斯七死八活"
