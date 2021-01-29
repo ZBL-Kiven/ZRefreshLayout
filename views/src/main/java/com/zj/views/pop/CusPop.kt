@@ -38,9 +38,15 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     private var vAnim: ValueAnimator? = null
 
     override fun dismiss() {
+        val ctx = popConfig.getContext()
+        if (ctx == null) {
+            superDisMiss()
+            return
+        }
+        val act = ctx as? Activity
         val animE = popConfig.animInRes
-        if (animE != 0) {
-            val animOut = AnimationUtils.loadAnimation(popConfig.getContext(), popConfig.animOutRes)
+        if (animE != 0 || (act != null && !act.isFinishing && !act.isDestroyed)) {
+            val animOut = AnimationUtils.loadAnimation(ctx, popConfig.animOutRes)
             (rootView as? ViewGroup)?.getChildAt(0)?.startAnimation(animOut)
             withAnim(false, animOut, popConfig.dimColor)
             animOut.setAnimationListener(object : Animation.AnimationListener {
@@ -55,7 +61,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
                 }
             })
         } else {
-            setBgColor(true, 0.0f, popConfig.dimColor)
+            if (act != null) setBgColor(true, 0.0f, popConfig.dimColor)
             superDisMiss()
         }
     }
@@ -179,7 +185,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         }
 
         fun dimColor(@ColorRes colorRes: Int): PopConfig {
-            this.dimColor = ContextCompat.getColor(getContext(), colorRes)
+            this.dimColor = getContext()?.let { ContextCompat.getColor(it, colorRes) } ?: 0
             return this
         }
 
@@ -215,8 +221,12 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return this
         }
 
-        internal fun getContext(): Context {
-            return v.context
+        internal fun getContext(): Context? {
+            return try {
+                v.context
+            } catch (e: Exception) {
+                null
+            }
         }
 
         fun instance(): CusPop {
@@ -245,7 +255,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
                 }
             } else {
                 val dm = DisplayMetrics()
-                val wm = getContext().getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+                val wm = getContext()?.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
                 wm?.defaultDisplay?.getRealMetrics(dm)
                 p = Point(dm.widthPixels, dm.heightPixels)
             }

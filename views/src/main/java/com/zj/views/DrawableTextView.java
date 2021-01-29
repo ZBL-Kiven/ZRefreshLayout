@@ -328,7 +328,7 @@ public class DrawableTextView extends View {
         }
         for (TextInfo tInfo : drawTextInfoList) tInfo.update(textWidth, textHeight, viewWidth, textGravity, paddingLeft, orientation, textPaint);
         final float badgeTextHalfHeight = !badgeEnable ? 0 : Math.max(badgeMinHeight, badgeTextPaint.getFontMetrics().descent - badgeTextPaint.getFontMetrics().ascent) / 2f;
-        final float badgeTextHalfWidth = !badgeEnable ? 0 : Math.max(badgeMinWidth, badgeTextPaint.measureText(badgeText)) / 2f;
+        final float badgeTextHalfWidth = !badgeEnable ? 0 : Math.max(badgeMinWidth, TextUtils.isEmpty(badgeText) ? 0 : badgeTextPaint.measureText(badgeText)) / 2f;
         final boolean isAlignBottom = badgeEnable && (badgeGravity & Gravity.bottom) != 0;
         final boolean isAlignRight = badgeEnable && (badgeGravity & Gravity.right) != 0;
         final boolean isAlignCenter = badgeEnable && (badgeGravity & Gravity.center) != 0;
@@ -455,7 +455,7 @@ public class DrawableTextView extends View {
         if (!badgeEnable) return;
         Paint.FontMetrics metrics = badgeTextPaint.getFontMetrics();
         final float textHeight = metrics.descent - metrics.ascent;
-        final float textWidth = badgeTextPaint.measureText(badgeText);
+        final float textWidth = TextUtils.isEmpty(badgeText) ? 0 : badgeTextPaint.measureText(badgeText);
         float badgeWidth = Math.max(badgeMinWidth, textWidth) + badgePadding * 2f;
         float badgeHeight = Math.max(badgeMinHeight, textHeight) + badgePadding * 2f;
         float left = 0, top = 0;
@@ -1208,7 +1208,7 @@ public class DrawableTextView extends View {
         TextInfo(String text, float textY, float maxWidth, Paint paint) {
             this.text = text;
             this.textY = textY + paint.getFontMetrics().descent / 2f;
-            textWidth = paint.measureText(text);
+            textWidth = TextUtils.isEmpty(text) ? 0 : paint.measureText(text);
         }
 
         void update(float maxWidth, float maxHeight, float viewWidth, int gravity, float padding, int orientation, Paint paint) {
