@@ -58,7 +58,7 @@ public class DrawableTextView extends View {
     private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f, minWidthOffset = 0f, minHeightOffset = 0f;
     private float drawablePadding = 0.0f;
     @Nullable
-    private String text = "", textSelected = "", badgeText = "";
+    private String text, textSelected, badgeText;
     private List<TextInfo> drawTextInfoList;
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;
@@ -217,7 +217,7 @@ public class DrawableTextView extends View {
                     badgeMarginTop = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginTop, badgeMargin);
                     badgeMarginBottom = ta.getDimension(R.styleable.DrawableTextView_dtv_badgeMarginBottom, badgeMargin);
                 }
-                if (!clearTextIfEmpty && TextUtils.isEmpty(textSelected)) textSelected = text;
+                if (!clearTextIfEmpty && TextUtils.isEmpty(textSelected)) textSelected = TextUtils.isEmpty(text) ? text = "" : text;
                 if (textColorSelect == -1) textColorSelect = textColor;
                 if (badgeTextColorSelected == -1) badgeTextColorSelected = badgeTextColor;
                 setSelected(selected);
@@ -880,9 +880,9 @@ public class DrawableTextView extends View {
     }
 
     //Check that is sure you`re set the attrs property [badgeEnable = true] ,else it`ll never working;
-    public void setBadgeText(String text) {
+    public void setBadgeText(String s) {
         if (!badgeEnable) throw new IllegalStateException("please check the attrs property [badgeEnable = true]");
-        badgeText = text;
+        badgeText = TextUtils.isEmpty(s) ? "" : s;
         refreshAndValidate();
     }
 
@@ -892,7 +892,7 @@ public class DrawableTextView extends View {
     }
 
     public void setText(String s) {
-        this.text = s;
+        this.text = TextUtils.isEmpty(s) ? "" : s;
         refreshAndValidate();
     }
 
@@ -907,7 +907,7 @@ public class DrawableTextView extends View {
     }
 
     public void setSelectedText(String s) {
-        this.textSelected = s;
+        this.textSelected = TextUtils.isEmpty(s) ? "" : s;
         refreshAndValidate();
     }
 

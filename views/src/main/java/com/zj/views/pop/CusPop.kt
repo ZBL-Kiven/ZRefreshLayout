@@ -37,6 +37,20 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     private var vParent: FrameLayout
     private var vAnim: ValueAnimator? = null
 
+    init {
+        val context = popConfig.getContext()
+        isOutsideTouchable = popConfig.outsideTouchAble
+        isFocusable = popConfig.focusAble
+        isClippingEnabled = false
+        vParent = LayoutInflater.from(context).inflate(R.layout.cus_pop_parent, null, false) as FrameLayout
+        contentView = vParent
+        contentView.setPadding(0, 0, 0, 0)
+        vParent.removeAllViews()
+        rootView = inflate(context, popConfig.contentId, vParent)
+        vParent.setBackgroundColor(Color.TRANSPARENT)
+        initView()
+    }
+
     override fun dismiss() {
         val ctx = popConfig.getContext()
         if (ctx == null) {
@@ -44,7 +58,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return
         }
         val act = ctx as? Activity
-        val animOut = loadAnim(ctx, popConfig.animInRes)
+        val animOut = loadAnim(ctx, popConfig.animOutRes)
         if (animOut != null && (act != null && !act.isFinishing && !act.isDestroyed)) {
             (rootView as? ViewGroup)?.getChildAt(0)?.startAnimation(animOut)
             withAnim(false, animOut, popConfig.dimColor)
@@ -101,20 +115,6 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         } catch (e: java.lang.Exception) {
             Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
         }
-    }
-
-    init {
-        val context = popConfig.getContext()
-        isOutsideTouchable = popConfig.outsideTouchAble
-        isFocusable = popConfig.focusAble
-        isClippingEnabled = false
-        vParent = LayoutInflater.from(context).inflate(R.layout.cus_pop_parent, null, false) as FrameLayout
-        contentView = vParent
-        contentView.setPadding(0, 0, 0, 0)
-        vParent.removeAllViews()
-        rootView = inflate(context, popConfig.contentId, vParent)
-        vParent.setBackgroundColor(Color.TRANSPARENT)
-        initView()
     }
 
     @SuppressLint("ClickableViewAccessibility")
