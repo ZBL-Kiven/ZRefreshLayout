@@ -58,7 +58,7 @@ public class DrawableTextView extends View {
     private float paddingLeft = 0.0f, paddingTop = 0.0f, paddingRight = 0.0f, paddingBottom = 0.0f, minWidthOffset = 0f, minHeightOffset = 0f;
     private float drawablePadding = 0.0f;
     @Nullable
-    private String text, textSelected, badgeText;
+    private String text = "", textSelected = "", badgeText = "";
     private List<TextInfo> drawTextInfoList;
     private float textSize = dp2px(12);
     private int textColor = Color.GRAY, textColorSelect = -1;

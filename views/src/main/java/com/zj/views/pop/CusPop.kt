@@ -44,9 +44,8 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return
         }
         val act = ctx as? Activity
-        val animE = popConfig.animInRes
-        if (animE != 0 || (act != null && !act.isFinishing && !act.isDestroyed)) {
-            val animOut = AnimationUtils.loadAnimation(ctx, popConfig.animOutRes)
+        val animOut = loadAnim(ctx, popConfig.animInRes)
+        if (animOut != null && (act != null && !act.isFinishing && !act.isDestroyed)) {
             (rootView as? ViewGroup)?.getChildAt(0)?.startAnimation(animOut)
             withAnim(false, animOut, popConfig.dimColor)
             animOut.setAnimationListener(object : Animation.AnimationListener {
@@ -133,9 +132,8 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     private fun startAnim() {
-        val animIn = popConfig.animInRes
-        if (animIn != 0) {
-            val animEnter = AnimationUtils.loadAnimation(popConfig.getContext(), animIn)
+        val animEnter = loadAnim(popConfig.getContext(), popConfig.animInRes)
+        if (animEnter != null) {
             (rootView as? ViewGroup)?.getChildAt(0)?.startAnimation(animEnter)
             withAnim(true, animEnter, popConfig.dimColor)
         } else {
@@ -151,6 +149,16 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             setBgColor(show, it.animatedFraction, targetColor)
         }
         vAnim?.start()
+    }
+
+    private fun loadAnim(ctx: Context?, resId: Int): Animation? {
+        return try {
+            AnimationUtils.loadAnimation(ctx, resId)
+        } catch (e: Exception) {
+            e.printStackTrace();null
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace();null
+        }
     }
 
     private fun setBgColor(show: Boolean, @FloatRange(from = 0.0, to = 1.0) fraction: Float, target: Int) {
