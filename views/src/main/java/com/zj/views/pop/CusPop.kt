@@ -193,7 +193,13 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         }
 
         fun dimColor(@ColorRes colorRes: Int): PopConfig {
-            this.dimColor = getContext()?.let { ContextCompat.getColor(it, colorRes) } ?: 0
+            getContext()?.let {
+                try {
+                    this.dimColor = ContextCompat.getColor(it, colorRes)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
             return this
         }
 
