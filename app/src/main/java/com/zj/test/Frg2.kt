@@ -4,8 +4,10 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupWindow
 import com.zj.cf.fragments.BaseLinkageFragment
 import com.zj.test.widget.UploadNotifyPop
+import com.zj.views.pop.CusPop
 
 class Frg2 : BaseLinkageFragment() {
     override fun getView(layoutInflater: LayoutInflater, viewGroup: ViewGroup?): View {

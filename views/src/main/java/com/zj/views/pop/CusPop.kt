@@ -33,8 +33,8 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return PopConfig(v)
         }
 
-        @Contract("This method is only suitable for'debug' mode, please don't use it in a release environment")
-        fun debugWith(v: View): PopConfig {
+        @Deprecated("This method is only suitable for'debug' mode," + "Its main function is to no longer automatically handle crashes caused by errors such as Activity being destroyed, asynchronous calls, and incorrect closing, " + "please don't use it in a release environment", ReplaceWith("CusPop.create()"), DeprecationLevel.WARNING)
+        fun debug(v: View): PopConfig {
             return PopConfig(v, true)
         }
     }
