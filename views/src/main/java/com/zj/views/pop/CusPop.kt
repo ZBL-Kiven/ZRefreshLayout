@@ -22,6 +22,7 @@ import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import com.zj.views.R
+import org.jetbrains.annotations.Contract
 
 @SuppressLint("ResourceType")
 @Suppress("unused", "MemberVisibilityCanBePrivate", "InflateParams")
@@ -30,6 +31,11 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     companion object {
         fun create(v: View): PopConfig {
             return PopConfig(v)
+        }
+
+        @Contract("This method is only suitable for'debug' mode, please don't use it in a release environment")
+        fun debugWith(v: View): PopConfig {
+            return PopConfig(v, true)
         }
     }
 
@@ -88,9 +94,9 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             startAnim()
             showAtLocation(popConfig.v, showGravity, popConfig.xOffset, popConfig.yOffset)
         } catch (e: Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         } catch (e: java.lang.Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         }
         @Suppress("LeakingThis") init(rootView, this)
     }
@@ -100,9 +106,9 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             startAnim()
             showAsDropDown(popConfig.v, popConfig.xOffset, popConfig.yOffset, showGravity)
         } catch (e: Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         } catch (e: java.lang.Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         }
         @Suppress("LeakingThis") init(rootView, this)
     }
@@ -111,15 +117,15 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         try {
             super@CusPop.dismiss()
         } catch (e: Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         } catch (e: java.lang.Exception) {
-            Log.e("CusPop.show", "unable to show cus pop view , the error case: ${e.message}")
+            onExceptionCatch(e, "unable to show cus pop view , the error case: ${e.message}")
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
-        if (!isOutsideTouchable) vParent.setOnTouchListener { _, _ ->
+        if (isOutsideTouchable) vParent.setOnTouchListener { _, _ ->
             return@setOnTouchListener if (isOutsideTouchable) {
                 if (popConfig.outsideTouchDismiss) dismiss()
                 false
@@ -155,9 +161,9 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         return try {
             AnimationUtils.loadAnimation(ctx, resId)
         } catch (e: Exception) {
-            e.printStackTrace();null
+            onExceptionCatch(e, e.message);null
         } catch (e: java.lang.Exception) {
-            e.printStackTrace();null
+            onExceptionCatch(e, e.message);null
         }
     }
 
@@ -168,7 +174,12 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         vParent.setBackgroundColor(color)
     }
 
-    class PopConfig(val v: View) {
+    private fun onExceptionCatch(e: Exception, errorMsg: String?) {
+        if (popConfig.debugging) throw e
+        else Log.e("CusPop ---> ", errorMsg ?: "UNKNOWN ERROR")
+    }
+
+    class PopConfig(val v: View, internal val debugging: Boolean = false) {
         internal var w = 0; private set
         internal var h = 0; private set
         internal var xOffset = 0; private set
@@ -197,7 +208,8 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
                 try {
                     this.dimColor = ContextCompat.getColor(it, colorRes)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    if (debugging) throw e
+                    else e.printStackTrace()
                 }
             }
             return this
@@ -239,7 +251,8 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return try {
                 v.context
             } catch (e: Exception) {
-                null
+                if (debugging) throw e
+                else null
             }
         }
 
