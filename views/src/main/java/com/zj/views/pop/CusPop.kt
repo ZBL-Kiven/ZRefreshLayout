@@ -22,7 +22,6 @@ import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import com.zj.views.R
-import org.jetbrains.annotations.Contract
 
 @SuppressLint("ResourceType")
 @Suppress("unused", "MemberVisibilityCanBePrivate", "InflateParams")
@@ -33,22 +32,26 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return PopConfig(v)
         }
 
-        @Deprecated("This method is only suitable for'debug' mode," + "Its main function is to no longer automatically handle crashes caused by errors such as Activity being destroyed, asynchronous calls, and incorrect closing, " + "please don't use it in a release environment", ReplaceWith("CusPop.create()"), DeprecationLevel.WARNING)
+        @Deprecated("This method is only suitable for debug  mode," + "Its main function is to no longer automatically handle crashes caused by errors such as Activity being destroyed, asynchronous calls, and incorrect closing, " + "please don't use it in a release environment", ReplaceWith("CusPop.create()"), DeprecationLevel.WARNING)
         fun debug(v: View): PopConfig {
             return PopConfig(v, true)
         }
     }
 
-    private var rootView: View
-    private var vParent: FrameLayout
+    private val rootView: View
+    private val vParent: FrameLayout
     private var vAnim: ValueAnimator? = null
 
     init {
-        val context = popConfig.getContext()
+        val context = popConfig.getContext() ?: popConfig.v.context
         isOutsideTouchable = popConfig.outsideTouchAble
         isFocusable = popConfig.focusAble
         isClippingEnabled = false
-        vParent = LayoutInflater.from(context).inflate(R.layout.cus_pop_parent, null, false) as FrameLayout
+        val flp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        popConfig.overrideGravity?.let { flp.gravity = it }
+        vParent = FrameLayout(context)
+        vParent.fitsSystemWindows = false
+        vParent.setBackgroundColor(Color.parseColor("#90000000"))
         contentView = vParent
         contentView.setPadding(0, 0, 0, 0)
         vParent.removeAllViews()
@@ -182,6 +185,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     class PopConfig(val v: View, internal val debugging: Boolean = false) {
         internal var w = 0; private set
         internal var h = 0; private set
+        internal var overrideGravity: Int? = null; private set
         internal var xOffset = 0; private set
         internal var yOffset = 0; private set
         private var dimMode: DimMode = DimMode.FULL_STATUS
@@ -239,6 +243,10 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         fun outsideTouchDismiss(dismiss: Boolean): PopConfig {
             this.outsideTouchDismiss = dismiss
             return this
+        }
+
+        fun overrideContentGravity(gravity: Int) {
+            this.overrideGravity = gravity
         }
 
         fun offset(x: Int, y: Int): PopConfig {
