@@ -14,8 +14,8 @@ import android.view.*
 import android.view.View.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
 import android.widget.PopupWindow
+import android.widget.RelativeLayout
 import androidx.annotation.AnimRes
 import androidx.annotation.ColorRes
 import androidx.annotation.FloatRange
@@ -39,7 +39,7 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
     }
 
     private val rootView: View
-    private val vParent: FrameLayout
+    private val vParent: RelativeLayout
     private var vAnim: ValueAnimator? = null
 
     init {
@@ -47,15 +47,14 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
         isOutsideTouchable = popConfig.outsideTouchAble
         isFocusable = popConfig.focusAble
         isClippingEnabled = false
-        val flp = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-        popConfig.overrideGravity?.let { flp.gravity = it }
-        vParent = FrameLayout(context)
+        vParent = RelativeLayout(context)
         vParent.fitsSystemWindows = false
         vParent.setBackgroundColor(Color.parseColor("#90000000"))
         contentView = vParent
         contentView.setPadding(0, 0, 0, 0)
         vParent.removeAllViews()
         rootView = inflate(context, popConfig.contentId, vParent)
+        popConfig.overrideGravity?.let { vParent.gravity = it }
         vParent.setBackgroundColor(Color.TRANSPARENT)
         initView()
     }
@@ -245,8 +244,9 @@ class CusPop private constructor(private val popConfig: PopConfig) : PopupWindow
             return this
         }
 
-        fun overrideContentGravity(gravity: Int) {
+        fun overrideContentGravity(gravity: Int): PopConfig {
             this.overrideGravity = gravity
+            return this
         }
 
         fun offset(x: Int, y: Int): PopConfig {

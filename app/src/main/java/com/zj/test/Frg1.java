@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,15 @@ import androidx.core.content.ContextCompat;
 
 import com.zj.cf.fragments.BaseLinkageFragment;
 import com.zj.views.DrawableTextView;
+import com.zj.views.pop.CusPop;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 public class Frg1 extends BaseLinkageFragment {
     @NotNull
@@ -44,28 +49,16 @@ public class Frg1 extends BaseLinkageFragment {
         super.onCreate();
         dtv = find(R.id.dtv);
         assert dtv != null;
-        dtv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e("===== ", " 11111 ");
-                dtv.setDrawableBackground(new ColorDrawable(Color.CYAN));
-                dtv.setBadgeText("");
-                dtv.setReplaceDrawable(ContextCompat.getDrawable(v.getContext(), R.mipmap.ic_launcher));
-                dtv.postInvalidate();
-            }
+        dtv.setOnClickListener(v -> {
+            CusPop.Companion.create(v).contentId(R.layout.cus_pop_test).overrideContentGravity(Gravity.CENTER | Gravity.END).dimColor(Color.GRAY).dimMode(CusPop.DimMode.FULL_SCREEN).show((view, cusPop) -> null);
         });
-        dtv.setOnBadgeClickListener(new DrawableTextView.BadgeClickListener() {
-            @Override
-            public void onClick(DrawableTextView v) {
-                Log.e("===== ", " 22222 ");
-            }
+        dtv.setOnBadgeClickListener(v -> {
+            dtv.setDrawableBackground(new ColorDrawable(Color.CYAN));
+            dtv.setBadgeText("");
+            dtv.setReplaceDrawable(ContextCompat.getDrawable(v.getContext(), R.mipmap.ic_launcher));
+            dtv.postInvalidate();
         });
-        dtv.setOnDrawableClickListener(new DrawableTextView.DrawableClickListener() {
-            @Override
-            public void onClick(DrawableTextView v) {
-                Log.e("===== ", " 33333 ");
-            }
-        });
+        dtv.setOnDrawableClickListener(v -> Log.e("===== ", " 33333 "));
         handler.sendEmptyMessageDelayed(127, 2000);
     }
 }

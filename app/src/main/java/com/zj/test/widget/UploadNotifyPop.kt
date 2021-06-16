@@ -17,6 +17,7 @@ import android.widget.TextView
 import com.zj.test.R
 import java.lang.ref.WeakReference
 
+@SuppressLint("StaticFieldLeak")
 @Suppress("unused")
 object UploadNotifyPop : Application.ActivityLifecycleCallbacks, Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
     private var ivPic: ImageView? = null
