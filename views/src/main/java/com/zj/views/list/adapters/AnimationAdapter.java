@@ -60,8 +60,8 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     }
 
     @Override
-    protected final void initData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads) {
-        int adapterPosition = holder.getAdapterPosition();
+    protected final void initData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads) {
+        int adapterPosition = holder.getAbsoluteAdapterPosition();
         bindData(holder, position, module, payloads);
         if ((!isFirstOnly || adapterPosition > mLastPosition) && (payloads == null || payloads.isEmpty())) {
             for (Animator anim : getAnimators(holder.itemView)) {
@@ -88,7 +88,7 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
 
     protected abstract Animator[] getAnimators(View view);
 
-    public abstract void bindData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads);
+    public abstract void bindData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads);
 
     public void setFirstOnly(boolean firstOnly) {
         isFirstOnly = firstOnly;

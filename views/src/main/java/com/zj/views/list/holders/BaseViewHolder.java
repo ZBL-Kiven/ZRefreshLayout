@@ -19,28 +19,25 @@ import com.zj.views.list.adapters.BaseRecyclerAdapter;
  */
 
 @SuppressWarnings("unused")
-public class BaseViewHolder extends RecyclerView.ViewHolder {
+public class BaseViewHolder<T> extends RecyclerView.ViewHolder {
 
     private final SparseArray<View> parseArray;
-    private final BaseRecyclerAdapter mAdapter;
+    private final BaseRecyclerAdapter<?, T> mAdapter;
 
-    public BaseViewHolder(BaseRecyclerAdapter adapter, View v) {
+    public BaseViewHolder(BaseRecyclerAdapter<?, T> adapter, View v) {
         super(v);
         this.mAdapter = adapter;
         parseArray = new SparseArray<>();
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public void onClick(View v) {
-                if (mAdapter.onClickListener != null)
-                    mAdapter.onClickListener.onItemClick(getLayoutPosition(), itemView, mAdapter.getItem(getLayoutPosition()));
+        itemView.setOnClickListener(v1 -> {
+            if (mAdapter.onClickListener != null) {
+                mAdapter.onClickListener.onItemClick(getLayoutPosition(), itemView, mAdapter.getItem(getLayoutPosition()));
             }
         });
     }
 
     @SuppressWarnings("unchecked")
-    public  <T extends View> T getView(@IdRes int id) {
-        T v = (T) parseArray.get(id);
+    public <V extends View> V getView(@IdRes int id) {
+        V v = (V) parseArray.get(id);
         if (v == null) {
             v = itemView.findViewById(id);
             parseArray.put(id, v);

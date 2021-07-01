@@ -13,7 +13,7 @@ import java.util.List;
  * Created by ZJJ on 2018/4/4.
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder, T> extends RecyclerView.Adapter<VH> {
+public abstract class BaseRecyclerAdapter<VH extends BaseViewHolder<T>, T> extends RecyclerView.Adapter<VH> {
 
     private final List<T> data;
 

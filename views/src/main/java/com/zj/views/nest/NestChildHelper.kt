@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
+@Suppress("unused")
 class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingViewIn) : NestScrollView.NestIn {
 
     private var touchSlop = 0

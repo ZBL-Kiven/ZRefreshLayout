@@ -17,7 +17,7 @@ import java.util.List;
  * Created by ZJJ on 2018/4/4.
  */
 
-public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder, T> {
+public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<T>, T> {
 
     private int resId = 0;
 
@@ -69,22 +69,22 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder,
     }
 
     @Override
-    public final BaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public final BaseViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         this.context = parent.getContext();
-        BaseViewHolder holder;
+        BaseViewHolder<T> holder;
         if (content == null) {
             if (inflater == null) inflater = LayoutInflater.from(context);
             if (viewBuilder != null) {
-                holder = new BaseViewHolder(this, viewBuilder.onCreateView(parent, inflater, viewType));
+                holder = new BaseViewHolder<>(this, viewBuilder.onCreateView(parent, inflater, viewType));
             } else if (layoutBuilder != null) {
-                holder = new BaseViewHolder(this, inflater.inflate(layoutBuilder.onCreateView(context, viewType), parent, false));
+                holder = new BaseViewHolder<>(this, inflater.inflate(layoutBuilder.onCreateView(context, viewType), parent, false));
             } else if (resId != 0) {
-                holder = new BaseViewHolder(this, inflater.inflate(resId, parent, false));
+                holder = new BaseViewHolder<>(this, inflater.inflate(resId, parent, false));
             } else {
                 throw new IllegalArgumentException();
             }
         } else {
-            holder = new BaseViewHolder(this, content);
+            holder = new BaseViewHolder<>(this, content);
         }
         return holder;
     }
@@ -93,11 +93,11 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder,
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) { }
 
     @Override
-    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position, @Nullable List<Object> payloads) {
+    public void onBindViewHolder(@NonNull BaseViewHolder<T> holder, int position, @Nullable List<Object> payloads) {
         initData(holder, position, getItem(position), payloads);
     }
 
-    protected abstract void initData(BaseViewHolder holder, int position, @Nullable T module, @Nullable List<Object> payloads);
+    protected abstract void initData(BaseViewHolder<T> holder, int position, @Nullable T module, @Nullable List<Object> payloads);
 
 
     public interface ViewBuilder {

@@ -282,12 +282,9 @@ public class DrawableTextView extends View {
         if (animDuration > 0) {
             animator = new DrawableValueAnimator();
             animator.setDuration(animDuration);
-            animator.setOnAnimListener(new OnAnimListener() {
-                @Override
-                public void onAnimFraction(float fraction) {
-                    DrawableTextView.this.curAnimFraction = fraction;
-                    postInvalidate();
-                }
+            animator.setOnAnimListener(fraction -> {
+                DrawableTextView.this.curAnimFraction = fraction;
+                postInvalidate();
             });
         }
         postInvalidate();
@@ -548,6 +545,7 @@ public class DrawableTextView extends View {
                 float textHeight = sth;
                 for (int i = 0; i < lines; i++) {
                     if (TextUtils.isEmpty(breakText)) break;
+                    assert breakText != null;
                     String singleLineText = (countOfLines >= breakText.length()) ? breakText : breakText.substring(0, countOfLines);
                     textHeight = sth * i + textLineSpacing * defaultTextSpacing * Math.max(0, i - 1) + sth / 2f;
                     TextInfo ti = new TextInfo(singleLineText, textHeight, textWidth, textPaint);
@@ -1188,13 +1186,10 @@ public class DrawableTextView extends View {
         }
 
         private void setListener(ValueAnimator animator) {
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    curDuration = Math.min(animDuration, animation.getCurrentPlayTime());
-                    curFraction = isSelected ? animation.getAnimatedFraction() : Math.max(0, maxFraction - animation.getAnimatedFraction());
-                    if (onAnimListener != null) onAnimListener.onAnimFraction(curFraction);
-                }
+            animator.addUpdateListener(animation -> {
+                curDuration = Math.min(animDuration, animation.getCurrentPlayTime());
+                curFraction = isSelected ? animation.getAnimatedFraction() : Math.max(0, maxFraction - animation.getAnimatedFraction());
+                if (onAnimListener != null) onAnimListener.onAnimFraction(curFraction);
             });
         }
     }

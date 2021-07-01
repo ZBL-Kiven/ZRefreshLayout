@@ -48,7 +48,7 @@ public final class EmptyRecyclerView<T> extends RecyclerView {
         if (adapter == null) {
             adapter = new BaseAdapter<T>(itemViewId) {
                 @Override
-                protected void initData(BaseViewHolder holder, int position, @Nullable T module, List<Object> payloads) {
+                protected void initData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads) {
                     if (adapterDataSet != null) adapterDataSet.initData(holder, position, module);
                 }
             };
