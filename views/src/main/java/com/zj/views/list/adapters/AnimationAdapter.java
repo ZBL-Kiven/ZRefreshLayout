@@ -43,13 +43,9 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
         super(view, data);
     }
 
-    public AnimationAdapter(ViewBuilder builder) {
-        super(builder);
-    }
+    public AnimationAdapter(ViewBuilder builder) { super(builder); }
 
-    public AnimationAdapter(ViewBuilder builder, List<T> data) {
-        super(builder, data);
-    }
+    public AnimationAdapter(ViewBuilder builder, List<T> data) { super(builder, data); }
 
     public AnimationAdapter(LayoutBuilder builder) {
         super(builder);
@@ -58,6 +54,10 @@ public abstract class AnimationAdapter<T> extends BaseAdapter<T> {
     public AnimationAdapter(LayoutBuilder builder, List<T> data) {
         super(builder, data);
     }
+
+    public AnimationAdapter(AdaptViewBuilder<T> builder) { super(builder); }
+
+    public AnimationAdapter(AdaptViewBuilder<T> builder, List<T> data) { super(builder, data); }
 
     @Override
     protected final void initData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads) {

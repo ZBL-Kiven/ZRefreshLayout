@@ -7,11 +7,14 @@ import android.widget.ListView
 import android.widget.ScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
+import java.lang.IllegalArgumentException
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 @Suppress("unused")
-class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingViewIn) : NestScrollView.NestIn {
+open class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingViewIn) : NestScrollView.NestIn {
 
     private var touchSlop = 0
     private var lastX = 0f
@@ -22,18 +25,40 @@ class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingV
         fun getScrollingView(): ViewGroup?
     }
 
-    override fun dispatchChildEvent(ev: MotionEvent?): Boolean? {
-        if (ev == null) return null
+    open fun getVisibilityRect(): Rect {
         val rect = Rect()
         parent.getLocalVisibleRect(rect)
+        return rect
+    }
+
+    override fun dispatchChildEvent(ev: MotionEvent?): Boolean? {
+        if (ev == null) return null
+        val rect = getVisibilityRect()
         val scrolling = rvi.getScrollingView() ?: return false
         if (!scrolling.isNestedScrollingEnabled) return false
         when (scrolling) {
+            is ViewPager -> {
+                if (!canChildScroll(Orientation.HOR, -1f) && !canChildScroll(Orientation.HOR, 1f)) {
+                    return true
+                }
+                val mko = handleInterceptTouchEvent(ev, 0)
+                return mko.first
+            }
+
+            is ViewPager2 -> {
+                val orientation = if (scrolling.orientation == RecyclerView.HORIZONTAL) Orientation.HOR else Orientation.VER
+                if (!canChildScroll(orientation, -1f) && !canChildScroll(orientation, 1f)) {
+                    return true
+                }
+                val mko = handleInterceptTouchEvent(ev, 0)
+                return mko.first
+            }
+
             is RecyclerView -> {
                 val lm = scrolling.layoutManager as? LinearLayoutManager ?: return false
                 val orientation = if (lm.orientation == RecyclerView.HORIZONTAL) Orientation.HOR else Orientation.VER
                 if (!canChildScroll(orientation, -1f) && !canChildScroll(orientation, 1f)) {
-                    return true // Early return if child can't scroll in same direction as parent
+                    return false
                 }
                 val mko = handleInterceptTouchEvent(ev, lm.orientation)
                 val isRelease = when (lm.orientation) {
@@ -59,9 +84,9 @@ class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingV
             is ScrollView -> {
                 return canChildScroll(Orientation.ANY, -1f) && !canChildScroll(Orientation.ANY, 1f)
             }
-            else -> throw java.lang.IllegalArgumentException("the ${scrolling::class.java.name} is no longer support in nest stick scrolling")
+            else -> throw IllegalArgumentException("the ${scrolling::class.java.name} is no longer support in nest stick scrolling")
         }
-        return true
+        return false
     }
 
     private fun handleInterceptTouchEvent(e: MotionEvent, orientation: Int): Pair<Boolean, Int> {
@@ -79,13 +104,13 @@ class NestChildHelper(private val parent: ViewGroup, private val rvi: ScrollingV
                 if (scaledDx > touchSlop || scaledDy > touchSlop) {
                     val markOrientation = isHorizontal != (scaledDy > scaledDx)
                     if (isMarkOrientation == null) isMarkOrientation = markOrientation
-                    return isMarkOrientation!!.let {
+                    return isMarkOrientation?.let {
                         Pair(it, if (it && scaledDy > scaledDx) {
                             if (dy > 0) SCROLL_BOTTOM else SCROLL_TOP
                         } else {
                             if (dx > 0) SCROLL_RIGHT else SCROLL_LEFT
                         })
-                    }
+                    } ?: throw IllegalArgumentException()
                 }
                 lastX = e.x;lastY = e.y
             }

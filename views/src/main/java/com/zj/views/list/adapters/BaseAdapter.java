@@ -27,6 +27,8 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<
 
     private LayoutBuilder layoutBuilder = null;
 
+    private AdaptViewBuilder<T> adaptViewBuilder = null;
+
     @Nullable
     protected Context context = null;
 
@@ -59,6 +61,15 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<
         change(data);
     }
 
+    public BaseAdapter(AdaptViewBuilder<T> builder) {
+        adaptViewBuilder = builder;
+    }
+
+    public BaseAdapter(AdaptViewBuilder<T> builder, List<T> data) {
+        adaptViewBuilder = builder;
+        change(data);
+    }
+
     public BaseAdapter(LayoutBuilder builder) {
         layoutBuilder = builder;
     }
@@ -76,6 +87,8 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<
             if (inflater == null) inflater = LayoutInflater.from(context);
             if (viewBuilder != null) {
                 holder = new BaseViewHolder<>(this, viewBuilder.onCreateView(parent, inflater, viewType));
+            } else if (this.adaptViewBuilder != null) {
+                holder = new BaseViewHolder<>(this, adaptViewBuilder.onCreateView(this, viewType));
             } else if (layoutBuilder != null) {
                 holder = new BaseViewHolder<>(this, inflater.inflate(layoutBuilder.onCreateView(context, viewType), parent, false));
             } else if (resId != 0) {
@@ -102,6 +115,10 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<
 
     public interface ViewBuilder {
         View onCreateView(@NonNull ViewGroup parent, LayoutInflater inflater, int viewType);
+    }
+
+    public interface AdaptViewBuilder<T> {
+        View onCreateView(BaseAdapter<T> adapter, int viewType);
     }
 
     public interface LayoutBuilder {
