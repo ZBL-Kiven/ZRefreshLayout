@@ -11,7 +11,7 @@ import android.widget.OverScroller;
 import androidx.core.view.ViewCompat;
 
 @SuppressWarnings("unused")
-abstract class ViewScroller {
+public abstract class ViewScroller {
 
     static final int SCROLL_STATE_IDLE = 0;
     static final int SCROLL_STATE_DRAGGING = 1;
