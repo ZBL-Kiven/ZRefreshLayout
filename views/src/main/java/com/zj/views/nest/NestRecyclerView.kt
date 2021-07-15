@@ -174,7 +174,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return true
     }
 
-    fun getNestedChild(): View? {
+    open fun getNestedChild(): View? {
         return nestScrollerIn?.getInnerView()
     }
 
@@ -377,12 +377,14 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     }
 
     open fun onComputeScroll(dy: Int, type: Int) {
-        val offset = getScrolledOffset()
+        var offset = getScrolledOffset()
         val total = getHeaderTotalHeight()
         if (dy > 0 && offset + dy >= total) {
             nestRootParent?.scrollTo(0, total)
+            offset = total
         } else if (dy < 0 && offset + dy <= 0) {
             nestRootParent?.scrollTo(0, 0)
+            offset = 0
         } else {
             nestRootParent?.scrollBy(0, dy)
         }
