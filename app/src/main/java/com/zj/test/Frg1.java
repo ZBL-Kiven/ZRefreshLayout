@@ -50,7 +50,7 @@ public class Frg1 extends BaseLinkageFragment {
         dtv = find(R.id.dtv);
         assert dtv != null;
         dtv.setOnClickListener(v -> {
-            CusPop.Companion.create(v).contentId(R.layout.cus_pop_test).overrideContentGravity(Gravity.CENTER | Gravity.END).dimColor(Color.GRAY).dimMode(CusPop.DimMode.FULL_SCREEN).show((view, cusPop) -> null);
+            CusPop.Companion.create(v).contentId(R.layout.cus_pop_test).dimColor(Color.GRAY).dimMode(CusPop.DimMode.FULL_SCREEN).show((view, cusPop) -> null);
         });
         dtv.setOnBadgeClickListener(v -> {
             dtv.setDrawableBackground(new ColorDrawable(Color.CYAN));

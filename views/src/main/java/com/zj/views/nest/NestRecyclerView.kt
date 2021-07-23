@@ -32,7 +32,6 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     private var overScrollerDispatchToParent: Boolean = true
     private var headerOffsetChangedListener: HeaderOffsetChangedListener? = null
     private var nestHeader: View? = null
-    private var cachedScrollFlags: Int = -1
     private var lastY: Float = 0f
     private var lastDy: Float = 0f
 
@@ -82,6 +81,10 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         this.headerOffsetChangedListener = l
     }
 
+    /**
+     * The processing here will satisfy whether there is a sliding processing of the linkage head at the top.
+     * And handle the ScrollFlag.SNAP event in [MotionEvent.ACTION_UP].
+     * */
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev == null) return super.dispatchTouchEvent(ev)
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
@@ -132,6 +135,14 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return super.onInterceptTouchEvent(e)
     }
 
+    /**
+     * Different from [RecyclerView.dispatchNestedPreScroll], NestRecyclerView will give priority to the processing power of nested sliding,
+     * until it can not complete the scroll in the same direction and pass it to the child View.
+     * When processing scroll events after consumption via ParentView,
+     * refer to the parameter comments [RecyclerView.dispatchNestedPreScroll] can be linked with other components
+     * that implement [androidx.core.view.NestedScrollingChild3] [androidx.core.view.NestedScrollingChild3],
+     * and its [getNestedChild] will receive scroll events after [canScrollVertically] false
+     * */
     override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?, type: Int): Boolean { //        var consumedSelf = false
         if ((!isNestHeaderFold() && !canScrollVertically(-1)) || interceptNextEvent == true) return false
         val consume = consumed ?: IntArray(2)
@@ -166,6 +177,11 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return consumedSelf || parentConsumed
     }
 
+    /**
+     * Fling events will be considered to be consumed here,
+     * and the events will be allocated one by one through [overScroller].
+     * For details of allocation, see [computeScroll]
+     * */
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean {
         if (!isNestHeaderFold() && !canScrollVertically(-1)) return true
         mCurrentFling = 0
@@ -174,6 +190,15 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return true
     }
 
+    /**
+     * @return It is at least a Child with unlimited length or a reasonable length.
+     * When its length and the length of the parent control cannot meet the minimum height of this view, nested sliding will not work.
+     * It might be a View class that does not implement the [androidx.core.view.NestedScrollingChild3] protocol,
+     * but they should to scrollable functions such as ScrollTo and ScrollBy, and meet touch events that support scroller by their self.
+     * Commonly used Views such as RecyclerView, ListView, ViewPager, NestScrollView, ScrollView, etc. are recommended.
+     * These target Views need`nt require any additional special processing.
+     * and the target View is need`nt as a direct children of NestRecyclerView.
+     * */
     open fun getNestedChild(): View? {
         return nestScrollerIn?.getInnerView()
     }
@@ -186,8 +211,13 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         }
     }
 
+    /**
+     * Get the ScrollFlags of the internal View of the head [AppBarLayout].
+     * If the parent layout does not contain any [AppBarLayout],
+     * this method will not complete the call.
+     * @return ScrollFlags If the execution is complete, false -1
+     * */
     private fun findAppbarLayoutTopViewScrollFlags(): Int {
-        if (cachedScrollFlags != -1) return cachedScrollFlags
         val appBarLayout = (findDefaultOverScroller() as? AppBarLayout) ?: return -1
         var firstFlags: Int = -1
         repeat(appBarLayout.childCount) { i ->
@@ -220,6 +250,10 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         requestLayout()
     }
 
+    /**
+     * Find any [AppBarLayout] or [NestHeaderIn] as its head to achieve the scrolling linkage,
+     * @see [NestHeaderIn]
+     * */
     private fun findDefaultOverScroller(anchor: View? = this, parentIds: MutableList<Int> = mutableListOf()): View? {
         if (anchor == null) return null
         if (nestHeader == null) {
@@ -248,13 +282,17 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return nestHeader
     }
 
+    /**
+     * @return scrollFlags or -1 ，
+     * @see [findDefaultOverScroller]
+     * */
     private fun getScrollFlags(): Int {
-        if (cachedScrollFlags == -1) cachedScrollFlags = if (nestHeader is AppBarLayout) {
+        if (!hasNestHeaders()) return -1
+        return if (nestHeader is AppBarLayout) {
             findAppbarLayoutTopViewScrollFlags()
         } else {
             (nestHeader as? NestHeaderIn)?.getScrollFlags() ?: -1
         }
-        return cachedScrollFlags
     }
 
     private fun checkFlags(flag: Int, flags: Int? = getScrollFlags()): Boolean {
@@ -291,7 +329,10 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         mCurrentFling = 0
     }
 
-
+    /**
+     * [blockIfOverScrollDispatch] Can block the nesting mechanism,
+     * used for head linkage, or overwrite it to achieve other behaviors
+     * */
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
             val current = overScroller.currY
@@ -403,17 +444,48 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return 0
     }
 
+    /**
+     * Whether to detect the default head view, the default is to detect,
+     * @see [NestHeaderIn]
+     * */
+    open fun hasNestHeaders(): Boolean {
+        return true
+    }
+
+    /**
+     * It can be implemented as an upper-level Header View that implements linked scrolling.
+     * It can be implemented on any type of View, even a View that does not support nested sliding.
+     * */
     interface NestHeaderIn {
+        /**
+         * the total scroll distance you need,
+         *It must be established when [getScrollFlags] contains [AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL],
+         * this property is used.
+         * You can use the Top of some established View to hover some controls
+         * */
         fun getTotalScrollRange(): Int
+
+        /**
+         * This callback is available when [getScrollFlags] points to a scrollable Flag
+         * */
         fun onScrolling(cur: Int, total: Int, @ViewCompat.NestedScrollType type: Int)
+
         fun getScrollFlags(): Int = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
     }
 
     interface HeaderOffsetChangedListener {
+
         fun onChanged(cur: Int, total: Int, @ViewCompat.NestedScrollType type: Int)
+
     }
 
+    /**
+     * Used to specify and allow other ScrollingView to be added inside,
+     * but there can only be one child control (mainly nested folding control) that continues the recycling mechanism inside.
+     * */
     interface NestScrollerIn {
+
         fun getInnerView(): View?
+
     }
 }

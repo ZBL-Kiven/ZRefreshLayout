@@ -73,33 +73,30 @@ import static com.zj.views.list.refresh.layout.util.SmartUtil.fling;
 import static com.zj.views.list.refresh.layout.util.SmartUtil.isContentView;
 import static java.lang.System.currentTimeMillis;
 
-/**
- * Intelligent RefreshLayout
- */
-@SuppressLint("RestrictedApi")
 @SuppressWarnings({"unused"})
+@SuppressLint("RestrictedApi")
 public class RefreshLayout extends ViewGroup implements com.zj.views.list.refresh.layout.api.RefreshLayoutIn, NestedScrollingParent/*, NestedScrollingChild*/ {
 
     protected int mTouchSlop;
-    protected int mSpinner;//当前的 Spinner 大于0表示下拉,小于零表示上拉
-    protected int mLastSpinner;//最后的，的Spinner
-    protected int mTouchSpinner;//触摸时候，的Spinner
-    protected int mFloorDuration = 300;//二楼展开时长
-    protected int mReboundDuration = 300;//回弹动画时长
-    protected int mScreenHeightPixels;//屏幕高度
+    protected int mSpinner;//The current Spinner greater than 0 means pull down, and less than zero means pull up
+    protected int mLastSpinner;//finally spinner
+    protected int mTouchSpinner;//Spinner when touched
+    protected int mFloorDuration = 300;//Expansion time on the second floor
+    protected int mReboundDuration = 300;//Rebound animation duration
+    protected int mScreenHeightPixels;//Screen height
     protected float mTouchX;
     protected float mTouchY;
-    protected float mLastTouchX;//用于实现Header的左右拖动效果
-    protected float mLastTouchY;//用于实现多点触摸
+    protected float mLastTouchX;//Used to achieve the left and right drag effect of the Header
+    protected float mLastTouchY;//Used to achieve multi-touch
     protected float mDragRate = .5f;
-    protected char mDragDirection = 'n';//拖动的方向 none-n horizontal-h vertical-v
-    protected boolean mIsBeingDragged;//是否正在拖动
-    protected boolean mSuperDispatchTouchEvent;//父类是否处理触摸事件
-    protected boolean mEnableDisallowIntercept;//是否允许拦截事件
-    protected int mFixedHeaderViewId = View.NO_ID;//固定在头部的视图Id
-    protected int mFixedFooterViewId = View.NO_ID;//固定在底部的视图Id
-    protected int mHeaderTranslationViewId = View.NO_ID;//下拉Header偏移的视图Id
-    protected int mFooterTranslationViewId = View.NO_ID;//下拉Footer偏移的视图Id
+    protected char mDragDirection = 'n';//The direction of the drag, none-n horizontal-h vertical-v
+    protected boolean mIsBeingDragged;//Is dragging
+    protected boolean mSuperDispatchTouchEvent;//Whether the parent class handles touch events
+    protected boolean mEnableDisallowIntercept;//Whether to allow interception of events
+    protected int mFixedHeaderViewId = View.NO_ID;//View ID fixed to the head
+    protected int mFixedFooterViewId = View.NO_ID;//View ID fixed at the bottom
+    protected int mHeaderTranslationViewId = View.NO_ID;//View Id of the drop-down Header offset
+    protected int mFooterTranslationViewId = View.NO_ID;//View Id of the drop-down Footer offset
 
     protected int mMinimumVelocity;
     protected int mMaximumVelocity;
@@ -110,28 +107,28 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     protected int[] mPrimaryColors;
     protected boolean mEnableRefresh = true;
     protected boolean mEnableLoadMore = false;
-    protected boolean mEnableClipHeaderWhenFixedBehind = true;//当 Header FixedBehind 时候是否剪裁遮挡 Header
-    protected boolean mEnableClipFooterWhenFixedBehind = true;//当 Footer FixedBehind 时候是否剪裁遮挡 Footer
-    protected boolean mEnableHeaderTranslationContent = true;//是否启用内容视图拖动效果
-    protected boolean mEnableFooterTranslationContent = true;//是否启用内容视图拖动效果
-    protected boolean mEnableFooterFollowWhenNoMoreData = false;//是否在全部加载结束之后Footer跟随内容 1.0.4-6
-    protected boolean mEnablePreviewInEditMode = true;//是否在编辑模式下开启预览功能
-    protected boolean mEnableOverScrollBounce = true;//是否启用越界回弹
-    protected boolean mEnableOverScrollDrag = false;//是否启用越界拖动（仿苹果效果）1.0.4-6
-    protected boolean mEnableAutoLoadMore = true;//是否在列表滚动到底部时自动加载更多
-    protected boolean mEnablePureScrollMode = false;//是否开启纯滚动模式
-    protected boolean mEnableScrollContentWhenLoaded = true;//是否在加载更多完成之后滚动内容显示新数据
-    protected boolean mEnableScrollContentWhenRefreshed = true;//是否在刷新完成之后滚动内容显示新数据
-    protected boolean mEnableLoadMoreWhenContentNotFull = true;//在内容不满一页的时候，是否可以上拉加载更多
-    protected boolean mEnableNestedScrolling = true;//是否启用潜逃滚动功能
-    protected boolean mDisableContentWhenRefresh = false;//是否开启在刷新时候禁止操作内容视图
-    protected boolean mDisableContentWhenLoading = false;//是否开启在刷新时候禁止操作内容视图
-    protected boolean mFooterNoMoreData = false;//数据是否全部加载完成，如果完成就不能在触发加载事件
-    protected boolean mFooterNoMoreDataEffective = false;//是否 NoMoreData 生效(有的 Footer 可能不支持)
+    protected boolean mEnableClipHeaderWhenFixedBehind = true;//Whether to clip and occlude the Header when Header FixedBehind
+    protected boolean mEnableClipFooterWhenFixedBehind = true;//When Footer FixedBehind, whether to clip or block Footer
+    protected boolean mEnableHeaderTranslationContent = true;//Whether to enable the content view drag effect
+    protected boolean mEnableFooterTranslationContent = true;//Whether to enable the content view drag effect
+    protected boolean mEnableFooterFollowWhenNoMoreData = false;//Whether Footer follows the content after all loading is over, 1.0.4-6
+    protected boolean mEnablePreviewInEditMode = true;//Whether to enable preview function in edit mode
+    protected boolean mEnableOverScrollBounce = true;//Whether to enable out-of-bounds rebound
+    protected boolean mEnableOverScrollDrag = false;//Whether to enable cross-border dragging (imitating apple effect),1.0.4-6
+    protected boolean mEnableAutoLoadMore = true;//Whether to automatically load more when the list scrolls to the bottom
+    protected boolean mEnablePureScrollMode = false;//Whether to enable pure scrolling mode
+    protected boolean mEnableScrollContentWhenLoaded = true;//Whether to scroll the content to display new data after loading more is complete
+    protected boolean mEnableScrollContentWhenRefreshed = true;//Whether to scroll the content to display the new data after the refresh is complete
+    protected boolean mEnableLoadMoreWhenContentNotFull = true;//When the content is not full of a page, can I pull up to load more
+    protected boolean mEnableNestedScrolling = true;//Whether to enable absconding scroll function
+    protected boolean mDisableContentWhenRefresh = false;//Whether to enable the content view to be disabled when refreshing
+    protected boolean mDisableContentWhenLoading = false;//Whether to enable the content view to be disabled when refreshing
+    protected boolean mFooterNoMoreData = false;//Whether the data has been loaded completely, if it is finished, the loading event cannot be triggered
+    protected boolean mFooterNoMoreDataEffective = false;//Whether NoMoreData is effective (some Footer may not support it)
 
-    protected boolean mManualLoadMore = false;//是否手动设置过LoadMore，用于智能开启
-    protected boolean mManualHeaderTranslationContent = false;//是否手动设置过内容视图拖动效果
-    protected boolean mManualFooterTranslationContent = false;//是否手动设置过内容视图拖动效果
+    protected boolean mManualLoadMore = false;//haveYouManuallySetLoadMoreForSmartOpening
+    protected boolean mManualHeaderTranslationContent = false;//Whether to manually set the content view drag effect
+    protected boolean mManualFooterTranslationContent = false;//Whether to manually set the content view drag effect
 
     protected OnRefreshListener mRefreshListener;
     protected OnLoadMoreListener mLoadMoreListener;
@@ -166,20 +163,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     protected Paint mPaint;
     protected Handler mHandler;
     protected RefreshKernel mKernel = new RefreshKernelImpl();
-
-    /**
-     * 【主要状态】
-     * 面对 SmartRefresh 外部的滚动状态
-     */
     protected RefreshState mState = RefreshState.None;          //主状态
-    /**
-     * 【附加状态】
-     * 用于主状态 mState 为 Refreshing 或 Loading 时的滚动状态
-     * 1.mState=Refreshing|Loading 时 mViceState 有可能与 mState 不同
-     * 2.mState=None,开启越界拖动 时 mViceState 有可能与 mState 不同
-     * 3.其他状态时与主状态相等 mViceState=mState
-     * 4.SmartRefresh 外部无法察觉 mViceState
-     */
     protected RefreshState mViceState = RefreshState.None;      //副状态（主状态刷新时候的滚动状态）
 
     protected long mLastOpenTime = 0;                           //上一次 刷新或者加载 时间
@@ -645,7 +629,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-    * Rewrite onDetachedFromWindow to complete specific functions of smart * 1. Restore original state * 2. Clear animation data (to prevent memory leaks)
+     * Rewrite onDetachedFromWindow to complete specific functions of smart * 1. Restore original state * 2. Clear animation data (to prevent memory leaks)
      */
     @Override
     protected void onDetachedFromWindow() {
@@ -657,8 +641,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             Animator animator = reboundAnimator;
             animator.removeAllListeners();
             reboundAnimator.removeAllUpdateListeners();
-            reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-            reboundAnimator.cancel();//会触发 cancel 和 end 调用
+            reboundAnimator.setDuration(0);//Cancel will trigger the End call, you can judge 0 to determine whether it is canceled
+            reboundAnimator.cancel();//Will trigger cancel and end calls
             reboundAnimator = null;
         }
         if (mRefreshHeader != null && mState == RefreshState.Refreshing) {
@@ -738,9 +722,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         return super.drawChild(canvas, child, drawingTime);
     }
 
-    protected boolean mVerticalPermit = false; //竖直通信证（用于特殊事件的权限判定）
+    protected boolean mVerticalPermit = false; //Vertical communication certificate (used to determine the authority of special events)
 
-    //重写 computeScroll 来完成 越界回弹/边界碰撞
+    //Rewrite computeScroll to complete out-of-bounds rebound boundary collision
     @Override
     public void computeScroll() {
         int lastCurY = mScroller.getCurrY();
@@ -764,11 +748,11 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     protected MotionEvent mFalsifyEvent = null;
 
     /**
-     * 事件分发 （手势核心）
-     * 1.多点触摸
-     * 2.无缝衔接内容滚动
+     * Event distribution (gesture core)
+     * 1. Multi-touch
+     * 2. Seamless content scrolling
      *
-     * @param e 事件
+     * @param e event
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent e) {
@@ -793,7 +777,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         mLastTouchX = touchX;
         mLastTouchY = touchY;
         final View thisView = this;
-        if (mNestedInProgress) {//嵌套滚动时，补充竖直方向不滚动，但是水平方向滚动，需要通知 onHorizontalDrag
+        if (mNestedInProgress) {//When nested scrolling, the supplementary vertical direction does not scroll, but the horizontal direction scrolls, you need to notify onHorizontalDrag
             int totalUnconsumed = mTotalUnconsumed;
             boolean ret = super.dispatchTouchEvent(e);
             if (action == MotionEvent.ACTION_MOVE) {
@@ -830,42 +814,42 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                 mEnableDisallowIntercept = false;
                 mSuperDispatchTouchEvent = super.dispatchTouchEvent(e);
                 if (mState == RefreshState.TwoLevel && mTouchY < thisView.getMeasuredHeight() * (1 - mTwoLevelBottomPullUpToCloseRate)) {
-                    mDragDirection = 'h';//二级刷新标记水平滚动来禁止拖动
+                    mDragDirection = 'h';//Level 2 refresh mark scrolls horizontally to prohibit drag
                     return mSuperDispatchTouchEvent;
                 }
                 if (mRefreshContent != null) {
-                    //为 RefreshContent 传递当前触摸事件的坐标，用于智能判断对应坐标位置View的滚动边界和相关信息
+                    //Pass the coordinates of the current touch event to RefreshContent, which is used to intelligently judge the scroll boundary and related information of the corresponding coordinate position View
                     mRefreshContent.onActionDown(e);
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float dx = touchX - mTouchX;
                 float dy = touchY - mTouchY;
-                mVelocityTracker.addMovement(e);//速度追踪
-                if (!mIsBeingDragged && !mEnableDisallowIntercept && mDragDirection != 'h' && mRefreshContent != null) {//没有拖动之前，检测  canRefresh canLoadMore 来开启拖动
-                    if (mDragDirection == 'v' || (Math.abs(dy) >= mTouchSlop && Math.abs(dx) < Math.abs(dy))) {//滑动允许最大角度为45度
+                mVelocityTracker.addMovement(e);
+                if (!mIsBeingDragged && !mEnableDisallowIntercept && mDragDirection != 'h' && mRefreshContent != null) {//Before dragging, check canRefresh canLoadMore to start dragging
+                    if (mDragDirection == 'v' || (Math.abs(dy) >= mTouchSlop && Math.abs(dx) < Math.abs(dy))) {//The maximum sliding angle allowed is 45 degrees
                         mDragDirection = 'v';
                         if (dy > 0 && (mSpinner < 0 || ((mEnableOverScrollDrag || mEnableRefresh) && mRefreshContent.canRefresh()))) {
                             mIsBeingDragged = true;
-                            mTouchY = touchY - mTouchSlop;//调整 mTouchSlop 偏差
+                            mTouchY = touchY - mTouchSlop;
                         } else if (dy < 0 && (mSpinner > 0 || ((mEnableOverScrollDrag || mEnableLoadMore) && ((mState == RefreshState.Loading && mFooterLocked) || mRefreshContent.canLoadMore())))) {
                             mIsBeingDragged = true;
-                            mTouchY = touchY + mTouchSlop;//调整 mTouchSlop 偏差
+                            mTouchY = touchY + mTouchSlop;
                         }
                         if (mIsBeingDragged) {
-                            dy = touchY - mTouchY;//调整 mTouchSlop 偏差 重新计算 dy
-                            if (mSuperDispatchTouchEvent) {//如果父类拦截了事件，发送一个取消事件通知
+                            dy = touchY - mTouchY;//dyAdjust mTouchSlop deviation and recalculate dy
+                            if (mSuperDispatchTouchEvent) {//If the parent class intercepts the event, send a cancellation event notification
                                 e.setAction(MotionEvent.ACTION_CANCEL);
                                 super.dispatchTouchEvent(e);
                             }
                             mKernel.setState((mSpinner > 0 || (mSpinner == 0 && dy > 0)) ? RefreshState.PullDownToRefresh : RefreshState.PullUpToLoad);
                             final ViewParent parent = thisView.getParent();
                             if (parent instanceof ViewGroup) {
-                                parent.requestDisallowInterceptTouchEvent(true);//通知父控件不要拦截事件
+                                parent.requestDisallowInterceptTouchEvent(true);//Notify the parent control not to intercept events
                             }
                         }
                     } else if (Math.abs(dx) >= mTouchSlop && Math.abs(dx) > Math.abs(dy) && mDragDirection != 'v') {
-                        mDragDirection = 'h';//标记为水平拖动，将无法再次触发 下拉刷新 上拉加载
+                        mDragDirection = 'h';//Marked as horizontal drag, it will not be triggered again Pull down to refresh Pull up to load
                     }
                 }
                 if (mIsBeingDragged) {
@@ -880,7 +864,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                         MotionEvent em = obtain(time, time, MotionEvent.ACTION_MOVE, mTouchX + dx, mTouchY + spinner, 0);
                         super.dispatchTouchEvent(em);
                         if (mFooterLocked && dy > mTouchSlop && mSpinner < 0) {
-                            mFooterLocked = false;//内容向下滚动时 解锁Footer 的锁定
+                            mFooterLocked = false;//Unlock Footer's lock when content scrolls down
                         }
                         if (spinner > 0 && ((mEnableOverScrollDrag || mEnableRefresh) && mRefreshContent.canRefresh())) {
                             mTouchY = mLastTouchY = touchY;
@@ -906,17 +890,17 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     moveSpinnerInfinitely(spinner);
                     return true;
                 } else if (mFooterLocked && dy > mTouchSlop && mSpinner < 0) {
-                    mFooterLocked = false;//内容向下滚动时 解锁Footer 的锁定
+                    mFooterLocked = false;//Unlock Footer's lock when content scrolls down
                 }
                 break;
-            case MotionEvent.ACTION_UP://向上抬起时处理速度追踪
+            case MotionEvent.ACTION_UP:
                 mVelocityTracker.addMovement(e);
                 mVelocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                 mCurrentVelocity = (int) mVelocityTracker.getYVelocity();
                 startFlingIfNeed(0);
             case MotionEvent.ACTION_CANCEL:
-                mVelocityTracker.clear();//清空速度追踪器
-                mDragDirection = 'n';//关闭拖动方向
+                mVelocityTracker.clear();
+                mDragDirection = 'n';
                 if (mFalsifyEvent != null) {
                     mFalsifyEvent.recycle();
                     mFalsifyEvent = null;
@@ -936,23 +920,22 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 这段代码来自谷歌官方的 SwipeRefreshLayout
-     * 主要是为了让老版本的 ListView 能平滑的下拉 而选择性的屏蔽 requestDisallowInterceptTouchEvent
+     * This code comes from Google's official SwipeRefreshLayout mainly to allow the old version of ListView to drop down smoothly and selectively block requestDisallowInterceptTouchEvent
      */
     @Override
     public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         View target = mRefreshContent.getScrollableView();
-        if ((android.os.Build.VERSION.SDK_INT >= 21 || !(target instanceof AbsListView)) && (/*target == null || */ViewCompat.isNestedScrollingEnabled(target))) {
+        if ((android.os.Build.VERSION.SDK_INT >= 21 || !(target instanceof AbsListView)) && (ViewCompat.isNestedScrollingEnabled(target))) {
             mEnableDisallowIntercept = disallowIntercept;
             super.requestDisallowInterceptTouchEvent(disallowIntercept);
         }
     }
 
     /**
-     * 在必要的时候 开始 Fling 模式
+     * When necessary, start Fling mode
      *
-     * @param flingVelocity 速度
-     * @return true 可以拦截 嵌套滚动的 Fling
+     * @param flingVelocity speed
+     * @return true can intercept nested scrolling Fling
      */
     protected boolean startFlingIfNeed(float flingVelocity) {
         float velocity = flingVelocity == 0 ? mCurrentVelocity : flingVelocity;
@@ -970,11 +953,11 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     animationRunnable = new FlingRunnable(velocity).start();
                     return true;
                 } else if (mState.isReleaseToOpening) {
-                    return true;//拦截嵌套滚动时，即将刷新或者加载的 Fling
+                    return true;//Fling that is about to refresh or load when intercepting nested scrolling
                 }
             }
             if ((velocity < 0 && ((mEnableOverScrollBounce && (mEnableLoadMore || mEnableOverScrollDrag)) || (mState == RefreshState.Loading && mSpinner >= 0) || (mEnableAutoLoadMore && isEnableRefreshOrLoadMore(mEnableLoadMore)))) || (velocity > 0 && ((mEnableOverScrollBounce && mEnableRefresh || mEnableOverScrollDrag) || (mState == RefreshState.Refreshing && mSpinner <= 0)))) {
-                mVerticalPermit = false;//关闭竖直通行证
+                mVerticalPermit = false;//Turn off vertical pass
                 mScroller.fling(0, 0, 0, (int) -velocity, 0, 0, -Integer.MAX_VALUE, Integer.MAX_VALUE);
                 mScroller.computeScrollOffset();
                 final View thisView = this;
@@ -985,24 +968,25 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 在动画执行时，触摸屏幕，打断动画，转为拖动状态
+     * When the animation is executing, touch the screen to interrupt the animation,
+     * and turn to the drag state
      *
      * @param action MotionEvent
-     * @return 是否成功打断
+     * @return Whether the interruption is successful
      */
     protected boolean interceptAnimatorByAction(int action) {
         if (action == MotionEvent.ACTION_DOWN) {
             if (reboundAnimator != null) {
                 if (mState.isFinishing || mState == RefreshState.TwoLevelReleased || mState == RefreshState.RefreshReleased || mState == RefreshState.LoadReleased) {
-                    return true;//完成动画和打开动画不能被打断
+                    return true;
                 }
                 if (mState == RefreshState.PullDownCanceled) {
                     mKernel.setState(RefreshState.PullDownToRefresh);
                 } else if (mState == RefreshState.PullUpCanceled) {
                     mKernel.setState(RefreshState.PullUpToLoad);
                 }
-                reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-                reboundAnimator.cancel();//会触发 cancel 和 end 调用
+                reboundAnimator.setDuration(0);
+                reboundAnimator.cancel();
                 reboundAnimator = null;
             }
             animationRunnable = null;
@@ -1011,9 +995,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置并通知状态改变 （setState）
+     * Set and notify state changes (setState)
      *
-     * @param state 状态
+     * @param state state
      */
     protected void notifyStateChanged(RefreshState state) {
         final RefreshState oldState = mState;
@@ -1041,14 +1025,14 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 直接将状态设置为 Loading 正在加载
+     * Set the status directly to Loading
      *
-     * @param triggerLoadMoreEvent 是否触发加载回调
+     * @param triggerLoadMoreEvent Whether to trigger the loading callback
      */
     protected void setStateDirectLoading(boolean triggerLoadMoreEvent) {
         if (mState != RefreshState.Loading) {
             mLastOpenTime = currentTimeMillis();
-            mFooterLocked = true;//Footer 正在loading 的时候是否锁住 列表不能向上滚动
+            mFooterLocked = true;
             notifyStateChanged(RefreshState.Loading);
             if (mLoadMoreListener != null) {
                 if (triggerLoadMoreEvent) {
@@ -1071,9 +1055,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置状态为 Loading 正在加载
+     * Set the status to Loading Loading
      *
-     * @param notify 是否触发通知事件
+     * @param notify Whether to trigger the notification event
      */
     protected void setStateLoading(final boolean notify) {
         AnimatorListenerAdapter listener = new AnimatorListenerAdapter() {
@@ -1091,24 +1075,24 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             animator.addListener(listener);
         }
         if (mRefreshFooter != null) {
-            //onReleased 的执行顺序定在 animSpinner 之后 onAnimationEnd 之前
-            // 这样 onReleased 内部 可以做出 对 前面 animSpinner 的覆盖 操作
+            //The execution order of onReleased is set after animSpinner and before onAnimationEnd.
+            //In this way, onReleased can overwrite the previous animSpinner.
             mRefreshFooter.onReleased(this, mFooterHeight, (int) (mFooterMaxDragRate * mFooterHeight));
         }
         if (mOnMultiListener != null && mRefreshFooter instanceof RefreshFooter) {
-            //同 mRefreshFooter.onReleased 一致
+            //The same as mRefreshFooter.onReleased
             mOnMultiListener.onFooterReleased((RefreshFooter) mRefreshFooter, mFooterHeight, (int) (mFooterMaxDragRate * mFooterHeight));
         }
         if (animator == null) {
-            //onAnimationEnd 会改变状态为 loading 必须在 onReleased 之后调用
+            //onAnimationEnd will change the state to loading and must be called after onReleased
             listener.onAnimationEnd(null);
         }
     }
 
     /**
-     * 设置状态为 Refreshing 正在刷新
+     * Set the status to Refreshing Refreshing
      *
-     * @param notify 是否触发通知事件
+     * @param notify Whether to trigger the notification event
      */
     protected void setStateRefreshing(final boolean notify) {
         AnimatorListenerAdapter listener = new AnimatorListenerAdapter() {
@@ -1143,24 +1127,22 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             animator.addListener(listener);
         }
         if (mRefreshHeader != null) {
-            //onReleased 的执行顺序定在 animSpinner 之后 onAnimationEnd 之前
-            // 这样 onRefreshReleased内部 可以做出 对 前面 animSpinner 的覆盖 操作
+            // The execution order of onReleased is set after animSpinner and before onAnimationEnd.
+            // In this way, onRefreshReleased can overwrite the previous animSpinner.
             mRefreshHeader.onReleased(this, mHeaderHeight, (int) (mHeaderMaxDragRate * mHeaderHeight));
         }
         if (mOnMultiListener != null && mRefreshHeader instanceof RefreshHeader) {
-            //同 mRefreshHeader.onReleased 一致
+            //the same as mRefreshHeader.onReleased
             mOnMultiListener.onHeaderReleased((RefreshHeader) mRefreshHeader, mHeaderHeight, (int) (mHeaderMaxDragRate * mHeaderHeight));
         }
         if (animator == null) {
-            //onAnimationEnd 会改变状态为 Refreshing 必须在 onReleased 之后调用
+            //onAnimationEnd will change the state to Refreshing and must be called after onReleased
             listener.onAnimationEnd(null);
         }
     }
 
     /**
-     * 设置 副状态
-     *
-     * @param state 状态
+     * Set the secondary status
      */
     protected void setViceState(RefreshState state) {
         if (mState.isDragging && mState.isHeader != state.isHeader) {
@@ -1172,7 +1154,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 判断是否 下拉的时候 需要 移动内容
+     * Determine whether the content needs to be moved when pulling down
      *
      * @param enable   mEnableHeaderTranslationContent or mEnableFooterTranslationContent
      * @param internal mRefreshHeader or mRefreshFooter
@@ -1183,8 +1165,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 是否真正的 可以刷新或者加载（与 越界拖动 纯滚动模式区分开来）
-     * 判断时候可以 刷新 或者 加载（直接影响，Header，Footer 是否显示）
+     * Whether it’s real can be refreshed or loaded (to distinguish it from the pure scrolling mode of cross-border dragging).
+     * When judging, it can be refreshed or loaded (directly affects whether Header and Footer are displayed)
      *
      * @param enable mEnableRefresh or mEnableLoadMore
      * @return enable
@@ -1201,7 +1183,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         int mFrame = 0;
         int mFrameDelay = 10;
         float mVelocity;
-        float mDamping = 0.98f;//每帧速度衰减值
+        float mDamping = 0.98f;
         long mStartTime = 0;
         long mLastTime = AnimationUtils.currentAnimationTimeMillis();
 
@@ -1289,12 +1271,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             if (animationRunnable == this && !mState.isFinishing) {
                 if (Math.abs(mSpinner) >= Math.abs(mSmoothDistance)) {
                     if (mSmoothDistance != 0) {
-                        mVelocity *= Math.pow(0.45f, ++mFrame * 2);//刷新、加载时回弹滚动数度衰减
+                        mVelocity *= Math.pow(0.45f, ++mFrame * 2);
                     } else {
-                        mVelocity *= Math.pow(0.85f, ++mFrame * 2);//回弹滚动数度衰减
+                        mVelocity *= Math.pow(0.85f, ++mFrame * 2);
                     }
                 } else {
-                    mVelocity *= Math.pow(0.95f, ++mFrame * 2);//平滑滚动数度衰减
+                    mVelocity *= Math.pow(0.95f, ++mFrame * 2);
                 }
                 long now = AnimationUtils.currentAnimationTimeMillis();
                 float t = 1f * (now - mLastTime) / 1000;
@@ -1321,19 +1303,18 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 执行回弹动画
+     * Perform rebound animation @param endSpinner target value
      *
-     * @param endSpinner   目标值
-     * @param startDelay   延时参数
-     * @param interpolator 加速器
-     * @param duration     时长
+     * @param startDelay   delay parameter
+     * @param interpolator accelerator
+     * @param duration     duration
      * @return ValueAnimator or null
      */
     protected ValueAnimator animSpinner(int endSpinner, int startDelay, Interpolator interpolator, int duration) {
         if (mSpinner != endSpinner) {
             if (reboundAnimator != null) {
-                reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-                reboundAnimator.cancel();//会触发 cancel 和 end 调用
+                reboundAnimator.setDuration(0);
+                reboundAnimator.cancel();
                 reboundAnimator = null;
             }
             animationRunnable = null;
@@ -1354,12 +1335,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     }
                 }
             });
-            reboundAnimator.addUpdateListener(new AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    mKernel.moveSpinner((int) animation.getAnimatedValue(), false);
-                }
-            });
+            reboundAnimator.addUpdateListener(animation -> mKernel.moveSpinner((int) animation.getAnimatedValue(), false));
             reboundAnimator.setStartDelay(startDelay);
             reboundAnimator.start();
             return reboundAnimator;
@@ -1368,9 +1344,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 越界回弹动画
+     * Out of bounds rebound animation
      *
-     * @param velocity 速度
+     * @param velocity speed
      */
     protected void animSpinnerBounce(final float velocity) {
         if (reboundAnimator == null) {
@@ -1385,8 +1361,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 手势拖动结束
-     * 开始执行回弹动画
+     * The gesture drag ends and the rebound animation starts
      */
     @SuppressWarnings("StatementWithEmptyBody")
     protected void overSpinner() {
@@ -1437,9 +1412,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 黏性移动 spinner
+     * Sticky move spinner
      *
-     * @param spinner 偏移量
+     * @param spinner offset
      */
     protected void moveSpinnerInfinitely(float spinner) {
         final View thisView = this;
@@ -1490,20 +1465,17 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             }
             setStateDirectLoading(false);
             /*
-             * 自动加载模式时，延迟触发 onLoadMore ，mReboundDuration 保证动画能顺利执行
+             *In auto-loading mode, delay trigger onLoadMore and mReboundDuration to ensure smooth execution of animation
              */
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mLoadMoreListener != null) {
-                        mLoadMoreListener.onLoadMore(RefreshLayout.this);
-                    } else if (mOnMultiListener == null) {
-                        finishLoadMore(2000);//如果没有任何加载监听器，两秒之后自动关闭
-                    }
-                    final OnLoadMoreListener listener = mOnMultiListener;
-                    if (listener != null) {
-                        listener.onLoadMore(RefreshLayout.this);
-                    }
+            mHandler.postDelayed(() -> {
+                if (mLoadMoreListener != null) {
+                    mLoadMoreListener.onLoadMore(RefreshLayout.this);
+                } else if (mOnMultiListener == null) {
+                    finishLoadMore(2000);
+                }
+                final OnLoadMoreListener listener = mOnMultiListener;
+                if (listener != null) {
+                    listener.onLoadMore(RefreshLayout.this);
                 }
             }, mReboundDuration);
         }
@@ -1547,8 +1519,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         // before allowing the list to scroll
         int consumedY = 0;
 
-        // dy * mTotalUnconsumed > 0 表示 mSpinner 已经拉出来，现在正要往回推
-        // mTotalUnconsumed 将要减去 dy 的距离 再计算新的 mSpinner
+        //dy mTotalUnconsumed> 0 means that mSpinner has been pulled out,
+        // and now it is about to push back mTotalUnconsumed will subtract the distance of dy and then calculate the new mSpinner
         if (dy * mTotalUnconsumed > 0) {
             if (Math.abs(dy) > Math.abs(mTotalUnconsumed)) {
                 consumedY = mTotalUnconsumed;
@@ -1588,7 +1560,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     final View thisView = this;
                     final ViewParent parent = thisView.getParent();
                     if (parent != null) {
-                        parent.requestDisallowInterceptTouchEvent(true);//通知父控件不要拦截事件
+                        parent.requestDisallowInterceptTouchEvent(true);
                     }
                 }
             }
@@ -1596,7 +1568,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         }
 
         if (mFooterLocked && dyConsumed < 0) {
-            mFooterLocked = false;//内容向下滚动时 解锁Footer 的锁定
+            mFooterLocked = false;
         }
 
     }
@@ -1637,9 +1609,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Header's height.
-     * 设置 Header 高度
      *
-     * @param heightDp Density-independent Pixels 虚拟像素（px需要调用px2dp转换）
+     * @param heightDp Density-independent Pixels ,virtual pixels (px need to call px 2 dp conversion)
      * @return RefreshLayout
      */
     @Override
@@ -1648,9 +1619,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置 Header 高度
-     *
-     * @param height 像素
+     * @param height pixel
      * @return RefreshLayout
      */
     @Override
@@ -1683,22 +1652,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Footer's height.
-     * 设置 Footer 的高度
-     *
-     * @param heightDp Density-independent Pixels 虚拟像素（px需要调用px2dp转换）
-     * @return RefreshLayout
      */
     @Override
     public RefreshLayout setFooterHeight(float heightDp) {
         return setFooterHeightPx(dp2px(heightDp));
     }
 
-    /**
-     * 设置 Footer 高度
-     *
-     * @param height 像素
-     * @return RefreshLayout
-     */
     @Override
     public RefreshLayout setFooterHeightPx(int height) {
         if (height == mFooterHeight) {
@@ -1730,9 +1689,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Header's start offset（see srlHeaderInsetStart in the RepastPracticeActivity XML in demo-app for the practical application）.
-     * 设置 Header 的起始偏移量（使用方法参考 demo-app 中的 RepastPracticeActivity xml 中的 srlHeaderInsetStart）
      *
-     * @param insetDp Density-independent Pixels 虚拟像素（px需要调用px2dp转换）
      * @return RefreshLayout
      */
     @Override
@@ -1743,9 +1700,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Header's start offset（see srlHeaderInsetStart in the RepastPracticeActivity XML in demo-app for the practical application）.
-     * 设置 Header 起始偏移量（使用方法参考 demo-app 中的 RepastPracticeActivity xml 中的 srlHeaderInsetStart）
      *
-     * @param insetPx 像素
      * @return RefreshLayout
      */
     @Override
@@ -1756,10 +1711,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Footer's start offset.
-     * 设置 Footer 起始偏移量（用户和 setHeaderInsetStart 一样）
      *
-     * @param insetDp Density-independent Pixels 虚拟像素（px需要调用px2dp转换）
-     * @return RefreshLayout
      * @see RefreshLayout#setHeaderInsetStart(float)
      */
     @Override
@@ -1770,9 +1722,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the Footer's start offset.
-     * 设置 Footer 起始偏移量（用处和 setHeaderInsetStartPx 一样）
      *
-     * @param insetPx 像素
      * @return RefreshLayout
      */
     @Override
@@ -1783,10 +1733,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the damping effect.
-     * 显示拖动高度/真实拖动高度 比率（默认0.5，阻尼效果）
+     * Display drag height ratio of true drag height (default 0.5, damping effect)
      *
      * @param rate ratio = (The drag height of the view)/(The actual drag height of the finger)
-     *             比率 = 视图拖动高度 / 手指拖动高度
      * @return RefreshLayout
      */
     @Override
@@ -1797,10 +1746,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the ratio of the maximum height to drag header.
-     * 设置下拉最大高度和Header高度的比率（将会影响可以下拉的最大高度）
      *
      * @param rate ratio = (the maximum height to drag header)/(the height of header)
-     *             比率 = 下拉最大高度 / Header的高度
      * @return RefreshLayout
      */
     @Override
@@ -1816,10 +1763,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the ratio of the maximum height to drag footer.
-     * 设置上拉最大高度和Footer高度的比率（将会影响可以上拉的最大高度）
      *
      * @param rate ratio = (the maximum height to drag footer)/(the height of footer)
-     *             比率 = 下拉最大高度 / Footer的高度
      * @return RefreshLayout
      */
     @Override
@@ -1835,9 +1780,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the ratio at which the refresh is triggered.
-     * 设置 触发刷新距离 与 HeaderHeight 的比率
      *
-     * @param rate 触发刷新距离 与 HeaderHeight 的比率
      * @return RefreshLayout
      */
     @Override
@@ -1848,9 +1791,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the ratio at which the load more is triggered.
-     * 设置 触发加载距离 与 FooterHeight 的比率
      *
-     * @param rate 触发加载距离 与 FooterHeight 的比率
      * @return RefreshLayout
      */
     @Override
@@ -1861,9 +1802,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the rebound interpolator.
-     * 设置回弹显示插值器 [放手时回弹动画,结束时收缩动画]
      *
-     * @param interpolator 动画插值器
      * @return RefreshLayout
      */
     @Override
@@ -1874,9 +1813,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set the duration of the rebound animation.
-     * 设置回弹动画时长 [放手时回弹动画,结束时收缩动画]
      *
-     * @param duration 时长
      * @return RefreshLayout
      */
     @Override
@@ -1887,9 +1824,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to enable pull-up loading more (enabled by default).
-     * 设置是否启用上拉加载更多（默认启用）
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1900,9 +1835,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 是否启用下拉刷新（默认启用）
+     * Whether to enable pull-down refresh (enabled by default)
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1913,9 +1847,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Whether to enable pull-down refresh (enabled by default).
-     * 是否启用下拉刷新（默认启用）
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1927,9 +1859,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to pull up the content while pulling up the header.
-     * 设置是否启在上拉 Footer 的同时上拉内容
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1941,9 +1871,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Sets whether to listen for the list to trigger a load event when scrolling to the bottom (default true).
-     * 设置是否监听列表在滚动到底部时触发加载事件（默认true）
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1954,9 +1882,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to enable cross-border rebound function.
-     * 设置是否启用越界回弹
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1967,9 +1893,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to enable the pure scroll mode.
-     * 设置是否开启纯滚动模式
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1980,9 +1904,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to scroll the content to display new data after loading more complete.
-     * 设置是否在加载更多完成之后滚动内容显示新数据
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -1993,9 +1915,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to scroll the content to display new data after the refresh is complete.
-     * 是否在刷新完成之后滚动内容显示新数据
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2006,9 +1926,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to pull up and load more when the content is not full of one page.
-     * 设置在内容不满一页的时候，是否可以上拉加载更多
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2022,9 +1940,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to enable cross-border drag (imitation iphone effect).
-     * 设置是否启用越界拖动（仿苹果效果）
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2035,9 +1951,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether or not Footer follows the content after there is no more data.
-     * 设置是否在没有更多数据之后 Footer 跟随内容
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2048,9 +1962,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to clip header when the Header is in the FixedBehind state.
-     * 设置是否在当 Header 处于 FixedBehind 状态的时候剪裁遮挡 Header
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2061,9 +1973,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Set whether to clip footer when the Footer is in the FixedBehind state.
-     * 设置是否在当 Footer 处于 FixedBehind 状态的时候剪裁遮挡 Footer
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2074,9 +1984,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Setting whether nesting scrolling is enabled (default off + smart on).
-     * 设置是会否启用嵌套滚动功能（默认关闭+智能开启）
      *
-     * @param enabled 是否启用
      * @return RefreshLayout
      */
     @Override
@@ -2086,9 +1994,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置固定在 Header 下方的视图Id，可以在 Footer 上下滚动的时候保持不跟谁滚动
+     * Set the view Id fixed below the Header, you can keep it from scrolling when the Footer is scrolling up and down
      *
-     * @param id 固定在头部的视图Id
+     * @param id View ID fixed to the head
      * @return RefreshLayout
      */
     @Override
@@ -2098,9 +2006,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置固定在 Footer 上方的视图Id，可以在 Header 上下滚动的时候保持不跟谁滚动
-     *
-     * @param id 固定在底部的视图Id
+     * @param id View ID fixed at the bottom
      * @return RefreshLayout
      */
     @Override
@@ -2110,9 +2016,8 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     }
 
     /**
-     * 设置在 Header 上下滚动时，需要跟随滚动的视图Id，默认整个内容视图
+     * Set the view ID that needs to follow the scrolling when scrolling up and down in the Header, the entire content view is by default
      *
-     * @param id 固定在头部的视图Id
      * @return RefreshLayout
      */
     @Override
@@ -2482,9 +2387,9 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Restore the original state after finishLoadMoreWithNoMoreData.
-     * 恢复没有更多数据的原始状态
+     * Restore the original state with no more data
      *
-     * @param noMoreData 是否有更多数据
+     * @param noMoreData has more data
      * @return RefreshLayout
      */
     @Override
@@ -2503,9 +2408,6 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     }
                 } else {
                     mFooterNoMoreDataEffective = false;
-                    String msg = "Footer:" + mRefreshFooter + " NoMoreData is not supported.(不支持NoMoreData，请使用[ClassicsFooter]或者[自定义Footer并实现setNoMoreData方法且返回true])";
-                    Throwable e = new RuntimeException(msg);
-                    e.printStackTrace();
                 }
             }
 
@@ -2515,7 +2417,6 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * Restore the original state after finishLoadMoreWithNoMoreData.
-     * 恢复没有更多数据的原始状态
      *
      * @return RefreshLayout
      */
@@ -2526,7 +2427,6 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * finish refresh.
-     * 完成刷新
      *
      * @return RefreshLayout
      */
@@ -2537,7 +2437,6 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * finish load more.
-     * 完成加载
      *
      * @return RefreshLayout
      */
@@ -2548,9 +2447,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * finish refresh.
-     * 完成刷新
      *
-     * @param delayed 开始延时
      * @return RefreshLayout
      */
     @Override
@@ -2560,16 +2457,15 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * finish refresh.
-     * 完成加载
      *
-     * @param success 数据是否成功刷新 （会影响到上次更新时间的改变）
+     * @param success Whether the data is refreshed successfully (it will affect the change of the last update time)
      * @return RefreshLayout
      */
     @Override
     public RefreshLayout finishRefresh(boolean success) {
         if (success) {
             long passTime = System.currentTimeMillis() - mLastOpenTime;
-            int delayed = (Math.min(Math.max(0, 300 - (int) passTime), 300) << 16);//保证加载动画有300毫秒的时间
+            int delayed = (Math.min(Math.max(0, 300 - (int) passTime), 300) << 16);
             return finishRefresh(delayed, true, Boolean.FALSE);
         } else {
             return finishRefresh(0, false, null);
@@ -2578,16 +2474,13 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
 
     /**
      * finish refresh.
-     * 完成刷新
      *
-     * @param delayed 开始延时
-     * @param success 数据是否成功刷新 （会影响到上次更新时间的改变）
      * @return RefreshLayout
      */
     @Override
     public RefreshLayout finishRefresh(final int delayed, final boolean success, final Boolean noMoreData) {
-        final int more = delayed >> 16;//动画剩余延时
-        int delay = delayed << 16 >> 16;//用户指定延时
+        final int more = delayed >> 16;//Animation remaining delay
+        int delay = delayed << 16 >> 16;//User specified delay
         Runnable runnable = new Runnable() {
             int count = 0;
 
@@ -2595,10 +2488,10 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
             public void run() {
                 if (count == 0) {
                     if (mState == RefreshState.None && mViceState == RefreshState.Refreshing) {
-                        //autoRefresh 即将执行，但未开始
+                        //autoRefresh will be executed but not started
                         mViceState = RefreshState.None;
                     } else if (reboundAnimator != null && mState.isHeader && (mState.isDragging || mState == RefreshState.RefreshReleased)) {
-                        //autoRefresh 正在执行，但未结束
+                        //autoRefresh executing
                         reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
                         reboundAnimator.cancel();//会触发 cancel 和 end 调用
                         reboundAnimator = null;
@@ -2779,59 +2672,56 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                             }
                         }
                         //准备：偏移并结束状态
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                AnimatorUpdateListener updateListener = null;
-                                if (mEnableScrollContentWhenLoaded && offset < 0) {
-                                    updateListener = mRefreshContent.scrollContentWhenFinished(mSpinner);
-                                    if (updateListener != null) {//如果内容需要滚动显示新数据
-                                        updateListener.onAnimationUpdate(ValueAnimator.ofInt(0, 0));//直接滚动, Footer 的距离
+                        mHandler.postDelayed(() -> {
+                            AnimatorUpdateListener updateListener = null;
+                            if (mEnableScrollContentWhenLoaded && offset < 0) {
+                                updateListener = mRefreshContent.scrollContentWhenFinished(mSpinner);
+                                if (updateListener != null) {//如果内容需要滚动显示新数据
+                                    updateListener.onAnimationUpdate(ValueAnimator.ofInt(0, 0));//直接滚动, Footer 的距离
+                                }
+                            }
+                            ValueAnimator animator = null;//动议动画和动画结束回调
+                            AnimatorListenerAdapter listenerAdapter = new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    if (animation != null && animation.getDuration() == 0) {
+                                        return;//0 表示被取消
+                                    }
+                                    mFooterLocked = false;
+                                    if (noMoreData) {
+                                        setNoMoreData(true);
+                                    }
+                                    if (mState == RefreshState.LoadFinish) {
+                                        notifyStateChanged(RefreshState.None);
                                     }
                                 }
-                                ValueAnimator animator = null;//动议动画和动画结束回调
-                                AnimatorListenerAdapter listenerAdapter = new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        if (animation != null && animation.getDuration() == 0) {
-                                            return;//0 表示被取消
-                                        }
-                                        mFooterLocked = false;
-                                        if (noMoreData) {
-                                            setNoMoreData(true);
-                                        }
-                                        if (mState == RefreshState.LoadFinish) {
-                                            notifyStateChanged(RefreshState.None);
-                                        }
-                                    }
-                                };
-                                if (mSpinner > 0) { //大于0表示下拉, 这是 Header 可见, Footer 不可见
-                                    animator = mKernel.animSpinner(0);//关闭 Header 回到原始状态
-                                } else if (updateListener != null || mSpinner == 0) {//如果 Header 和 Footer 都不可见 或者内容需要滚动显示新内容
-                                    if (reboundAnimator != null) {
-                                        reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-                                        reboundAnimator.cancel();//会触发 cancel 和 end 调用
-                                        reboundAnimator = null;//取消之前的任何动画
-                                    }
-                                    //直接关闭 Header 或者 Header 到原始状态
-                                    mKernel.moveSpinner(0, false);
-                                    mKernel.setState(RefreshState.None);
-                                } else {//准备按正常逻辑关闭Footer
-                                    if (noMoreData && mEnableFooterFollowWhenNoMoreData) {//如果需要显示没有更多数据
-                                        if (mSpinner >= -mFooterHeight) {//如果 Footer 的位置再可见范围内
-                                            notifyStateChanged(RefreshState.None);//直接通知重置状态,不关闭 Footer
-                                        } else {//如果 Footer 的位置超出 Footer 显示高度 (这个情况的概率应该很低, 手指故意拖拽 Footer 向上超出原位置时会触发)
-                                            animator = mKernel.animSpinner(-mFooterHeight);//通过动画让 Footer 回到全显示状态位置
-                                        }
-                                    } else {
-                                        animator = mKernel.animSpinner(0);//动画正常关闭 Footer
-                                    }
+                            };
+                            if (mSpinner > 0) { //大于0表示下拉, 这是 Header 可见, Footer 不可见
+                                animator = mKernel.animSpinner(0);//关闭 Header 回到原始状态
+                            } else if (updateListener != null || mSpinner == 0) {//如果 Header 和 Footer 都不可见 或者内容需要滚动显示新内容
+                                if (reboundAnimator != null) {
+                                    reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
+                                    reboundAnimator.cancel();//会触发 cancel 和 end 调用
+                                    reboundAnimator = null;//取消之前的任何动画
                                 }
-                                if (animator != null) {
-                                    animator.addListener(listenerAdapter);//如果通过动画关闭,绑定动画结束回调
+                                //直接关闭 Header 或者 Header 到原始状态
+                                mKernel.moveSpinner(0, false);
+                                mKernel.setState(RefreshState.None);
+                            } else {//准备按正常逻辑关闭Footer
+                                if (noMoreData && mEnableFooterFollowWhenNoMoreData) {//如果需要显示没有更多数据
+                                    if (mSpinner >= -mFooterHeight) {//如果 Footer 的位置再可见范围内
+                                        notifyStateChanged(RefreshState.None);//直接通知重置状态,不关闭 Footer
+                                    } else {//如果 Footer 的位置超出 Footer 显示高度 (这个情况的概率应该很低, 手指故意拖拽 Footer 向上超出原位置时会触发)
+                                        animator = mKernel.animSpinner(-mFooterHeight);//通过动画让 Footer 回到全显示状态位置
+                                    }
                                 } else {
-                                    listenerAdapter.onAnimationEnd(null);//如果没有动画,立即执行结束回调(必须逻辑)
+                                    animator = mKernel.animSpinner(0);//动画正常关闭 Footer
                                 }
+                            }
+                            if (animator != null) {
+                                animator.addListener(listenerAdapter);//如果通过动画关闭,绑定动画结束回调
+                            } else {
+                                listenerAdapter.onAnimationEnd(null);//如果没有动画,立即执行结束回调(必须逻辑)
                             }
                         }, mSpinner < 0 ? startDelay : 0);
                     }
@@ -2948,50 +2838,44 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     @Override
     public boolean autoRefresh(int delayed, final int duration, final float dragRate, final boolean animationOnly) {
         if (mState == RefreshState.None && isEnableRefreshOrLoadMore(mEnableRefresh)) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (mViceState != RefreshState.Refreshing) return;
-                    if (reboundAnimator != null) {
-                        reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-                        reboundAnimator.cancel();//会触发 cancel 和 end 调用
-                        reboundAnimator = null;
-                    }
-
-                    final View thisView = RefreshLayout.this;
-                    mLastTouchX = thisView.getMeasuredWidth() / 2f;
-                    mKernel.setState(RefreshState.PullDownToRefresh);
-
-                    reboundAnimator = ValueAnimator.ofInt(mSpinner, (int) (mHeaderHeight * dragRate));
-                    reboundAnimator.setDuration(duration);
-                    reboundAnimator.setInterpolator(new SmartUtil(SmartUtil.INTERPOLATOR_VISCOUS_FLUID));
-                    reboundAnimator.addUpdateListener(new AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            if (reboundAnimator != null && mRefreshHeader != null) {
-                                mKernel.moveSpinner((int) animation.getAnimatedValue(), true);
-                            }
-                        }
-                    });
-                    reboundAnimator.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            if (animation != null && animation.getDuration() == 0) {
-                                return;//0 表示被取消
-                            }
-                            reboundAnimator = null;
-                            if (mRefreshHeader != null) {
-                                if (mState != RefreshState.ReleaseToRefresh) {
-                                    mKernel.setState(RefreshState.ReleaseToRefresh);
-                                }
-                                setStateRefreshing(!animationOnly);
-                            } else {
-                                mKernel.setState(RefreshState.None);
-                            }
-                        }
-                    });
-                    reboundAnimator.start();
+            Runnable runnable = () -> {
+                if (mViceState != RefreshState.Refreshing) return;
+                if (reboundAnimator != null) {
+                    reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
+                    reboundAnimator.cancel();//会触发 cancel 和 end 调用
+                    reboundAnimator = null;
                 }
+
+                final View thisView = RefreshLayout.this;
+                mLastTouchX = thisView.getMeasuredWidth() / 2f;
+                mKernel.setState(RefreshState.PullDownToRefresh);
+
+                reboundAnimator = ValueAnimator.ofInt(mSpinner, (int) (mHeaderHeight * dragRate));
+                reboundAnimator.setDuration(duration);
+                reboundAnimator.setInterpolator(new SmartUtil(SmartUtil.INTERPOLATOR_VISCOUS_FLUID));
+                reboundAnimator.addUpdateListener(animation -> {
+                    if (reboundAnimator != null && mRefreshHeader != null) {
+                        mKernel.moveSpinner((int) animation.getAnimatedValue(), true);
+                    }
+                });
+                reboundAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (animation != null && animation.getDuration() == 0) {
+                            return;//0 表示被取消
+                        }
+                        reboundAnimator = null;
+                        if (mRefreshHeader != null) {
+                            if (mState != RefreshState.ReleaseToRefresh) {
+                                mKernel.setState(RefreshState.ReleaseToRefresh);
+                            }
+                            setStateRefreshing(!animationOnly);
+                        } else {
+                            mKernel.setState(RefreshState.None);
+                        }
+                    }
+                });
+                reboundAnimator.start();
             };
             setViceState(RefreshState.Refreshing);
             if (delayed > 0) {
@@ -3055,50 +2939,44 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
     @Override
     public boolean autoLoadMore(int delayed, final int duration, final float dragRate, final boolean animationOnly) {
         if (mState == RefreshState.None && (isEnableRefreshOrLoadMore(mEnableLoadMore) && !mFooterNoMoreData)) {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (mViceState != RefreshState.Loading) return;
-                    if (reboundAnimator != null) {
-                        reboundAnimator.setDuration(0);//cancel会触发End调用，可以判断0来确定是否被cancel
-                        reboundAnimator.cancel();//会触发 cancel 和 end 调用
-                        reboundAnimator = null;
-                    }
-
-                    final View thisView = RefreshLayout.this;
-                    mLastTouchX = thisView.getMeasuredWidth() / 2f;
-                    mKernel.setState(RefreshState.PullUpToLoad);
-
-                    reboundAnimator = ValueAnimator.ofInt(mSpinner, -(int) (mFooterHeight * dragRate));
-                    reboundAnimator.setDuration(duration);
-                    reboundAnimator.setInterpolator(new SmartUtil(SmartUtil.INTERPOLATOR_VISCOUS_FLUID));
-                    reboundAnimator.addUpdateListener(new AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            if (reboundAnimator != null && mRefreshFooter != null) {
-                                mKernel.moveSpinner((int) animation.getAnimatedValue(), true);
-                            }
-                        }
-                    });
-                    reboundAnimator.addListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            if (animation != null && animation.getDuration() == 0) {
-                                return;//0 表示被取消
-                            }
-                            reboundAnimator = null;
-                            if (mRefreshFooter != null) {
-                                if (mState != RefreshState.ReleaseToLoad) {
-                                    mKernel.setState(RefreshState.ReleaseToLoad);
-                                }
-                                setStateLoading(!animationOnly);
-                            } else {
-                                mKernel.setState(RefreshState.None);
-                            }
-                        }
-                    });
-                    reboundAnimator.start();
+            Runnable runnable = () -> {
+                if (mViceState != RefreshState.Loading) return;
+                if (reboundAnimator != null) {
+                    reboundAnimator.setDuration(0);
+                    reboundAnimator.cancel();
+                    reboundAnimator = null;
                 }
+
+                final View thisView = RefreshLayout.this;
+                mLastTouchX = thisView.getMeasuredWidth() / 2f;
+                mKernel.setState(RefreshState.PullUpToLoad);
+
+                reboundAnimator = ValueAnimator.ofInt(mSpinner, -(int) (mFooterHeight * dragRate));
+                reboundAnimator.setDuration(duration);
+                reboundAnimator.setInterpolator(new SmartUtil(SmartUtil.INTERPOLATOR_VISCOUS_FLUID));
+                reboundAnimator.addUpdateListener(animation -> {
+                    if (reboundAnimator != null && mRefreshFooter != null) {
+                        mKernel.moveSpinner((int) animation.getAnimatedValue(), true);
+                    }
+                });
+                reboundAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (animation != null && animation.getDuration() == 0) {
+                            return;//0 表示被取消
+                        }
+                        reboundAnimator = null;
+                        if (mRefreshFooter != null) {
+                            if (mState != RefreshState.ReleaseToLoad) {
+                                mKernel.setState(RefreshState.ReleaseToLoad);
+                            }
+                            setStateLoading(!animationOnly);
+                        } else {
+                            mKernel.setState(RefreshState.None);
+                        }
+                    }
+                });
+                reboundAnimator.start();
             };
             setViceState(RefreshState.Loading);
             if (delayed > 0) {
@@ -3278,7 +3156,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         if (animation != null && animation.getDuration() == 0) {
-                            return;//0 表示被取消
+                            return;//0 means cancelled
                         }
                         mKernel.setState(RefreshState.TwoLevel);
                     }
@@ -3314,15 +3192,12 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
         }
 
         /**
-         * 移动滚动 Scroll
-         * moveSpinner 的取名来自 谷歌官方的 { android.support.v4.widget.SwipeRefreshLayout#moveSpinner(float)}
-         * moveSpinner The name comes from { android.support.v4.widget.SwipeRefreshLayout#moveSpinner(float)}
+         * The name of Scroll moveSpinner comes from Google's official {android.support.v4.widget.SwipeRefreshLayoutmoveSpinner(float)}
+         * moveSpinner The name comes from {android.support.v4.widget.SwipeRefreshLayoutmoveSpinner(float)}
          *
-         * @param spinner    新的 spinner
-         * @param isDragging 是否是拖动产生的滚动
-         *                   只有，finishRefresh，finishLoadMore，overSpinner 的回弹动画才会是 false
-         *                   dispatchTouchEvent , nestScroll 等都为 true
-         *                   autoRefresh，autoLoadMore，需要模拟拖动，也为 true
+         * @param spinner    new spinner
+         * @param isDragging Whether it is scrolling caused by dragging,
+         *                   only the rebound animation of finishRefresh, finishLoadMore, overSpinner will be false, dispatchTouchEvent, nestScroll, etc. are all true autoRefresh, autoLoadMore, need to simulate dragging, also true
          */
         public RefreshKernel moveSpinner(final int spinner, final boolean isDragging) {
             if (mSpinner == spinner && (mRefreshHeader == null || !mRefreshHeader.isSupportHorizontalDrag()) && (mRefreshFooter == null || !mRefreshFooter.isSupportHorizontalDrag())) {
@@ -3387,7 +3262,7 @@ public class RefreshLayout extends ViewGroup implements com.zj.views.list.refres
                 final int headerHeight = mHeaderHeight;
                 final int maxDragHeight = (int) (mHeaderHeight * mHeaderMaxDragRate);
                 final float percent = 1f * offset / (mHeaderHeight == 0 ? 1 : mHeaderHeight);
-                //因为用户有可能 finish 之后，直接 enable=false 关闭，所以还要加上 state 的状态判断
+                //Because the user may directly enable=false to close after finish, so the state judgment should be added
                 if (isEnableRefreshOrLoadMore(mEnableRefresh) || (mState == RefreshState.RefreshFinish && !isDragging)) {
                     if (oldSpinner != mSpinner) {
                         if (mRefreshHeader.getSpinnerStyle() == SpinnerStyle.Translate) {
