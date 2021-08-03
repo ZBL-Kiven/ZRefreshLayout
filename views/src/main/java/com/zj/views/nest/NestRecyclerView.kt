@@ -242,7 +242,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                         throw  IllegalArgumentException("NestRecyclerView does not support linkage with AppBarLayout in horizontal scrolling as a multi-layer nest")
                     }
                     val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.width, sup.height)
-                    lp.height = nrp.measuredHeight - (ahl.measuredHeight - getHeaderTotalHeight())
+                    lp.height = nrp.measuredHeight + getHeaderTotalHeight()
                     sup.layoutParams = lp
                 }
             }
@@ -254,7 +254,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
      * Find any [AppBarLayout] or [NestHeaderIn] as its head to achieve the scrolling linkage,
      * @see [NestHeaderIn]
      * */
-    private fun findDefaultOverScroller(anchor: View? = this, parentIds: MutableList<Int> = mutableListOf()): View? {
+    private fun findDefaultOverScroller(anchor: View? = this.parent as? ViewGroup, parentIds: MutableList<Int> = mutableListOf()): View? {
         if (anchor == null) return null
         if (nestHeader == null) {
             (anchor as? ViewGroup)?.let { p ->
