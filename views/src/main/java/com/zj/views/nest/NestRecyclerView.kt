@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -241,10 +242,13 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                     if (nrp.orientation == LinearLayout.HORIZONTAL) {
                         throw  IllegalArgumentException("NestRecyclerView does not support linkage with AppBarLayout in horizontal scrolling as a multi-layer nest")
                     }
-                    val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.width, sup.height)
-                    lp.height = nrp.measuredHeight + getHeaderTotalHeight()
-                    sup.layoutParams = lp
+                    if (nrp != sup && sup.height >= nrp.height) {
+                        val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.width, sup.height)
+                        lp.height = nrp.measuredHeight - (ahl.measuredHeight - getHeaderTotalHeight())
+                        sup.layoutParams = lp
+                    }
                 }
+                else -> Log.e("NestRecyclerViewError", "case: When the head and NestRecyclerView are not specified as a vertical dependency, their height will not be accurately calculated. It is recommended to use a vertical LinearLayout as the parent of the head view")
             }
         }
         requestLayout()
