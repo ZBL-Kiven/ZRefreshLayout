@@ -144,7 +144,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
      * that implement [androidx.core.view.NestedScrollingChild3] [androidx.core.view.NestedScrollingChild3],
      * and its [getNestedChild] will receive scroll events after [canScrollVertically] false
      * */
-    override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?, type: Int): Boolean { //        var consumedSelf = false
+    override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?, type: Int): Boolean {
         if ((!isNestHeaderFold() && !canScrollVertically(-1)) || interceptNextEvent == true) return false
         val consume = consumed ?: IntArray(2)
         if (dy > 0) { // up
@@ -242,8 +242,8 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                     if (nrp.orientation == LinearLayout.HORIZONTAL) {
                         throw  IllegalArgumentException("NestRecyclerView does not support linkage with AppBarLayout in horizontal scrolling as a multi-layer nest")
                     }
-                    if (nrp != sup && sup.height >= nrp.height) {
-                        val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.width, sup.height)
+                    if (nrp != sup && (sup.measuredHeight <= 0 || sup.measuredHeight >= nrp.measuredHeight)) {
+                        val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.measuredHeight, sup.measuredHeight)
                         lp.height = nrp.measuredHeight - (ahl.measuredHeight - getHeaderTotalHeight())
                         sup.layoutParams = lp
                     }
