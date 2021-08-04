@@ -267,6 +267,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                     if (v is AppBarLayout || v is NestHeaderIn) {
                         nestRootParent = p
                         nestHeader = v
+                        if (parentIds.isNullOrEmpty()) selfUnderTheAppBarRootParent = nestRootParent
                     } else {
                         parentIds.add(p.id)
                     }
