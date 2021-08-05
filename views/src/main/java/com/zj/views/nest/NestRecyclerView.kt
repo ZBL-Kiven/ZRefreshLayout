@@ -1,4 +1,4 @@
-package com.zj.viewtest.partition.util.nest2
+package com.zj.views.nest
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -17,8 +17,22 @@ import kotlin.math.roundToInt
 
 /**
  * Created by Zjj on 21.7.7
+ *
+ * Recyclable components used to support multiple nested sliding.
+ * It must be set to [NestScrollerIn] through the [withNestIn] method to mark an inline recyclable list of unlimited length.
+ * @see [getNestedChild]. Of course the inline view should be a [androidx.core.view.NestedScrollingChild].
+ * The Wrapper of this view is not subject to any restrictions.
+ *
+ * NestRecyclerView supports linkage with other Views as Header, and AppBarLayout is supported by default.
+ * You can to use [AppBarLayout] as the linkage head to make it more convenient to use the SystemUi compatible solution and the specified distance linkage solution specified by the system.
+ * If you need to customize the linkage Header, please implement the [NestHeaderIn] protocol in any View and add it to any parents leaf node or root node.
+ *
+ * How to use:
+ *
+ * It just a RecyclerView, and then set other View in Child that need nested scrolling through [withNestIn].
+ * To set the linkage header, directly include the corresponding header View in the XML or ViewTree
  * */
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 open class NestRecyclerView @JvmOverloads constructor(context: Context, attributeSet: AttributeSet? = null, def: Int = 0) : RecyclerView(context, attributeSet, def) {
 
     private val mParentScrollConsumed = IntArray(2)
@@ -72,9 +86,9 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     }
 
     /**
-     * NestRecyclerView supports linkage with other Views as Header, and AppBarLayout is supported by default.
-     * You can to use [AppBarLayout] as the linkage head to make it more convenient to use the SystemUi compatible solution and the specified distance linkage solution specified by the system.
-     * If you need to customize the linkage Header, please implement the [NestHeaderIn] protocol in any View and add it to any parents leaf node or root node.
+     * This setting does not affect the linkage function of the header,
+     * it only calls back after scrolling has occurred,
+     * the maximum scrolling distance, see [NestHeaderIn.getTotalScrollRange]
      * */
     fun setOnHeaderOffsetChangedListener(l: HeaderOffsetChangedListener?) {
         this.headerOffsetChangedListener = l
@@ -336,7 +350,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         }
     }
 
-    open fun abortScroller() {
+    fun abortScroller() {
         if (!overScroller.isFinished) {
             overScroller.abortAnimation()
         }
