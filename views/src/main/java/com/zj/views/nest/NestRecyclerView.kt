@@ -1,14 +1,12 @@
-package com.zj.views.nest
+package com.zj.viewtest.partition.util.nest2
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.OverScroller
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.NestedScrollingParent
@@ -207,7 +205,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     private fun checkNotCoordinatorParent(anchor: View? = this) {
         anchor?.parent?.let {
             return if (it is CoordinatorLayout) {
-                throw IllegalArgumentException("NestRecyclerView cannot be a subclass of CoordinatorLayout.If you need to implement Martial-Design's Appbar function, you can add a AppBarLayout under the same levels leaf layout or root layout.")
+                throw IllegalArgumentException("NestRecyclerView cannot be a child of CoordinatorLayout.If you need to implement Martial-Design's Appbar function, you can add a AppBarLayout or some view extends [NestHeaderIn] under the same levels leaf layout or root layout.")
             } else checkNotCoordinatorParent(it as? View)
         }
     }
@@ -232,23 +230,28 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return firstFlags
     }
 
-    private fun onPatchNestMeasureHeight() {
+    /**
+     * In order to meet the head linkage displacement situation,
+     * set the offset of the ViewGroup containing the root node to ensure that after the view is scrolled,
+     * the remaining views can completely fill the root node
+     * */
+    open fun onPatchNestMeasureHeight() {
         val nrp = nestRootParent
         val ahl = nestHeader
         val sup = selfUnderTheAppBarRootParent
+        if (nestRootParent?.scrollY != 0) return
         if (nrp != null && ahl != null && sup != null) {
-            when (nrp) {
-                is LinearLayout -> {
-                    if (nrp.orientation == LinearLayout.HORIZONTAL) {
-                        throw  IllegalArgumentException("NestRecyclerView does not support linkage with AppBarLayout in horizontal scrolling as a multi-layer nest")
-                    }
-                    if (nrp != sup && (sup.measuredHeight <= 0 || sup.measuredHeight >= nrp.measuredHeight)) {
-                        val lp = sup.layoutParams ?: LinearLayout.LayoutParams(sup.measuredHeight, sup.measuredHeight)
-                        lp.height = nrp.measuredHeight - (ahl.measuredHeight - getHeaderTotalHeight())
-                        sup.layoutParams = lp
-                    }
-                }
-                else -> Log.e("NestRecyclerViewError", "case: When the head and NestRecyclerView are not specified as a vertical dependency, their height will not be accurately calculated. It is recommended to use a vertical LinearLayout as the parent of the head view")
+            val width = nrp.measuredWidth
+            val lp = nrp.layoutParams ?: ViewGroup.LayoutParams(if (width == 0) ViewGroup.LayoutParams.MATCH_PARENT else width, 0)
+            lp.height = nrp.measuredHeight + getHeaderTotalHeight()
+            nrp.layoutParams = lp
+            val spr = nrp.height - sup.top
+            if (spr < sup.height) {
+                val lp1 = sup.layoutParams ?: ViewGroup.LayoutParams(if (sup.measuredWidth == 0) {
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                } else sup.measuredWidth, sup.measuredHeight)
+                lp1.height = spr
+                sup.layoutParams = lp1
             }
         }
         requestLayout()
@@ -265,20 +268,22 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                 repeat(p.childCount) {
                     val v = p.getChildAt(it)
                     if (v is AppBarLayout || v is NestHeaderIn) {
-                        nestRootParent = p
                         nestHeader = v
-                        if (parentIds.isNullOrEmpty()) selfUnderTheAppBarRootParent = nestRootParent
-                    } else {
-                        parentIds.add(p.id)
                     }
                 }
                 if (nestHeader == null) {
+                    parentIds.add(p.id)
                     return findDefaultOverScroller(p.parent as? View, parentIds)
                 } else {
-                    repeat(p.childCount) {
-                        val v = p.getChildAt(it)
-                        if (v.id in parentIds) {
-                            selfUnderTheAppBarRootParent = v as? ViewGroup
+                    nestRootParent = p
+                    if (parentIds.isNullOrEmpty()) {
+                        selfUnderTheAppBarRootParent = p
+                    } else {
+                        repeat(p.childCount) {
+                            val v = p.getChildAt(it)
+                            if (v.id in parentIds) {
+                                selfUnderTheAppBarRootParent = v as? ViewGroup
+                            }
                         }
                     }
                 }
@@ -304,6 +309,10 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         return flags?.and(flag) == flag
     }
 
+    /**
+     * When ScrollFlags is contains [AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP], after stop touching or scrolling,
+     * the [nestHeader] will automatically expand or collapse based on distance
+     * */
     private fun checkPendingSnapEvent(dy: Float = 0f) {
         if (!isNestHeaderFold()) {
             val offset = getScrolledOffset()
@@ -327,7 +336,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         }
     }
 
-    private fun abortScroller() {
+    open fun abortScroller() {
         if (!overScroller.isFinished) {
             overScroller.abortAnimation()
         }
@@ -440,11 +449,13 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     }
 
     open fun getHeaderTotalHeight(): Int {
-        (nestHeader as? AppBarLayout)?.let {
-            return it.totalScrollRange
-        }
-        (nestHeader as? NestHeaderIn)?.let {
-            return it.getTotalScrollRange()
+        nestHeader?.let { ns ->
+            (ns as? AppBarLayout)?.let {
+                return it.totalScrollRange + if (it.totalScrollRange == it.height) -1 else 0
+            }
+            (ns as? NestHeaderIn)?.let {
+                return it.getTotalScrollRange() + if (it.getTotalScrollRange() == ns.height) -1 else 0
+            }
         }
         return 0
     }
