@@ -39,7 +39,6 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     private var nestScrollerIn: NestScrollerIn? = null
     private var mCurrentFling = 0
     private var nestRootParent: ViewGroup? = null
-    private var selfUnderTheAppBarRootParent: ViewGroup? = null
     private var consumedSelf: Boolean = false
     private var interceptNextEvent: Boolean? = null
     private var overScrollerDispatchToParent: Boolean = true
@@ -251,31 +250,22 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
      * */
     open fun onPatchNestMeasureHeight() {
         val nrp = nestRootParent
-        val ahl = nestHeader
-        val sup = selfUnderTheAppBarRootParent
-        if (nestRootParent?.scrollY != 0) return
-        if (nrp != null && ahl != null && sup != null) {
-            val width = nrp.measuredWidth
-            val lp = nrp.layoutParams ?: ViewGroup.LayoutParams(if (width == 0) ViewGroup.LayoutParams.MATCH_PARENT else width, 0)
-            lp.height = nrp.measuredHeight + getHeaderTotalHeight()
-            nrp.layoutParams = lp
-            val spr = nrp.height - sup.top
-            if (spr < sup.height) {
-                val lp1 = sup.layoutParams ?: ViewGroup.LayoutParams(if (sup.measuredWidth == 0) {
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                } else sup.measuredWidth, sup.measuredHeight)
-                lp1.height = spr
-                sup.layoutParams = lp1
+        val root = nrp?.parent as? View
+        if (root != null) {
+            if (nrp.bottom < root.bottom + getHeaderTotalHeight()) {
+                val width = nrp.measuredWidth
+                val lp = nrp.layoutParams ?: ViewGroup.LayoutParams(if (width == 0) ViewGroup.LayoutParams.MATCH_PARENT else width, 0)
+                lp.height = root.bottom - nrp.top + getHeaderTotalHeight()
+                nrp.layoutParams = lp
             }
         }
-        requestLayout()
     }
 
     /**
      * Find any [AppBarLayout] or [NestHeaderIn] as its head to achieve the scrolling linkage,
      * @see [NestHeaderIn]
      * */
-    private fun findDefaultOverScroller(anchor: View? = this.parent as? ViewGroup, parentIds: MutableList<Int> = mutableListOf()): View? {
+    private fun findDefaultOverScroller(anchor: View? = this.parent as? ViewGroup): View? {
         if (anchor == null) return null
         if (nestHeader == null) {
             (anchor as? ViewGroup)?.let { p ->
@@ -286,20 +276,9 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                     }
                 }
                 if (nestHeader == null) {
-                    parentIds.add(p.id)
-                    return findDefaultOverScroller(p.parent as? View, parentIds)
+                    return findDefaultOverScroller(p.parent as? View)
                 } else {
                     nestRootParent = p
-                    if (parentIds.isNullOrEmpty()) {
-                        selfUnderTheAppBarRootParent = p
-                    } else {
-                        repeat(p.childCount) {
-                            val v = p.getChildAt(it)
-                            if (v.id in parentIds) {
-                                selfUnderTheAppBarRootParent = v as? ViewGroup
-                            }
-                        }
-                    }
                 }
             }
         }
