@@ -298,8 +298,9 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         }
     }
 
-    private fun checkFlags(flag: Int, flags: Int? = getScrollFlags()): Boolean {
-        return flags?.and(flag) == flag
+    private fun checkFlags(flag: Int, flags: Int = getScrollFlags()): Boolean {
+        if (flags <= 0) return false
+        return flags.and(flag) == flag
     }
 
     /**
@@ -312,6 +313,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
             nestHeader?.let {
                 val x2 = getHeaderTotalHeight() - offset
                 abortScroller()
+                if (!checkFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL)) return
                 if (checkFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP)) {
                     val d = if (offset > x2) x2 else -x2
                     post {
