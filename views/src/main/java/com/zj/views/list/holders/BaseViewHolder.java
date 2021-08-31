@@ -28,11 +28,10 @@ public class BaseViewHolder<T> extends RecyclerView.ViewHolder {
         super(v);
         this.mAdapter = adapter;
         parseArray = new SparseArray<>();
-        itemView.setOnClickListener(v1 -> {
-            if (mAdapter.onClickListener != null) {
-                mAdapter.onClickListener.onItemClick(getLayoutPosition(), itemView, mAdapter.getItem(getLayoutPosition()));
-            }
-        });
+        if (mAdapter.onClickListener != null) {
+            itemView.setOnClickListener(v1 -> mAdapter.onClickListener.onItemClick(getAbsoluteAdapterPosition(), itemView, mAdapter.getItem(getAbsoluteAdapterPosition())));
+            itemView.setOnLongClickListener(v1 -> mAdapter.onClickListener.onItemLongClick(getAbsoluteAdapterPosition(), itemView, mAdapter.getItem(getAbsoluteAdapterPosition())));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +73,6 @@ public class BaseViewHolder<T> extends RecyclerView.ViewHolder {
         view.setBackgroundResource(backgroundRes);
         return view;
     }
-
 
     public ImageView setImageDrawable(@IdRes int viewId, Drawable drawable) {
         ImageView view = getView(viewId);

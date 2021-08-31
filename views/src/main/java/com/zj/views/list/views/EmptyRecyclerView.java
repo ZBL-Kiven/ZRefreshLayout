@@ -61,8 +61,8 @@ public final class EmptyRecyclerView<T> extends RecyclerView {
                     }
 
                     @Override
-                    public void onItemLongClick(int position, View v, @Nullable T m) {
-                        adapterDataSet.onItemLongClick(position, v, m);
+                    public boolean onItemLongClick(int position, View v, @Nullable T m) {
+                        return adapterDataSet.onItemLongClick(position, v, m);
                     }
                 });
             }

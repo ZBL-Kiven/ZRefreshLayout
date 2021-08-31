@@ -12,8 +12,8 @@ public abstract class ItemClickListener<T> {
 
     public abstract void onItemClick(int position, View v, @Nullable T m);
 
-    public void onItemLongClick(int position, View v, @Nullable T m) {
-
+    public boolean onItemLongClick(int position, View v, @Nullable T m) {
+        return false;
     }
 
 }

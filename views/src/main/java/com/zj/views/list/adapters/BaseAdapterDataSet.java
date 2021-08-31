@@ -19,7 +19,7 @@ public abstract class BaseAdapterDataSet<T> {
 
     }
 
-    public void onItemLongClick(int position, View v, @Nullable T m) {
-
+    public boolean onItemLongClick(int position, View v, @Nullable T m) {
+        return false;
     }
 }

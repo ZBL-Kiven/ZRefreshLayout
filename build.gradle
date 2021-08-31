@@ -5,9 +5,8 @@ buildscript {
     ext.kotlin_version = '1.3.2'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -19,16 +18,9 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        maven {
-            credentials {
-                username 'iRqFxj'
-                password 'fMTKbe0WP6'
-            }
-            url 'https://repo.rdc.aliyun.com/repository/129757-release-BhhDH6/'
-        }
         maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url "https://jitpack.io" }
+        google()
+        mavenCentral()
     }
 }
 
