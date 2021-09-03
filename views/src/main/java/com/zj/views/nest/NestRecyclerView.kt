@@ -3,6 +3,8 @@ package com.zj.views.nest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -44,8 +46,14 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     private var overScrollerDispatchToParent: Boolean = true
     private var headerOffsetChangedListener: HeaderOffsetChangedListener? = null
     private var nestHeader: View? = null
+    private var inTouchMode = false
     private var lastY: Float = 0f
     private var lastDy: Float = 0f
+    private var checkSnapPendingCode = 0x1122d
+    private var mHandler = Handler(Looper.getMainLooper()) {
+        if (it.what == checkSnapPendingCode) checkPendingSnapEvent(lastDy)
+        return@Handler false
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onFinishInflate() {
@@ -58,6 +66,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
             nestHeader?.let {
                 onPatchNestMeasureHeight()
                 getScrollFlags()
+                requestLayout()
             }
             repeat(childCount) {
                 getChildAt(it).let { child ->
@@ -100,12 +109,16 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (ev == null) return super.dispatchTouchEvent(ev)
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
+            inTouchMode = true
             if (!overScroller.isFinished) {
                 overScroller.abortAnimation()
             }
         }
         when (ev.action) {
-            MotionEvent.ACTION_CANCEL -> abortScroller()
+            MotionEvent.ACTION_CANCEL -> {
+                inTouchMode = false
+                abortScroller()
+            }
             MotionEvent.ACTION_DOWN -> {
                 lastY = ev.rawY;interceptNextEvent = true
             }
@@ -122,7 +135,9 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                 }
             }
             MotionEvent.ACTION_UP -> {
-                checkPendingSnapEvent(lastDy)
+                inTouchMode = false
+                mHandler.removeMessages(checkSnapPendingCode)
+                mHandler.sendEmptyMessageDelayed(checkSnapPendingCode, 16)
             }
         }
         return super.dispatchTouchEvent(ev)
@@ -261,6 +276,22 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
         }
     }
 
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        super.onMeasure(widthSpec, heightSpec)
+        (nestRootParent as? View)?.let { np ->
+            val width = nestRootParent?.measuredWidth ?: 0
+            val height = np.layoutParams.height - getParentHeightFromRoot()
+            if (width > 0 && height > 0) setMeasuredDimension(width, height)
+        }
+    }
+
+    private fun getParentHeightFromRoot(view: View = this, total: Int = 0): Int {
+        var t = total
+        if (view == nestRootParent) return if (t <= 0) view.top else t else t += view.top
+        val parent = (view.parent as? View) ?: return t
+        return getParentHeightFromRoot(parent, t)
+    }
+
     /**
      * Find any [AppBarLayout] or [NestHeaderIn] as its head to achieve the scrolling linkage,
      * @see [NestHeaderIn]
@@ -308,6 +339,7 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
      * the [nestHeader] will automatically expand or collapse based on distance
      * */
     private fun checkPendingSnapEvent(dy: Float = 0f) {
+        if (inTouchMode) return
         if (!isNestHeaderFold()) {
             val offset = getScrolledOffset()
             nestHeader?.let {
@@ -381,6 +413,11 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
                 }
             }
             invalidate()
+        } else {
+            if (overScroller.isFinished) {
+                mHandler.removeMessages(checkSnapPendingCode)
+                mHandler.sendEmptyMessageDelayed(checkSnapPendingCode, 150)
+            }
         }
         super.computeScroll()
     }
@@ -409,7 +446,9 @@ open class NestRecyclerView @JvmOverloads constructor(context: Context, attribut
             x1 < getHeaderTotalHeight()
         } else {
             if (checkFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED)) {
-                !canScrollVertically(-1) && x1 < headView.height
+                val headerIsNotFold = x1 < headView.height
+                val contentExpand = !canScrollVertically(-1) && getNestedChild()?.canScrollVertically(-1) != true
+                return contentExpand && headerIsNotFold
             } else {
                 x1 < headView.height
             }
