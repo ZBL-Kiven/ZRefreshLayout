@@ -1,9 +1,12 @@
 package com.zj.test
 
 import android.os.Bundle
+import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.zj.cf.managers.BaseFragmentManager
+import com.zj.test.views.DynamicLivingImageView
+import com.zj.test.views.DynamicLivingTextView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -11,7 +14,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main_2)
         val ll = findViewById<LinearLayout>(R.id.group)
         object : BaseFragmentManager(this, R.id.fg_content, 0, ll, Frg1(), Frg2()) {}
-        //        FoldTextView ftv = findViewById(R.id.dtv);
-        //        ftv.setText("uyqgewf qwd qw ef weq fwe  fw ef q  sdv qwf qwe f ds c d cw e sd sd c sdc w fd wf uyqgewf qwd qw ef weq fwe  fw ef q  sdv qwf qwe f ds c d cw e sd sd c sdc w fd wfuyqgewf qwd qw ef weq fwe  fw ef q  sdv qwf qwe f ds c d cw e sd sd c sdc w fd wf uyqgewf qwd qw ef weq fwe  fw ef q  sdv qwf qwe f ds c d cw e sd sd c sdc w fd wf uyqgewf qwd qw ef weq fwe  fw ef q  sdv qwf qwe f ds c d cw e sd sd c sdc w fd wf");
     }
+
+    fun onActive(v: View) {
+        v.isSelected = !v.isSelected
+        if (v.isSelected) {
+            (v as DynamicLivingTextView).startLivingAnim()
+        } else {
+            (v as DynamicLivingTextView).stopLivingAnim()
+        }
+    }
+
+    fun onActiveImg(v: View) {
+        v.isSelected = !v.isSelected
+        if (v.isSelected) {
+            (v as DynamicLivingImageView).startLivingAnim()
+        } else {
+            (v as DynamicLivingImageView).stopLivingAnim()
+        }
+    }
+
 }
