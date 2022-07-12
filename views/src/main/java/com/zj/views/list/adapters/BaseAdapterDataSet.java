@@ -6,6 +6,8 @@ import androidx.annotation.Nullable;
 
 import com.zj.views.list.holders.BaseViewHolder;
 
+import java.util.List;
+
 
 /**
  * Created by ZJJ on 2018/4/9.
@@ -13,7 +15,7 @@ import com.zj.views.list.holders.BaseViewHolder;
 @SuppressWarnings("unused")
 public abstract class BaseAdapterDataSet<T> {
 
-    public abstract void initData(BaseViewHolder<T> holder, int position, @Nullable T module);
+    public abstract void initData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads);
 
     public void onItemClick(int position, View v, @Nullable T m) {
 

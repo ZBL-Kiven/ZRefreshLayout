@@ -79,6 +79,7 @@ public abstract class BaseAdapter<T> extends BaseRecyclerAdapter<BaseViewHolder<
         change(data);
     }
 
+    @NonNull
     @Override
     public final BaseViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         this.context = parent.getContext();

@@ -49,7 +49,7 @@ public final class EmptyRecyclerView<T> extends RecyclerView {
             adapter = new BaseAdapter<T>(itemViewId) {
                 @Override
                 protected void initData(BaseViewHolder<T> holder, int position, @Nullable T module, List<Object> payloads) {
-                    if (adapterDataSet != null) adapterDataSet.initData(holder, position, module);
+                    if (adapterDataSet != null) adapterDataSet.initData(holder, position, module, payloads);
                 }
             };
             setAdapter(adapter);
